@@ -3,16 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package models.memberFactory;
+package models.Server;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
-import models.member.Member;
+import models.ICity;
 
 /**
  *
  * @author Joseph
  */
-public abstract class MemberFactory {
+public interface IServer extends Remote {
 
-    protected abstract Member createMember(int id, int age, int x, int y, double rNumber) throws RemoteException;
+    public void addCity(ICity ic) throws RemoteException;
+
+    public void removeCity(ICity ic) throws RemoteException;
 }

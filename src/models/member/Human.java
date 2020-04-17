@@ -6,7 +6,11 @@
 package models.member;
 
 import java.awt.Graphics;
-import java.rmi.RemoteException;
+import models.City;
+import models.Server.HumanAgeType;
+import models.Server.MonteCarlo;
+import models.Server.ReligionType;
+import models.location.House;
 
 /**
  *
@@ -16,15 +20,11 @@ public class Human extends Member {
 
     private String firstName;
     private String lastName;
+    private ReligionType religionType;
+    private HumanAgeType humanAgeType;
 
     @Override
     protected void draw(Graphics g) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void notify(String message) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public String getFirstName() {
@@ -43,14 +43,26 @@ public class Human extends Member {
         this.lastName = lastName;
     }
 
-    public Human(String firstName, String lastName, int id, int age, int x, int y, double rNumber) throws RemoteException {
-        super(id, age, x, y, rNumber);
+    public Human(String firstName, String lastName, int id, int x, int y, House ownHouse, City city) {
+        super(id, x, y, ownHouse, city);
         this.firstName = firstName;
         this.lastName = lastName;
     }
 
-    public Human(int id, int age, int x, int y, double rNumber) throws RemoteException {
-        super(id, age, x, y, rNumber);
+    public Human(int id, int x, int y, House ownHouse, City city, ReligionType religionType) {
+        super(id, x, y, ownHouse, city);
+        this.religionType = religionType;
+        this.humanAgeType = MonteCarlo.getHumanAgeType();
+        this.age = MonteCarlo.getHumanAge(humanAgeType);
+    }
+
+    public Human(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    public Human() {
+        super();
     }
 
 }

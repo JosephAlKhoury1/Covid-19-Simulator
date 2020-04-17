@@ -6,47 +6,25 @@
 package models.member;
 
 import java.awt.Graphics;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.io.Serializable;
+import models.City;
+import models.location.House;
+import views.tile.Tile;
 
 /**
  *
  * @author Joseph
  */
-public abstract class Member extends UnicastRemoteObject implements IMember {
+public abstract class Member implements Runnable, Serializable {
 
+    protected int x, y;
     protected int id;
+    protected House ownHouse;
+    protected City city;
+    protected Tile myTile;
     protected int age;
-    protected int x;
-    protected int y;
-    protected double rNumber;
 
-    public Member(int id, int age, int x, int y, double rNumber) throws RemoteException {
-        this.id = id;
-        this.age = age;
-        this.x = x;
-        this.y = y;
-        this.rNumber = rNumber;
-    }
-
-    public Member() throws RemoteException {
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
+    protected abstract void draw(Graphics g);
 
     public int getX() {
         return x;
@@ -64,13 +42,73 @@ public abstract class Member extends UnicastRemoteObject implements IMember {
         this.y = y;
     }
 
-    public double getrNumber() {
-        return rNumber;
+    public Member(int id, int x, int y, House ownHouse, City city) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.ownHouse = ownHouse;
     }
 
-    public void setrNumber(double rNumber) {
-        this.rNumber = rNumber;
+    public Member() {
     }
 
-    protected abstract void draw(Graphics g);
+    public int getId() {
+        return this.id;
+    }
+
+    public House getOwnHouse() {
+        return ownHouse;
+    }
+
+    public void setOwnHouse(House ownHouse) {
+        this.ownHouse = ownHouse;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public void moveUp() {
+        y = y - 1;
+    }
+
+    public void moveDown() {
+        y = y + 1;
+    }
+
+    public void moveLeft() {
+        x = x - 1;
+    }
+
+    public void moveRight() {
+        x = x + 1;
+    }
+
+    public Tile getMyTile() {
+        return myTile;
+    }
+
+    public void setMyTile(Tile myTile) {
+        this.myTile = myTile;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+    
+
+    @Override
+    public void run() {
+        while (true) {
+
+        }
+    }
 }

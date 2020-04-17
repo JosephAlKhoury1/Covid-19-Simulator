@@ -13,28 +13,18 @@ import models.member.Member;
  *
  * @author Joseph
  */
-public class SchoolBus extends Transportation{
+public class SchoolBus extends Transportation {
 
-    public SchoolBus(int id, int x, int y, int width, int height, double averageSick, int numberMember) throws RemoteException {
+    public SchoolBus(int id, int x, int y, int width, int height, double averageSick, int numberMember) {
         super(id, x, y, width, height, averageSick, numberMember);
     }
 
-    public SchoolBus() throws RemoteException {
+    public SchoolBus() {
     }
 
     @Override
-    protected void draw(Graphics g) throws RemoteException {
+    protected void draw(Graphics g) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    protected boolean isIn(Member m) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void notify(String message) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }

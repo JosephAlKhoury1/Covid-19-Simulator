@@ -6,15 +6,17 @@
 package models.transportation;
 
 import java.awt.Graphics;
+import java.io.Serializable;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+import java.util.Map;
 import models.member.Member;
 
 /**
  *
  * @author Joseph
  */
-public abstract class Transportation extends UnicastRemoteObject implements ITransportation {
+public abstract class Transportation implements Serializable {
 
     protected int id;
     protected int x;
@@ -23,8 +25,9 @@ public abstract class Transportation extends UnicastRemoteObject implements ITra
     protected int height;
     protected double averageSick;
     protected int numberMember;
+    protected Map<Integer, Member> listMember;
 
-    public Transportation(int id, int x, int y, int width, int height, double averageSick, int numberMember) throws RemoteException {
+    public Transportation(int id, int x, int y, int width, int height, double averageSick, int numberMember) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -32,9 +35,10 @@ public abstract class Transportation extends UnicastRemoteObject implements ITra
         this.height = height;
         this.averageSick = averageSick;
         this.numberMember = numberMember;
+        this.listMember = new HashMap();
     }
 
-    public Transportation() throws RemoteException {
+    public Transportation() {
     }
 
     public int getId() {
@@ -93,7 +97,18 @@ public abstract class Transportation extends UnicastRemoteObject implements ITra
         this.numberMember = numberMember;
     }
 
+    public void addMember(Member m) {
+        this.listMember.put(m.getId(), m);
+    }
+
+    public void removeMember(int id) {
+        this.listMember.remove(id);
+    }
+
+    public Map<Integer, Member> getListMember() {
+        return this.listMember;
+    }
+
     protected abstract void draw(Graphics g) throws RemoteException;
 
-    protected abstract boolean isIn(Member m) throws RemoteException;
 }

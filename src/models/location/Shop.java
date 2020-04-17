@@ -6,7 +6,11 @@
 package models.location;
 
 import java.awt.Graphics;
-import models.member.Member;
+import java.awt.Toolkit;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import models.City;
+import static models.location.LocationData.*;
 
 /**
  *
@@ -14,21 +18,30 @@ import models.member.Member;
  */
 public class Shop extends Location{
 
-    public Shop(int id, int x, int y, int width, int height, double average_sick) {
-        super(id, x, y, width, height, average_sick);
+    public Shop(int x, int y, double average_sick, JPanel panel, City city) {
+        super(x, y, WTILESHOP, HTILESHOP, average_sick, panel, city);
+        loadImage();
     }
 
     public Shop() {
     }
 
     @Override
-    protected void draw(Graphics g) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void draw(Graphics g) {
+         g.drawImage(image, x, y, width, height, panel);
+        Toolkit.getDefaultToolkit().sync();
     }
 
     @Override
-    protected boolean isIn(Member m) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected void loadImage() {
+        ImageIcon ii = new ImageIcon("C:\\Users\\Joseph\\Documents\\NetBeansProjects\\Covid-19Sim\\src\\models\\resources\\shop.jpg");
+        image = ii.getImage();
     }
+
+    @Override
+    public void initPopulation() {
+    }
+
+
     
 }

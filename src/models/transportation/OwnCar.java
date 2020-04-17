@@ -6,36 +6,22 @@
 package models.transportation;
 
 import java.awt.Graphics;
-import java.rmi.RemoteException;
-import models.member.Member;
 
 /**
  *
  * @author Joseph
  */
-public class OwnCar extends Transportation{
+public class OwnCar extends Transportation {
 
-    public OwnCar(int id, int x, int y, int width, int height, double averageSick, int numberMember) throws RemoteException {
+    public OwnCar(int id, int x, int y, int width, int height, double averageSick, int numberMember) {
         super(id, x, y, width, height, averageSick, numberMember);
     }
 
-    public OwnCar() throws RemoteException {
-    }
-
-    
-    @Override
-    protected void draw(Graphics g) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public OwnCar() {
     }
 
     @Override
-    protected boolean isIn(Member m) throws RemoteException {
+    protected void draw(Graphics g) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
-    @Override
-    public void notify(String message) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }

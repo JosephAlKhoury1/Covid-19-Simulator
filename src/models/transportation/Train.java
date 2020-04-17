@@ -15,26 +15,16 @@ import models.member.Member;
  */
 public class Train extends Transportation{
 
-    public Train(int id, int x, int y, int width, int height, double averageSick, int numberMember) throws RemoteException {
+    public Train(int id, int x, int y, int width, int height, double averageSick, int numberMember) {
         super(id, x, y, width, height, averageSick, numberMember);
     }
 
-    public Train() throws RemoteException {
+    public Train(){
     }
 
     @Override
-    protected void draw(Graphics g) throws RemoteException {
+    protected void draw(Graphics g) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    protected boolean isIn(Member m) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void notify(String message) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }
