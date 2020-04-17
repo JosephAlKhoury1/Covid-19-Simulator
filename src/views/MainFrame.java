@@ -184,6 +184,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jButton19.setText("Generate Transportations");
         jButton19.setToolTipText("");
+        jButton19.setEnabled(false);
 
         generatePopulation.setText("Generate Population");
         generatePopulation.setToolTipText("");
