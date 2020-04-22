@@ -8,6 +8,7 @@ package models.member;
 import java.awt.Graphics;
 import java.io.Serializable;
 import models.City;
+import models.Server.SexeType;
 import models.location.House;
 import views.tile.Tile;
 
@@ -23,7 +24,7 @@ public abstract class Member implements Runnable, Serializable {
     protected City city;
     protected Tile myTile;
     protected int age;
-
+    protected SexeType sexeType;
     protected abstract void draw(Graphics g);
 
     public int getX() {
@@ -102,6 +103,14 @@ public abstract class Member implements Runnable, Serializable {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public SexeType getSexeType() {
+        return sexeType;
+    }
+
+    public void setSexeType(SexeType sexeType) {
+        this.sexeType = sexeType;
     }
     
 

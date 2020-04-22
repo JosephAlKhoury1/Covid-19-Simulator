@@ -43,6 +43,12 @@ public class City extends UnicastRemoteObject implements ICity {
     private Map<Integer, Shop> listShop;
     private Map<Integer, RefugeeCamp> listRefugeeCamp;
     private Map<Integer, DisplacementCamp> listDisplacementCamp;
+
+    private Map<Integer, Member> healthyMembers = new HashMap();
+    private Map<Integer, Member> sickMembers = new HashMap();
+    private Map<Integer, Member> recoveryMembers = new HashMap();
+    private Map<Integer, Member> deathMembers = new HashMap();
+
     private int nbPopulation = 0;
     private int id;
     private int width = 2000, height = 800;
@@ -63,7 +69,7 @@ public class City extends UnicastRemoteObject implements ICity {
 
     public City(int width, int height, int hospital, int school, int university, int church,
             int mosque, int shop, int house, int refugeeCamp, int displacementCamp) throws RemoteException {
-        Data.initHousePopulationPercentage();
+        //Data.initHousePopulationPercentage();
         this.listMember = new HashMap();
         this.listLocations = new HashMap();
         this.listChurch = new HashMap();

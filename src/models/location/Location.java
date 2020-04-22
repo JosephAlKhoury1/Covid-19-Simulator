@@ -14,10 +14,8 @@ import java.util.Map;
 import javax.swing.JPanel;
 import models.City;
 import models.Server.Data;
-import models.Server.MonteCarlo;
 import models.member.Member;
 import views.tile.Tile;
-import views.tile.TileType;
 
 /**
  *
@@ -106,6 +104,7 @@ public abstract class Location {
 
     public void addMember(Member m) {
         this.listMember.put(m.getId(), m);
+        this.city.getListMember().put(m.getId(), m);
     }
 
     public void removeMember(int id) {
@@ -159,6 +158,6 @@ public abstract class Location {
     public abstract void draw(Graphics g);
 
     protected abstract void loadImage();
-    
+
     public abstract void initPopulation();
 }

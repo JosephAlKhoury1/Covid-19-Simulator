@@ -39,10 +39,23 @@ public class MonteCarlo {
         }
     }
 
+    public static HumanAgeType getHumanAgeTypeWithoutChildren() {
+        while (true) {
+            int index = uniformFixedSeed.nextInt(Data.populationAgePercentageWithoutChildren.size());
+            HumanAgeType ht = (HumanAgeType) Data.populationAgePercentageWithoutChildren.keySet().toArray()[index];
+            Double prob = Data.populationAgePercentageWithoutChildren.get(ht) / 100d;
+            double newRandom = uniformFixedSeed.nextDouble();
+            if (newRandom <= prob) {
+                return (HumanAgeType) Data.populationAgePercentageWithoutChildren.keySet().toArray()[index];
+            }
+        }
+    }
+
     public static HumanAgeType getHumanAgeType() {
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.populationAgePercentage.size());
-            Double prob = Data.populationAgePercentage.get(index) / 100d;
+            HumanAgeType ht = (HumanAgeType) Data.populationAgePercentage.keySet().toArray()[index];
+            Double prob = Data.populationAgePercentage.get(ht) / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
                 return (HumanAgeType) Data.populationAgePercentage.keySet().toArray()[index];
@@ -60,10 +73,24 @@ public class MonteCarlo {
     public static ReligionType getHouseReligionType() {
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.houseReligionTypePercentage.size());
-            Double prob = Data.houseReligionTypePercentage.get(index) / 100d;
+            ReligionType rt = (ReligionType) Data.houseReligionTypePercentage.keySet().toArray()[index];
+            Double prob = Data.houseReligionTypePercentage.get(rt) / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
+                System.out.println("index=" + index);
                 return (ReligionType) Data.houseReligionTypePercentage.keySet().toArray()[index];
+            }
+        }
+    }
+
+    public static SexeType getSexeType() {
+        while (true) {
+            int index = uniformFixedSeed.nextInt(Data.humanSex.size());
+            SexeType st = (SexeType) Data.humanSex.keySet().toArray()[index];
+            Double prob = Data.humanSex.get(st) / 100d;
+            double newRandom = uniformFixedSeed.nextDouble();
+            if (newRandom <= prob) {
+                return (SexeType) Data.humanSex.keySet().toArray()[index];
             }
         }
     }

@@ -13,7 +13,7 @@ public enum ReligionType {
 
     christianReligion("Christian Religion"),
     islamicReligion("Islamic Religion");
-    private String type;
+    private final String type;
 
     private ReligionType(String type) {
         this.type = type;

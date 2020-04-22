@@ -27,8 +27,8 @@ public class House extends Location {
 
     public House(int x, int y, double average_sick, JPanel panel, City city) {
         super(x, y, WTILEHOUSE, HTILEHOUSE, average_sick, panel, city);
-        loadImage();
         this.religionType = MonteCarlo.getHouseReligionType();
+        loadImage();
     }
 
     public House() {
@@ -41,7 +41,7 @@ public class House extends Location {
     }
 
     @Override
-    protected void loadImage() {
+    protected final void loadImage() {
         ImageIcon ii = new ImageIcon("C:\\Users\\Joseph\\Documents\\NetBeansProjects\\Covid-19Sim\\src\\models\\resources\\house.jpg");
         image = ii.getImage();
     }
@@ -59,7 +59,7 @@ public class House extends Location {
         this.nbPopulation = MonteCarlo.getHousePopulation();
         this.listMember.clear();
         for (int i = 0; i < nbPopulation; i++) {
-            addMember(new Human(Data.numberPopulation++, x, y, this, city,this.religionType));
+            addMember(new Human(Data.numberPopulation++, x, y, this, city, this.religionType));
         }
     }
 
