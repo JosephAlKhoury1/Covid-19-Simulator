@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import models.Server.Data;
+import models.client.Data;
 import models.member.Member;
 
 /**

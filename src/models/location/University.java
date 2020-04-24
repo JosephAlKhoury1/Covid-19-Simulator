@@ -9,7 +9,7 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import models.City;
+import models.client.City;
 import static models.location.LocationData.*;
 
 /**
@@ -20,6 +20,7 @@ public class University extends Location {
 
     public University(int x, int y, double average_sick, JPanel panel, City city) {
         super(x, y, WTILEUNIVERSITY, HTILEUNIVERSITY, average_sick, panel, city);
+        this.fixedLocation = true;
         loadImage();
     }
 

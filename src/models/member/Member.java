@@ -7,9 +7,11 @@ package models.member;
 
 import java.awt.Graphics;
 import java.io.Serializable;
-import models.City;
-import models.Server.SexeType;
+import java.util.List;
+import models.client.City;
+import models.client.SexeType;
 import models.location.House;
+import models.location.Location;
 import views.tile.Tile;
 
 /**
@@ -25,7 +27,8 @@ public abstract class Member implements Runnable, Serializable {
     protected Tile myTile;
     protected int age;
     protected SexeType sexeType;
-    protected abstract void draw(Graphics g);
+    protected List<Location>listLocation;
+    public abstract void draw(Graphics g);
 
     public int getX() {
         return x;

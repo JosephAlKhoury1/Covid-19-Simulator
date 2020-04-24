@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package models;
+package models.client;
 
 import java.awt.Graphics;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
-import models.location.Location;
+import models.location.*;
 import models.member.Member;
 import models.transportation.Transportation;
 
@@ -28,4 +28,14 @@ public interface ICity extends Remote {
     public int getPopulation() throws RemoteException;
 
     public Map<Integer, Location> getListLocations() throws RemoteException;
+
+    public Hospital getHospital() throws RemoteException;
+
+    public School getSchool() throws RemoteException;
+
+    public University getUniversity() throws RemoteException;
+
+    public Church getChurch() throws RemoteException;
+
+    public Mosque getMosque() throws RemoteException;
 }

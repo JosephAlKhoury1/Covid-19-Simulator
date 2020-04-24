@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -5,13 +6,19 @@
  */
 package models.member;
 
+import models.client.ReligionType;
+import models.client.HumanAgeType;
+import models.client.MonteCarlo;
+import models.client.Data;
+import models.client.HumanStat;
 import java.awt.Graphics;
-import models.City;
-import models.Server.HumanAgeType;
-import models.Server.HumanStat;
-import models.Server.MonteCarlo;
-import models.Server.ReligionType;
+import java.rmi.RemoteException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import models.client.City;
 import models.location.House;
+import models.location.School;
+import models.location.University;
 
 /**
  *
@@ -25,8 +32,13 @@ public class Human extends Member {
     private HumanAgeType humanAgeType;
     private HumanStat humanStat;
 
+    private School school;
+    private University university;
+
     @Override
-    protected void draw(Graphics g) {
+    public void draw(Graphics g) {
+        g.setColor(Data.getColor(humanStat));
+        g.drawOval(x, y, 5, 5);
     }
 
     public String getFirstName() {
@@ -62,6 +74,24 @@ public class Human extends Member {
         this.age = MonteCarlo.getHumanAge(humanAgeType);
         this.setSexeType(MonteCarlo.getSexeType());
         this.humanStat = HumanStat.healthy;
+
+        boolean goSchool = MonteCarlo.checkProb(humanAgeType.getGoSchoolPercentage());
+        boolean goUniversity = MonteCarlo.checkProb(humanAgeType.getGoUniversityPercentage());
+        if (goSchool) {
+            try {
+                this.school = city.getSchool();
+            } catch (RemoteException ex) {
+                Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        if (goUniversity) {
+            try {
+                this.university = city.getUniversity();
+            } catch (RemoteException ex) {
+                Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     public Human(String firstName, String lastName) {
@@ -95,6 +125,22 @@ public class Human extends Member {
 
     public void setHumanStat(HumanStat humanStat) {
         this.humanStat = humanStat;
+    }
+
+    public School getSchool() {
+        return school;
+    }
+
+    public void setSchool(School school) {
+        this.school = school;
+    }
+
+    public University getUniversity() {
+        return university;
+    }
+
+    public void setUniversity(University university) {
+        this.university = university;
     }
 
 }

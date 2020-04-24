@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package models.Server;
+package models.client;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
-import models.ICity;
 
 /**
  *
@@ -19,7 +19,6 @@ public class Data {
     public static Map<Integer, ICity> listCity = new HashMap();
     public static Map<Integer, Double> housePopulationPercentage = new HashMap();
 
-    
     public static Map<HumanAgeType, Double> populationAgePercentage = new HashMap();
     public static Map<HumanAgeType, Double> populationAgePercentageWithoutChildren = new HashMap();
 
@@ -92,5 +91,27 @@ public class Data {
         initHumanSex();
         initPopulationAgePercentageWithoutChildren();
         iniPopulationAgePercentage();
+    }
+
+    public static Color getColor(HumanStat humanStat) {
+        if (null != humanStat) {
+            switch (humanStat) {
+                case healthy:
+                    return Color.GREEN;
+                case infected:
+                    return Color.ORANGE;
+                case immune:
+                    return Color.WHITE;
+                case inHospital:
+                    return Color.RED;
+                case sick:
+                    return Color.YELLOW;
+                case inIcu:
+                    return Color.PINK;
+                default:
+                    break;
+            }
+        }
+        return null;
     }
 }

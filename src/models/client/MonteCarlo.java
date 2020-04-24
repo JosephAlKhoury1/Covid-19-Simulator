@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package models.Server;
+package models.client;
 
 import java.util.Random;
 
@@ -64,10 +64,7 @@ public class MonteCarlo {
     }
 
     public static int getHumanAge(HumanAgeType humanAgeType) {
-        while (true) {
-            return getNextIntBetween2Number(humanAgeType.getMin(), humanAgeType.getMax());
-        }
-
+        return getNextIntBetween2Number(humanAgeType.getMin(), humanAgeType.getMax());
     }
 
     public static ReligionType getHouseReligionType() {
@@ -92,6 +89,16 @@ public class MonteCarlo {
             if (newRandom <= prob) {
                 return (SexeType) Data.humanSex.keySet().toArray()[index];
             }
+        }
+    }
+
+    public static boolean checkProb(double prob) {
+        Double pro = prob / 100d;
+        double newRandom = uniformFixedSeed.nextDouble();
+        if (newRandom <= pro) {
+            return true;
+        } else {
+            return false;
         }
     }
 }

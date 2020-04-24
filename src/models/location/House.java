@@ -9,10 +9,10 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import models.City;
-import models.Server.Data;
-import models.Server.MonteCarlo;
-import models.Server.ReligionType;
+import models.client.City;
+import models.client.Data;
+import models.client.MonteCarlo;
+import models.client.ReligionType;
 import static models.location.LocationData.*;
 import models.member.Human;
 

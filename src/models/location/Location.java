@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
-import models.City;
-import models.Server.Data;
+import models.client.City;
+import models.client.Data;
 import models.member.Member;
 import views.tile.Tile;
 
@@ -36,6 +36,7 @@ public abstract class Location {
     protected JPanel panel;
     protected City city;
     protected List<Tile> listTile;
+    protected boolean fixedLocation;
 
     public Location(int x, int y, int wTile, int hTile, double average_sick, JPanel panel, City city) {
         this.x = x;
@@ -153,6 +154,14 @@ public abstract class Location {
 
     public void sethTile(int hTile) {
         this.hTile = hTile;
+    }
+
+    public boolean isFixedLocation() {
+        return fixedLocation;
+    }
+
+    public void setFixedLocation(boolean fixedLocation) {
+        this.fixedLocation = fixedLocation;
     }
 
     public abstract void draw(Graphics g);

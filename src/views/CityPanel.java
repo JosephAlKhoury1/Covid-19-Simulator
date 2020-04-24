@@ -5,8 +5,8 @@ import java.awt.Graphics;
 import java.rmi.RemoteException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.City;
-import models.ICity;
+import models.client.City;
+import models.client.ICity;
 
 /**
  *

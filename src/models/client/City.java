@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package models;
+package models.client;
 
 import java.awt.Graphics;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import models.Server.Data;
-import models.Server.MonteCarlo;
 import models.location.*;
 import models.member.Member;
 import models.transportation.Transportation;
@@ -35,14 +35,14 @@ public class City extends UnicastRemoteObject implements ICity {
     private Map<Integer, ICity> topCities;
     private Map<Integer, ICity> bottomCities;
     private Map<Integer, House> listHouse;
-    private Map<Integer, Hospital> listHospital;
-    private Map<Integer, School> listSchool;
-    private Map<Integer, University> listUniversity;
-    private Map<Integer, Church> listChurch;
-    private Map<Integer, Mosque> listMosque;
-    private Map<Integer, Shop> listShop;
-    private Map<Integer, RefugeeCamp> listRefugeeCamp;
-    private Map<Integer, DisplacementCamp> listDisplacementCamp;
+    private List<Hospital> listHospital;
+    private List<School> listSchool;
+    private List<University> listUniversity;
+    private List<Church> listChurch;
+    private List<Mosque> listMosque;
+    private List<Shop> listShop;
+    private List<RefugeeCamp> listRefugeeCamp;
+    private List<DisplacementCamp> listDisplacementCamp;
 
     private Map<Integer, Member> healthyMembers = new HashMap();
     private Map<Integer, Member> sickMembers = new HashMap();
@@ -72,15 +72,15 @@ public class City extends UnicastRemoteObject implements ICity {
         //Data.initHousePopulationPercentage();
         this.listMember = new HashMap();
         this.listLocations = new HashMap();
-        this.listChurch = new HashMap();
-        this.listDisplacementCamp = new HashMap();
-        this.listHospital = new HashMap();
+        this.listChurch = new ArrayList();
+        this.listDisplacementCamp = new ArrayList();
+        this.listHospital = new ArrayList();
         this.listHouse = new HashMap();
-        this.listMosque = new HashMap();
-        this.listSchool = new HashMap();
-        this.listUniversity = new HashMap();
-        this.listRefugeeCamp = new HashMap();
-        this.listShop = new HashMap();
+        this.listMosque = new ArrayList();
+        this.listSchool = new ArrayList();
+        this.listUniversity = new ArrayList();
+        this.listRefugeeCamp = new ArrayList();
+        this.listShop = new ArrayList();
         this.listTransportations = new HashMap();
         this.leftCities = new HashMap();
         this.rightCities = new HashMap();
@@ -168,6 +168,9 @@ public class City extends UnicastRemoteObject implements ICity {
         for (Entry<Integer, Location> e : listLocations.entrySet()) {
             e.getValue().draw(g);
         }
+        for (Entry<Integer, Member> e : listMember.entrySet()) {
+            e.getValue().draw(g);
+        }
     }
 
     @Override
@@ -253,7 +256,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 Hospital h = new Hospital(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listHospital.put(listLocations.size(), h);
+                this.listHospital.add(h);
                 for (int a = 0; a < WTILEHOSPITAL; a++) {
                     for (int b = 0; b < HTILEHOSPITAL; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -286,7 +289,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 School h = new School(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listSchool.put(listLocations.size(), h);
+                this.listSchool.add(h);
                 for (int a = 0; a < WTILESCHOOL; a++) {
                     for (int b = 0; b < HTILESCHOOL; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -320,7 +323,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 University h = new University(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listUniversity.put(listLocations.size(), h);
+                this.listUniversity.add(h);
                 for (int a = 0; a < WTILEUNIVERSITY; a++) {
                     for (int b = 0; b < HTILEUNIVERSITY; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -354,7 +357,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 Church h = new Church(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listChurch.put(listLocations.size(), h);
+                this.listChurch.add(h);
                 for (int a = 0; a < WTILECHURCH; a++) {
                     for (int b = 0; b < HTILECHURCH; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -388,7 +391,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 Mosque h = new Mosque(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listMosque.put(listLocations.size(), h);
+                this.listMosque.add(h);
                 for (int a = 0; a < WTILEMOSQUE; a++) {
                     for (int b = 0; b < HTILEMOSQUE; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -422,7 +425,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 Shop h = new Shop(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listShop.put(listLocations.size(), h);
+                this.listShop.add(h);
                 for (int a = 0; a < WTILESHOP; a++) {
                     for (int b = 0; b < HTILESHOP; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -456,7 +459,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 RefugeeCamp h = new RefugeeCamp(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listRefugeeCamp.put(listLocations.size(), h);
+                this.listRefugeeCamp.add(h);
                 for (int a = 0; a < WTILEREFUGEECAMP; a++) {
                     for (int b = 0; b < HTILEREFUGEECAMP; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -490,7 +493,7 @@ public class City extends UnicastRemoteObject implements ICity {
             if (draw) {
                 DisplacementCamp h = new DisplacementCamp(map[i][j].getX(), map[i][j].getY(), percentageOfsick, this.cityPanel, this);
                 this.listLocations.put(listLocations.size(), h);
-                this.listDisplacementCamp.put(listLocations.size(), h);
+                this.listDisplacementCamp.add(h);
                 for (int a = 0; a < WTILEDISPLACEMENTCAMP; a++) {
                     for (int b = 0; b < HTILEDISPLACEMENTCAMP; b++) {
                         map[i + a][j + b].setWalking(false);
@@ -539,6 +542,56 @@ public class City extends UnicastRemoteObject implements ICity {
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public Hospital getHospital() throws RemoteException {
+        if (listHospital.size() > 0) {
+            int index = MonteCarlo.getNextInt(listHospital.size());
+            return listHospital.get(index);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public School getSchool() throws RemoteException {
+        if (listSchool.size() > 0) {
+            int index = MonteCarlo.getNextInt(listSchool.size());
+            return listSchool.get(index);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public University getUniversity() throws RemoteException {
+        if (listUniversity.size() > 0) {
+            int index = MonteCarlo.getNextInt(listUniversity.size());
+            return listUniversity.get(index);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Church getChurch() throws RemoteException {
+        if (listChurch.size() > 0) {
+            int index = MonteCarlo.getNextInt(listChurch.size());
+            return listChurch.get(index);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Mosque getMosque() throws RemoteException {
+        if (listMosque.size() > 0) {
+            int index = MonteCarlo.getNextInt(listMosque.size());
+            return listMosque.get(index);
+        } else {
+            return null;
         }
     }
 }
