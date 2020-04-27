@@ -7,6 +7,7 @@ package models.member;
 
 import java.awt.Graphics;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import models.client.City;
 import models.client.SexeType;
@@ -27,7 +28,8 @@ public abstract class Member implements Runnable, Serializable {
     protected Tile myTile;
     protected int age;
     protected SexeType sexeType;
-    protected List<Location>listLocation;
+    protected List<Location> listLocation;
+
     public abstract void draw(Graphics g);
 
     public int getX() {
@@ -51,6 +53,7 @@ public abstract class Member implements Runnable, Serializable {
         this.x = x;
         this.y = y;
         this.ownHouse = ownHouse;
+        this.listLocation = new ArrayList();
     }
 
     public Member() {
@@ -115,7 +118,6 @@ public abstract class Member implements Runnable, Serializable {
     public void setSexeType(SexeType sexeType) {
         this.sexeType = sexeType;
     }
-    
 
     @Override
     public void run() {

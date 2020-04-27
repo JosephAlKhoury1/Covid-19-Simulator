@@ -80,6 +80,7 @@ public class Human extends Member {
         if (goSchool) {
             try {
                 this.school = city.getSchool();
+                this.listLocation.add(school);
             } catch (RemoteException ex) {
                 Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -88,6 +89,7 @@ public class Human extends Member {
         if (goUniversity) {
             try {
                 this.university = city.getUniversity();
+                this.listLocation.add(this.university);
             } catch (RemoteException ex) {
                 Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
             }

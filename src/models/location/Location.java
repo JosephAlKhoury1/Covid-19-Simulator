@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package models.location;
 
 import java.awt.Graphics;
@@ -36,7 +31,7 @@ public abstract class Location {
     protected JPanel panel;
     protected City city;
     protected List<Tile> listTile;
-    protected boolean fixedLocation;
+    protected boolean fixedLocation = false;
 
     public Location(int x, int y, int wTile, int hTile, double average_sick, JPanel panel, City city) {
         this.x = x;
