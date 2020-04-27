@@ -79,7 +79,7 @@ public class Human extends Member {
         boolean goUniversity = MonteCarlo.checkProb(humanAgeType.getGoUniversityPercentage());
         if (goSchool) {
             try {
-                this.school = city.getSchool();
+                this.school = (School) city.getLocation("School");
                 this.listLocation.add(school);
             } catch (RemoteException ex) {
                 Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
@@ -88,7 +88,7 @@ public class Human extends Member {
 
         if (goUniversity) {
             try {
-                this.university = city.getUniversity();
+                this.university = (University) city.getLocation("University");
                 this.listLocation.add(this.university);
             } catch (RemoteException ex) {
                 Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);

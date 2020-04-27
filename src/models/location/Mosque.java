@@ -8,9 +8,8 @@ package models.location;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 import models.client.City;
-import static models.location.LocationData.*;
+import models.client.Data;
 
 /**
  *
@@ -18,8 +17,10 @@ import static models.location.LocationData.*;
  */
 public class Mosque extends Location{
 
-    public Mosque(int x, int y,double average_sick , JPanel panel, City city) {
-        super(x, y, WTILEMOSQUE, HTILEMOSQUE, average_sick , panel, city);
+    public Mosque(int x, int y,double average_sick ,City city) {
+        super(x, y,average_sick , city);
+        this.setWidth(LocationData.WTILEMOSQUE* Data.TileWidth);
+        this.setHeight(LocationData.HTILEMOSQUE* Data.TileHeight);
         loadImage();
     }
 
@@ -28,7 +29,7 @@ public class Mosque extends Location{
 
     @Override
     public void draw(Graphics g) {
-        g.drawImage(image, x, y, width, height, panel);
+        g.drawImage(image, x, y, width, height, city.getCityPanel());
         Toolkit.getDefaultToolkit().sync();
     }
 

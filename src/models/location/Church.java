@@ -3,9 +3,8 @@ package models.location;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 import models.client.City;
-import static models.location.LocationData.*;
+import models.client.Data;
 
 /**
  *
@@ -13,8 +12,10 @@ import static models.location.LocationData.*;
  */
 public class Church extends Location {
 
-    public Church(int x, int y, double average_sick, JPanel panel, City city) {
-        super(x, y, WTILECHURCH, HTILECHURCH, average_sick, panel, city);
+    public Church(int x, int y, double average_sick, City city) {
+        super(x, y, average_sick, city);
+        this.setWidth(LocationData.WTILECHURCH * Data.TileWidth);
+        this.setHeight(LocationData.HTILECHURCH * Data.TileHeight);
         loadImage();
     }
 
@@ -23,7 +24,7 @@ public class Church extends Location {
 
     @Override
     public void draw(Graphics g) {
-        g.drawImage(image, x, y, width, height, panel);
+        g.drawImage(image, x, y, width, height, city.getCityPanel());
         Toolkit.getDefaultToolkit().sync();
     }
 

@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JPanel;
 import models.client.City;
-import models.client.Data;
 import models.member.Member;
 import views.tile.Tile;
 
@@ -23,26 +21,18 @@ public abstract class Location {
     protected int y;
     protected int width;
     protected int height;
-    protected int wTile;
-    protected int hTile;
     protected double average_sick;
     protected Map<Integer, Member> listMember;
     protected Image image;
-    protected JPanel panel;
     protected City city;
     protected List<Tile> listTile;
     protected boolean fixedLocation = false;
 
-    public Location(int x, int y, int wTile, int hTile, double average_sick, JPanel panel, City city) {
+    public Location(int x, int y, double average_sick, City city) {
         this.x = x;
         this.y = y;
-        this.wTile = wTile;
-        this.hTile = hTile;
-        this.width = Data.TileWidth * wTile;
-        this.height = Data.TileHeight * hTile;
         this.average_sick = average_sick;
         this.listMember = new HashMap();
-        this.panel = panel;
         this.city = city;
         this.listTile = new ArrayList();
     }
@@ -133,22 +123,6 @@ public abstract class Location {
 
     public void addTile(Tile t) {
         this.listTile.add(t);
-    }
-
-    public int getwTile() {
-        return wTile;
-    }
-
-    public void setwTile(int wTile) {
-        this.wTile = wTile;
-    }
-
-    public int gethTile() {
-        return hTile;
-    }
-
-    public void sethTile(int hTile) {
-        this.hTile = hTile;
     }
 
     public boolean isFixedLocation() {

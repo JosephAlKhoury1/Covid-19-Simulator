@@ -5,7 +5,6 @@
  */
 package models.client;
 
-import java.awt.Graphics;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
@@ -23,19 +22,9 @@ public interface ICity extends Remote {
 
     public void notifyTransportation(Transportation t) throws RemoteException;
 
-    public void draw(Graphics g) throws RemoteException;
-
     public int getPopulation() throws RemoteException;
 
     public Map<Integer, Location> getListLocations() throws RemoteException;
 
-    public Hospital getHospital() throws RemoteException;
-
-    public School getSchool() throws RemoteException;
-
-    public University getUniversity() throws RemoteException;
-
-    public Church getChurch() throws RemoteException;
-
-    public Mosque getMosque() throws RemoteException;
+    public Location getLocation(String kind) throws RemoteException;
 }

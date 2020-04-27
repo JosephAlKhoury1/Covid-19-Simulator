@@ -16,29 +16,27 @@ public class CityPanel extends javax.swing.JPanel {
 
     private ICity city;
     private int width, height;
+    private City city1;
 
-    public CityPanel(int width, int height, int hospital, int school, int university, int church,
-            int mosque, int shop, int house, int refugeeCamp, int displacementCamp) {
+    public CityPanel(int width, int height) {
         this.width = width;
         this.height = height;
         try {
-            city = new City(width, height, hospital, school, university, church, mosque, shop, house, refugeeCamp, displacementCamp);
+            city = new City(width, height, this);
         } catch (RemoteException ex) {
             Logger.getLogger(CityPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         initComponents();
     }
 
-    
+    public void addCity(City city) {
+        this.city1 = city;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
-        try {
-            super.paintComponent(g);
-            city.draw(g);
-        } catch (RemoteException ex) {
-            Logger.getLogger(CityPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-       
+        super.paintComponent(g);
+        city1.draw(g);
     }
 
     public ICity getCity() {
@@ -47,6 +45,14 @@ public class CityPanel extends javax.swing.JPanel {
 
     public void setCity(ICity city) {
         this.city = city;
+    }
+
+    public City getCity1() {
+        return city1;
+    }
+
+    public void setCity1(City city1) {
+        this.city1 = city1;
     }
 
     @SuppressWarnings("unchecked")
@@ -59,11 +65,11 @@ public class CityPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 542, Short.MAX_VALUE)
+            .addGap(0, 642, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGap(0, 465, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 

@@ -2,13 +2,12 @@ package views;
 
 import java.awt.BorderLayout;
 import java.rmi.RemoteException;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import models.client.Data;
-import models.location.Location;
+import models.client.ICity;
 
 /**
  *
@@ -16,13 +15,15 @@ import models.location.Location;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private CityPanel cityPanel;
-    LocationListPanel locationListPanel;
+    public CityPanel cityPanel;
+    public LocationListPanel locationListPanel;
+    public ICity city;
 
     public MainFrame() {
         initComponents();
+
         Data.initData();
-        locationListPanel = new LocationListPanel(locationPanel.getWidth() + 20, locationPanel.getHeight());
+        locationListPanel = new LocationListPanel(this, locationPanel.getWidth() + 20, locationPanel.getHeight());
         jPanel2.setLayout(new BorderLayout());
         locationPanel.setLayout(new BorderLayout());
         locationListPanel.setSize(locationPanel.getSize());
@@ -42,20 +43,6 @@ public class MainFrame extends javax.swing.JFrame {
         widthTxt = new javax.swing.JTextField();
         heighTxt = new javax.swing.JTextField();
         jSeparator13 = new javax.swing.JSeparator();
-        jLabel33 = new javax.swing.JLabel();
-        hospitalTxt = new javax.swing.JTextField();
-        jLabel34 = new javax.swing.JLabel();
-        schoolTxt = new javax.swing.JTextField();
-        jLabel35 = new javax.swing.JLabel();
-        universityTxt = new javax.swing.JTextField();
-        jLabel36 = new javax.swing.JLabel();
-        churchTxt = new javax.swing.JTextField();
-        jLabel37 = new javax.swing.JLabel();
-        mosqueTxt = new javax.swing.JTextField();
-        jLabel38 = new javax.swing.JLabel();
-        shopTxt = new javax.swing.JTextField();
-        jLabel39 = new javax.swing.JLabel();
-        houseTxt = new javax.swing.JTextField();
         jSeparator14 = new javax.swing.JSeparator();
         jLabel40 = new javax.swing.JLabel();
         jTextField8 = new javax.swing.JTextField();
@@ -67,10 +54,6 @@ public class MainFrame extends javax.swing.JFrame {
         jButton19 = new javax.swing.JButton();
         generatePopulation = new javax.swing.JButton();
         jSeparator16 = new javax.swing.JSeparator();
-        jLabel1 = new javax.swing.JLabel();
-        refugeeTxt = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        displacementTxt = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         populationLabel = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -115,53 +98,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         jSeparator13.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        jLabel33.setText("Hospital:");
-
-        hospitalTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        hospitalTxt.setText("0");
-        hospitalTxt.setToolTipText("");
-
-        jLabel34.setText("School:");
-
-        schoolTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        schoolTxt.setText("0");
-        schoolTxt.setToolTipText("");
-
-        jLabel35.setText("University:");
-
-        universityTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        universityTxt.setText("0");
-        universityTxt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                universityTxtActionPerformed(evt);
-            }
-        });
-
-        jLabel36.setText("Church:");
-
-        churchTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        churchTxt.setText("0");
-        churchTxt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                churchTxtActionPerformed(evt);
-            }
-        });
-
-        jLabel37.setText("Mosque:");
-
-        mosqueTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        mosqueTxt.setText("0");
-
-        jLabel38.setText("Shop:");
-
-        shopTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        shopTxt.setText("0");
-
-        jLabel39.setText("House:");
-
-        houseTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        houseTxt.setText("0");
-
         jSeparator14.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jLabel40.setText("Stay Home%:");
@@ -200,21 +136,6 @@ public class MainFrame extends javax.swing.JFrame {
         });
 
         jSeparator16.setOrientation(javax.swing.SwingConstants.VERTICAL);
-
-        jLabel1.setText("Refugee camp:");
-
-        refugeeTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        refugeeTxt.setText("0");
-        refugeeTxt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                refugeeTxtActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setText("Displacement camp:");
-
-        displacementTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        displacementTxt.setText("0");
 
         jLabel3.setText("Population:");
 
@@ -255,45 +176,7 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(heighTxt))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel33, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(hospitalTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
-                            .addComponent(schoolTxt))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel35, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel36, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(universityTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                            .addComponent(churchTxt))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel37, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
-                            .addComponent(jLabel38, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(mosqueTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-                            .addComponent(shopTxt)))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(refugeeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(24, 24, 24)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(displacementTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addComponent(jLabel39)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(houseTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(13, 13, 13)
+                .addGap(385, 385, 385)
                 .addComponent(jSeparator14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -344,30 +227,6 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel33, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(hospitalTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel35, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(universityTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel37)
-                            .addComponent(mosqueTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel39)
-                            .addComponent(houseTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel34, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(schoolTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel36)
-                            .addComponent(churchTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel38)
-                            .addComponent(shopTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(8, 8, 8)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(refugeeTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2)
-                            .addComponent(displacementTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -470,24 +329,17 @@ public class MainFrame extends javax.swing.JFrame {
         if (cityPanel != null) {
             jPanel2.remove(cityPanel);
         }
-        int width, height, nbHosp, nbSch, nbUni, nbChu, nbMosq, nbShop, nbHouse, nbRefugeeCamp, nbDisp;
+        int width, height;
         try {
             width = Integer.parseInt(widthTxt.getText());
             height = Integer.parseInt(heighTxt.getText());
-            nbHosp = Integer.parseInt(hospitalTxt.getText());
-            nbSch = Integer.parseInt(schoolTxt.getText());
-            nbUni = Integer.parseInt(universityTxt.getText());
-            nbChu = Integer.parseInt(churchTxt.getText());
-            nbMosq = Integer.parseInt(mosqueTxt.getText());
-            nbShop = Integer.parseInt(shopTxt.getText());
-            nbHouse = Integer.parseInt(houseTxt.getText());
-            nbRefugeeCamp = Integer.parseInt(refugeeTxt.getText());
-            nbDisp = Integer.parseInt(displacementTxt.getText());
         } catch (Exception e) {
             new JOptionPane("Bad parameters !", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        cityPanel = new CityPanel(width, height, nbHosp, nbSch, nbUni, nbChu, nbMosq, nbShop, nbHouse, nbRefugeeCamp, nbDisp);
+
+        cityPanel = new CityPanel(width, height);
+        locationListPanel.initLocation();
         jPanel2.add(cityPanel);
         try {
             populationLabel.setText(cityPanel.getCity().getPopulation() + "");
@@ -498,30 +350,12 @@ public class MainFrame extends javax.swing.JFrame {
         this.setVisible(true);
     }//GEN-LAST:event_generateLocationActionPerformed
 
-    private void churchTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_churchTxtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_churchTxtActionPerformed
-
-    private void universityTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_universityTxtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_universityTxtActionPerformed
-
-    private void refugeeTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refugeeTxtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_refugeeTxtActionPerformed
-
     private void generatePopulationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generatePopulationActionPerformed
-        try {
-            Data.numberPopulation = 0;
-            for (Entry<Integer, Location> e : cityPanel.getCity().getListLocations().entrySet()) {
-                e.getValue().initPopulation();
-                populationLabel.setText(Data.numberPopulation + "");
-                cityPanel.repaint();
-                this.setVisible(true);
-            }
-        } catch (RemoteException ex) {
-            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Data.numberPopulation = 0;
+        this.cityPanel.getCity1().initPopulation();
+        populationLabel.setText(Data.numberPopulation + "");
+        this.cityPanel.repaint();
+        this.setVisible(true);
     }//GEN-LAST:event_generatePopulationActionPerformed
 
     /**
@@ -561,31 +395,18 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField churchTxt;
     private javax.swing.JLabel deathLabel;
-    private javax.swing.JTextField displacementTxt;
     private javax.swing.JButton generateLocation3;
     private javax.swing.JButton generatePopulation;
     private javax.swing.JLabel healthylabel;
     private javax.swing.JTextField heighTxt;
-    private javax.swing.JTextField hospitalTxt;
-    private javax.swing.JTextField houseTxt;
     private javax.swing.JButton jButton16;
     private javax.swing.JButton jButton17;
     private javax.swing.JButton jButton18;
     private javax.swing.JButton jButton19;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel34;
-    private javax.swing.JLabel jLabel35;
-    private javax.swing.JLabel jLabel36;
-    private javax.swing.JLabel jLabel37;
-    private javax.swing.JLabel jLabel38;
-    private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel5;
@@ -602,13 +423,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JPanel locationPanel;
-    private javax.swing.JTextField mosqueTxt;
     private javax.swing.JLabel populationLabel;
-    private javax.swing.JTextField refugeeTxt;
-    private javax.swing.JTextField schoolTxt;
-    private javax.swing.JTextField shopTxt;
     private javax.swing.JLabel sickLabel;
-    private javax.swing.JTextField universityTxt;
     private javax.swing.JTextField widthTxt;
     // End of variables declaration//GEN-END:variables
 }
