@@ -17,16 +17,35 @@ public class CityPanel extends javax.swing.JPanel {
     private ICity city;
     private int width, height;
     private City city1;
+    private MainFrame mainFrame;
 
-    public CityPanel(int width, int height) {
+    public CityPanel(int width, int height, MainFrame mainFrame, City city) {
         this.width = width;
         this.height = height;
-        try {
-            city = new City(width, height, this);
-        } catch (RemoteException ex) {
-            Logger.getLogger(CityPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        this.mainFrame = mainFrame;
+        this.city1 = city;
+//        try {
+//            //city = new City(width, height, this, mainFrame);
+////        } catch (RemoteException ex) {
+////            Logger.getLogger(CityPanel.class.getName()).log(Level.SEVERE, null, ex);
+////        }
         initComponents();
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public void addCity(City city) {
@@ -39,14 +58,13 @@ public class CityPanel extends javax.swing.JPanel {
         city1.draw(g);
     }
 
-    public ICity getCity() {
+    /* public ICity getCity() {
         return city;
     }
 
     public void setCity(ICity city) {
         this.city = city;
-    }
-
+    }*/
     public City getCity1() {
         return city1;
     }

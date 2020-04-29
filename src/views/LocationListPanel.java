@@ -7,7 +7,9 @@ package views;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -27,7 +28,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import models.client.City;
 import models.locationFactories.LocationFactory;
 import views.dialog.NewLocationDialog;
 
@@ -54,7 +54,6 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         this.mapLocation = new HashMap();
 
         listModel = new DefaultListModel();
-        // listModel.addElement("Location");
 
         listLocation = new JList(listModel);
         listLocation.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -73,6 +72,7 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         nameToAddTxt.getDocument().addDocumentListener(addListener);
         removeButton.addActionListener(new RemoveListener());
         this.jPanel1.add(listScrollPane);
+        this.locationPropertiesPanel.setLayout(new BorderLayout());
     }
 
     public void initLocation() {
@@ -89,12 +89,16 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
             index++;
         }
         mapLocation.put(name, new LocationProperties(name, kind, quantity, percentage, factory, mainFrame));
+        this.locationPropertiesPanel.removeAll();
+        this.locationPropertiesPanel.add(mapLocation.get(name));
         listModel.insertElementAt(name, index);
         nameToAddTxt.requestFocusInWindow();
         nameToAddTxt.setText("");
         listLocation.setSelectedIndex(index);
         listLocation.ensureIndexIsVisible(index);
+        this.locationPropertiesPanel.repaint();
         removeButton.setEnabled(true);
+        this.mainFrame.setVisible(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -102,17 +106,18 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         addButton = new javax.swing.JButton();
         nameToAddTxt = new javax.swing.JTextField();
         removeButton = new javax.swing.JButton();
         locationPropertiesPanel = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
         setPreferredSize(new Dimension(this.width,this.height));
 
+        jPanel1.setBackground(new java.awt.Color(204, 204, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -123,24 +128,7 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 246, Short.MAX_VALUE)
-        );
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Locations");
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+            .addGap(0, 312, Short.MAX_VALUE)
         );
 
         addButton.setText("Add ");
@@ -166,11 +154,15 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(addButton)
-                .addComponent(nameToAddTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(removeButton))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(1, 1, 1)
+                .addComponent(nameToAddTxt))
+            .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+            .addComponent(removeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+
+        locationPropertiesPanel.setBackground(new java.awt.Color(255, 255, 255));
+        locationPropertiesPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout locationPropertiesPanelLayout = new javax.swing.GroupLayout(locationPropertiesPanel);
         locationPropertiesPanel.setLayout(locationPropertiesPanelLayout);
@@ -180,7 +172,24 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         );
         locationPropertiesPanelLayout.setVerticalGroup(
             locationPropertiesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 226, Short.MAX_VALUE)
+            .addGap(0, 200, Short.MAX_VALUE)
+        );
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Locations");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -188,9 +197,9 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(locationPropertiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(locationPropertiesPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -293,31 +302,31 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
             int size = listModel.getSize();
             if (size == 0) {
                 removeButton.setEnabled(false);
+                locationPropertiesPanel.removeAll();
             } else {
                 if (index == listModel.getSize()) {
                     index--;
                 }
                 listLocation.setSelectedIndex(index);
                 listLocation.ensureIndexIsVisible(index);
+                locationPropertiesPanel.removeAll();
+                locationPropertiesPanel.add(mapLocation.get(listLocation.getSelectedValue()));
             }
+            locationPropertiesPanel.repaint();
+            mainFrame.setVisible(true);
         }
 
-    }
-
-    private class LocationRowProperties extends JPanel {
-
-        private String locationName;
-        private JButton removeButton;
-        private JLabel label;
-
-        public LocationRowProperties(String locationName) {
-            this.locationName = locationName;
-            this.setVisible(true);
-        }
     }
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
+        String name = listLocation.getSelectedValue();
+        locationPropertiesPanel.removeAll();
+        if (mapLocation.get(name) != null) {
+            locationPropertiesPanel.add(mapLocation.get(name));
+        }
+        locationPropertiesPanel.repaint();
+        mainFrame.setVisible(true);
     }
 
 }

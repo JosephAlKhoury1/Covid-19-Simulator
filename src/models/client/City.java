@@ -13,19 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import models.location.*;
 import models.member.Member;
 import models.transportation.Transportation;
 import views.CityPanel;
+import views.MainFrame;
 import views.tile.Tile;
 import views.tile.TileType;
-import static models.location.LocationData.*;
 
-/**
- *
- * @author Joseph
- */
-public class City extends UnicastRemoteObject implements ICity {
+public class City extends UnicastRemoteObject implements ICity, Runnable {
 
     private Map<Integer, Member> listMember;
     private Map<Integer, Location> listLocations;
@@ -58,12 +56,17 @@ public class City extends UnicastRemoteObject implements ICity {
     private int nbh;
     private Tile[][] map;
     public CityPanel cityPanel;
+    public MainFrame mainFrame;
     private int percentageOfsick = 50;
+    private Week week;
 
-    public City(int width, int height, CityPanel cityPanel) throws RemoteException {
-        this.cityPanel = cityPanel;
-        this.cityPanel.addCity(this);
+    private Thread thread;
 
+    public City(MainFrame mainFrame) throws RemoteException {
+        this.thread = new Thread(this);
+        mainFrame.setCity1(this);
+        this.mainFrame = mainFrame;
+        this.week = new Week(Day.monday, 0, 0);
         this.mapLocation = new HashMap();
         this.listMember = new HashMap();
         this.listLocations = new HashMap();
@@ -81,20 +84,6 @@ public class City extends UnicastRemoteObject implements ICity {
         this.rightCities = new HashMap();
         this.bottomCities = new HashMap();
         this.topCities = new HashMap();
-        this.width = width;
-        this.height = height;
-        nbw = width / (Data.TileWidth + 1);
-        int dw = width % (Data.TileWidth + 1);
-        width -= dw;
-        nbh = height / (Data.TileHeight + 1);
-        int dh = height % (Data.TileHeight + 1);
-        height -= dh;
-        map = new Tile[nbw][nbh];
-        for (int i = 0; i < nbw; i++) {
-            for (int j = 0; j < nbh; j++) {
-                map[i][j] = new Tile(i * (Data.TileWidth + 1), j * (Data.TileHeight + 1), TileType.buildingTile, this.cityPanel);
-            }
-        }
     }
 
     public void addLeftCity(City c) {
@@ -233,6 +222,20 @@ public class City extends UnicastRemoteObject implements ICity {
 
     public void setCityPanel(CityPanel cityPanel) {
         this.cityPanel = cityPanel;
+        this.width = cityPanel.getWidth();
+        this.height = cityPanel.getHeight();
+        nbw = width / (Data.TileWidth + 1);
+        int dw = width % (Data.TileWidth + 1);
+        width -= dw;
+        nbh = height / (Data.TileHeight + 1);
+        int dh = height % (Data.TileHeight + 1);
+        height -= dh;
+        map = new Tile[nbw][nbh];
+        for (int i = 0; i < nbw; i++) {
+            for (int j = 0; j < nbh; j++) {
+                map[i][j] = new Tile(i * (Data.TileWidth + 1), j * (Data.TileHeight + 1), TileType.buildingTile, this.cityPanel);
+            }
+        }
     }
 
     public void addLocation(String name, List<Location> listLocation) {
@@ -261,5 +264,38 @@ public class City extends UnicastRemoteObject implements ICity {
             }
         }
         return null;
+    }
+
+    public Week getWeek() {
+        return week;
+    }
+
+    public void setWeek(Week week) {
+        this.week = week;
+    }
+
+    public void start() {
+        this.thread.start();
+    }
+
+    public void pause() {
+        this.thread.suspend();
+    }
+
+    public void resume() {
+        this.thread.resume();
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                this.thread.sleep(50);
+                week.changeTime();
+                mainFrame.updateTime(week);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(City.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

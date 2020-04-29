@@ -48,35 +48,35 @@ public class LocationProperties extends javax.swing.JPanel {
         List<Location> list = new ArrayList();
         q = quantity;
         while (q > 0) {
-            int i = MonteCarlo.getNextIntBetween(1, 4, mainFrame.cityPanel.getCity1().getNbw());
-            int j = MonteCarlo.getNextIntBetween(1, 4, mainFrame.cityPanel.getCity1().getNbh());
+            int i = MonteCarlo.getNextIntBetween(1, 4, mainFrame.city1.getNbw());
+            int j = MonteCarlo.getNextIntBetween(1, 4, mainFrame.city1.getNbh());
             boolean draw = true;
             for (int a = 0; a < WTILEUNIVERSITY; a++) {
                 for (int b = 0; b < HTILEUNIVERSITY; b++) {
-                    if (mainFrame.cityPanel.getCity1().getMap()[i + a][j + b].getTileType() == TileType.buildingTile && mainFrame.cityPanel.getCity1().getMap()[i + a][j + a].isDrawable()) {
+                    if (mainFrame.getCity1().getMap()[i + a][j + b].getTileType() == TileType.buildingTile && mainFrame.getCity1().getMap()[i + a][j + a].isDrawable()) {
                     } else {
                         draw = false;
                     }
                 }
             }
             if (draw) {
-                Location l = factory.creatLocation(mainFrame.cityPanel.getCity1().getMap()[i][j].getX(), mainFrame.cityPanel.getCity1().getMap()[i][j].getY(), quantity, mainFrame.cityPanel.getCity1());
+                Location l = factory.creatLocation(mainFrame.getCity1().getMap()[i][j].getX(), mainFrame.getCity1().getMap()[i][j].getY(), quantity, mainFrame.cityPanel.getCity1());
                 list.add(l);
                 for (int a = 0; a < WTILEUNIVERSITY; a++) {
                     for (int b = 0; b < HTILEUNIVERSITY; b++) {
-                        mainFrame.cityPanel.getCity1().getMap()[i + a][j + b].setWalking(false);
-                        l.addTile(mainFrame.cityPanel.getCity1().getMap()[i + a][j + b]);
+                        mainFrame.getCity1().getMap()[i + a][j + b].setWalking(false);
+                        l.addTile(mainFrame.getCity1().getMap()[i + a][j + b]);
                     }
                 }
                 q--;
                 for (int k = i - 1; k <= i + WTILEUNIVERSITY; k++) {
                     for (int g = j - 1; g <= j + HTILEUNIVERSITY; g++) {
-                        mainFrame.cityPanel.getCity1().getMap()[k][g].setDrawable(false);
+                        mainFrame.getCity1().getMap()[k][g].setDrawable(false);
                     }
                 }
             }
         }
-        mainFrame.cityPanel.getCity1().addLocation(name + " " + locationKind, list);
+        mainFrame.getCity1().addLocation(name + " " + locationKind, list);
     }
 
     @SuppressWarnings("unchecked")
@@ -173,8 +173,10 @@ public class LocationProperties extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel7)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jLabel7)
+                .addContainerGap(219, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
