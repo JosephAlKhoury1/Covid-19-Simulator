@@ -7,18 +7,16 @@ package views;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,6 +26,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import models.client.Day;
 import models.locationFactories.LocationFactory;
 import views.dialog.NewLocationDialog;
 
@@ -81,14 +80,14 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         }
     }
 
-    public void addNewRow(String name, String kind, int quantity, double percentage, LocationFactory factory) {
+    public void addNewRow(String name, String kind, int quantity, double percentage, LocationFactory factory, List<Day> list) {
         int index = listLocation.getSelectedIndex();
         if (index == -1) {
             index = 0;
         } else {
             index++;
         }
-        mapLocation.put(name, new LocationProperties(name, kind, quantity, percentage, factory, mainFrame));
+        mapLocation.put(name, new LocationProperties(name, kind, quantity, percentage, factory, list, mainFrame));
         this.locationPropertiesPanel.removeAll();
         this.locationPropertiesPanel.add(mapLocation.get(name));
         listModel.insertElementAt(name, index);

@@ -25,7 +25,8 @@ public class NewLocationDialog extends JDialog {
         this.frame = rf;
         this.setAlwaysOnTop(true);
         this.setLocation(370, 150);
-        this.setSize(570, 470);
+        this.setSize(470, 440);
+        this.setResizable(false);
         addWindowListener(new WindowAdapter() {
 
             @Override

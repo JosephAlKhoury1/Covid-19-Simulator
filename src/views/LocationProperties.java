@@ -7,6 +7,7 @@ package views;
 
 import java.util.ArrayList;
 import java.util.List;
+import models.client.Day;
 import models.client.MonteCarlo;
 import models.location.Location;
 import static models.location.LocationData.HTILEUNIVERSITY;
@@ -26,15 +27,17 @@ public class LocationProperties extends javax.swing.JPanel {
     private final Double percentage;
     private final LocationFactory factory;
     private final MainFrame mainFrame;
+    private final List<Day> listDay;
     private int q;
 
-    public LocationProperties(String name, String locationkind, int quantity, double percentage, LocationFactory factory, MainFrame mainFrame) {
+    public LocationProperties(String name, String locationkind, int quantity, double percentage, LocationFactory factory, List<Day> listDay, MainFrame mainFrame) {
         this.name = name;
         this.locationKind = locationkind;
         this.quantity = quantity;
         this.percentage = percentage;
         this.mainFrame = mainFrame;
         this.factory = factory;
+        this.listDay = listDay;
         initComponents();
         this.nameLabel.setText(name);
         this.kindLabel.setText(locationkind);
@@ -62,6 +65,9 @@ public class LocationProperties extends javax.swing.JPanel {
             if (draw) {
                 Location l = factory.creatLocation(mainFrame.getCity1().getMap()[i][j].getX(), mainFrame.getCity1().getMap()[i][j].getY(), quantity, mainFrame.cityPanel.getCity1());
                 list.add(l);
+                for (Day d : listDay) {
+                    l.addDay(d);
+                }
                 for (int a = 0; a < WTILEUNIVERSITY; a++) {
                     for (int b = 0; b < HTILEUNIVERSITY; b++) {
                         mainFrame.getCity1().getMap()[i + a][j + b].setWalking(false);

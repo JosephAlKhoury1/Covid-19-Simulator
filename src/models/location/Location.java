@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import models.client.City;
+import models.client.Day;
 import models.member.Member;
 import views.tile.Tile;
 
@@ -27,6 +28,7 @@ public abstract class Location {
     protected City city;
     protected List<Tile> listTile;
     protected boolean fixedLocation = false;
+    protected List<Day> listDay;
 
     public Location(int x, int y, double average_sick, City city) {
         this.x = x;
@@ -35,6 +37,15 @@ public abstract class Location {
         this.listMember = new HashMap();
         this.city = city;
         this.listTile = new ArrayList();
+        this.listDay = new ArrayList();
+    }
+
+    public List<Day> getListDay() {
+        return listDay;
+    }
+
+    public void setListDay(List<Day> listDay) {
+        this.listDay = listDay;
     }
 
     public Location() {
@@ -131,6 +142,16 @@ public abstract class Location {
 
     public void setFixedLocation(boolean fixedLocation) {
         this.fixedLocation = fixedLocation;
+    }
+
+    public void addDay(Day d) {
+        this.listDay.add(d);
+        d.addLocation(this);
+    }
+
+    public void removeDay(Day d) {
+        this.listDay.remove(d);
+        d.removeLocation(this);
     }
 
     public abstract void draw(Graphics g);

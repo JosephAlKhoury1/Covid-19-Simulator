@@ -5,6 +5,10 @@
  */
 package models.client;
 
+import java.util.ArrayList;
+import java.util.List;
+import models.location.Location;
+
 /**
  *
  * @author Joseph
@@ -21,14 +25,24 @@ public enum Day {
     private DayName day;
     private DayName nextDay;
     private int index;
+    private List<Location> listLocation;
 
     private Day(DayName dayName, DayName nextDay, int index) {
         this.day = dayName;
         this.nextDay = nextDay;
         this.index = index;
+        listLocation = new ArrayList();
     }
 
     public int getIndex() {
         return this.index;
+    }
+
+    public void addLocation(Location l) {
+        this.listLocation.add(l);
+    }
+
+    public void removeLocation(Location l) {
+        this.listLocation.remove(l);
     }
 }
