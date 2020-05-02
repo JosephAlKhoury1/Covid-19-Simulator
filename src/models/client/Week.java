@@ -6,7 +6,7 @@ package models.client;
  */
 public class Week {
 
-    private Day[] dayTab = {Day.monday, Day.tuesday, Day.wednesday, Day.thursday, Day.friday, Day.saturday, Day.sunday};
+    private final Day[] dayTab = {Day.monday, Day.tuesday, Day.wednesday, Day.thursday, Day.friday, Day.saturday, Day.sunday};
     private Day currentDay;
     private int hour;
     private int minute;

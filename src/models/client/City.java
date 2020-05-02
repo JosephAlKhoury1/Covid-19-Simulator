@@ -124,6 +124,7 @@ public class City extends UnicastRemoteObject implements ICity, Runnable {
     }
 
     public void initPopulation() {
+        this.listMember.clear();
         for (Entry<String, List<Location>> e : mapLocation.entrySet()) {
             for (Location l : e.getValue()) {
                 l.initPopulation();
@@ -141,9 +142,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable {
             for (Location l : e.getValue()) {
                 l.draw(g);
             }
-        }
-        for (Entry<Integer, Location> e : listLocations.entrySet()) {
-            e.getValue().draw(g);
         }
         for (Entry<Integer, Member> e : listMember.entrySet()) {
             e.getValue().draw(g);
@@ -234,6 +232,12 @@ public class City extends UnicastRemoteObject implements ICity, Runnable {
         for (int i = 0; i < nbw; i++) {
             for (int j = 0; j < nbh; j++) {
                 map[i][j] = new Tile(i * (Data.TileWidth + 1), j * (Data.TileHeight + 1), TileType.buildingTile, this.cityPanel);
+                if (i > 0) {
+                    map[i][j].setTopTile(map[i - 1][j]);
+                }
+                if (j > 0) {
+                    map[i][j].setLeftTile(map[i][j - 1]);
+                }
             }
         }
     }
@@ -245,6 +249,26 @@ public class City extends UnicastRemoteObject implements ICity, Runnable {
     @Override
     public Location getLocation(String kind) throws RemoteException {
         List<String> list = new ArrayList();
+        if (kind.equals("Work")) {
+            for (Entry<String, List<Location>> e : mapLocation.entrySet()) {
+                String[] tab = e.getKey().split(" ");
+                if (!tab[1].equals("House")) {
+                    list.add(e.getKey());
+                }
+            }
+            if (list.size() > 0) {
+                while (list.size() > 0) {
+                    int index = MonteCarlo.getNextInt(list.size());
+                    String name = list.get(index);
+                    if (mapLocation.get(name).size() > 0) {
+                        int in = MonteCarlo.getNextInt(mapLocation.get(name).size());
+                        return mapLocation.get(name).get(in);
+                    } else {
+                        list.remove(name);
+                    }
+                }
+            }
+        }
         for (Entry<String, List<Location>> e : mapLocation.entrySet()) {
             String[] tab = e.getKey().split(" ");
             if (tab[1].equals(kind)) {
@@ -253,16 +277,19 @@ public class City extends UnicastRemoteObject implements ICity, Runnable {
         }
         if (list.size() > 0) {
             while (list.size() > 0) {
+                System.out.println("list size while=" + list.size());
                 int index = MonteCarlo.getNextInt(list.size());
                 String name = list.get(index);
                 if (mapLocation.get(name).size() > 0) {
                     int in = MonteCarlo.getNextInt(mapLocation.get(name).size());
+                    System.out.println("location returned");
                     return mapLocation.get(name).get(in);
                 } else {
                     list.remove(name);
                 }
             }
         }
+
         return null;
     }
 
@@ -286,13 +313,32 @@ public class City extends UnicastRemoteObject implements ICity, Runnable {
         this.thread.resume();
     }
 
+    public Tile getTile(int x, int y) {
+        int xi = x / Data.TileWidth;
+        int yi = y / Data.TileHeight;
+        return this.map[xi][yi];
+    }
+
+    public void print() {
+        for (Entry<Integer, Member> e : listMember.entrySet()) {
+            System.out.println("x" + e.getKey() + "=" + e.getValue().getX() + " y" + e.getKey() + "=" + e.getValue().getY());
+        }
+    }
+
     @Override
     public void run() {
         while (true) {
             try {
-                this.thread.sleep(50);
+                this.thread.sleep(60);
                 week.changeTime();
                 mainFrame.updateTime(week);
+                for (Entry<Integer, Member> e : listMember.entrySet()) {
+                    e.getValue().move();
+
+                }
+                //print();
+                this.mainFrame.cityPanel.repaint();
+                this.mainFrame.setVisible(true);
             } catch (InterruptedException ex) {
                 Logger.getLogger(City.class.getName()).log(Level.SEVERE, null, ex);
             }

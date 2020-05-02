@@ -27,6 +27,10 @@ public class Tile {
     private boolean drawable = true;
     private boolean walking = true;
     private Map<Integer, Member> listMember;
+    private Tile leftTile;
+    private Tile rightTile;
+    private Tile topTile;
+    private Tile bottomTile;
 
     public Tile(int x, int y, TileType type, JPanel panel) {
         this.x = x;
@@ -102,4 +106,62 @@ public class Tile {
         this.listMember = listMember;
     }
 
+    public boolean containX(int x) {
+        if (x >= this.x && x < this.x + Data.TileWidth) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean containPoint(int x, int y) {
+        if (x >= this.x && x < this.x + Data.TileWidth) {
+            if (y >= this.y && y < this.y + Data.TileHeight) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Tile getLeftTile() {
+        return leftTile;
+    }
+
+    public void setLeftTile(Tile leftTile) {
+        this.leftTile = leftTile;
+        leftTile.setRightTile(this);
+    }
+
+    public Tile getRightTile() {
+        return rightTile;
+    }
+
+    public void setRightTile(Tile rightTile) {
+        this.rightTile = rightTile;
+    }
+
+    public Tile getTopTile() {
+        return topTile;
+    }
+
+    public void setTopTile(Tile topTile) {
+        this.topTile = topTile;
+        topTile.setBottomTile(this);
+    }
+
+    public Tile getBottomTile() {
+        return bottomTile;
+    }
+
+    public void setBottomTile(Tile bottomTile) {
+        this.bottomTile = bottomTile;
+    }
+
+    public boolean containY(int y) {
+        if (y >= this.y && y < this.y + Data.TileHeight) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

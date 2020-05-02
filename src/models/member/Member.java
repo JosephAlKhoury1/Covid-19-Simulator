@@ -29,8 +29,29 @@ public abstract class Member implements Runnable, Serializable {
     protected int age;
     protected SexeType sexeType;
     protected List<Location> listLocation;
+    protected int locationIndex;
+    protected Location currentLocationToGo;
+    protected Tile currentTile;
+
+    protected List<Tile> listTileWaked = new ArrayList();
 
     public abstract void draw(Graphics g);
+
+    public List<Location> getListLocation() {
+        return listLocation;
+    }
+
+    public void setListLocation(List<Location> listLocation) {
+        this.listLocation = listLocation;
+    }
+
+    public int getLocationIndex() {
+        return locationIndex;
+    }
+
+    public void setLocationIndex(int locationIndex) {
+        this.locationIndex = locationIndex;
+    }
 
     public int getX() {
         return x;
@@ -52,8 +73,10 @@ public abstract class Member implements Runnable, Serializable {
         this.id = id;
         this.x = x;
         this.y = y;
+        this.city = city;
         this.ownHouse = ownHouse;
         this.listLocation = new ArrayList();
+        this.currentTile = city.getTile(x, y);
     }
 
     public Member() {
@@ -79,22 +102,6 @@ public abstract class Member implements Runnable, Serializable {
         this.city = city;
     }
 
-    public void moveUp() {
-        y = y - 1;
-    }
-
-    public void moveDown() {
-        y = y + 1;
-    }
-
-    public void moveLeft() {
-        x = x - 1;
-    }
-
-    public void moveRight() {
-        x = x + 1;
-    }
-
     public Tile getMyTile() {
         return myTile;
     }
@@ -117,6 +124,38 @@ public abstract class Member implements Runnable, Serializable {
 
     public void setSexeType(SexeType sexeType) {
         this.sexeType = sexeType;
+    }
+
+  
+
+    public void move() {
+        if (this.currentLocationToGo == null) {
+            return;
+        }
+        if (currentTile == null) {
+            currentTile = city.getTile(this.x, this.y);
+        }
+        final int step = 6;
+        boolean containX = currentLocationToGo.containX(this.x);
+        boolean containY = currentLocationToGo.containY(this.y);
+
+        if (containX && containY) {
+            return;
+        }
+
+        if (this.currentLocationToGo.isHigherX(this.x)) {
+            this.x -= step;
+        } else if (this.currentLocationToGo.isSmallerX(this.x)) {
+            this.x += step;
+        } else {
+            if (this.currentLocationToGo.isHigherY(this.y)) {
+                this.y -= step;
+            } else if (this.currentLocationToGo.isSmallerY(this.y)) {
+                this.y += step;
+            } else {
+                return;
+            }
+        }
     }
 
     @Override

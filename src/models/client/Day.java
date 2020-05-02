@@ -22,10 +22,10 @@ public enum Day {
     saturday(DayName.saturday, DayName.sunday, 6),
     sunday(DayName.sunday, DayName.monday, 7);
 
-    private DayName day;
-    private DayName nextDay;
-    private int index;
-    private List<Location> listLocation;
+    private final DayName day;
+    private final DayName nextDay;
+    private final int index;
+    private final List<Location> listLocation;
 
     private Day(DayName dayName, DayName nextDay, int index) {
         this.day = dayName;

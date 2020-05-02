@@ -15,7 +15,7 @@ import views.dialog.NewLocationDialog;
  * @author Joseph
  */
 public class NewLocation extends javax.swing.JPanel {
-    
+
     private final MainFrame mainFrame;
     private final NewLocationDialog dialog;
     private final String name;
@@ -36,7 +36,8 @@ public class NewLocation extends javax.swing.JPanel {
     private int quantity = 0;
     private double percentage = 50;
     private List<Day> listDay;
-    
+    private int openTime = 0, closeTime = 0;
+
     public NewLocation(String name, MainFrame mainFrame, NewLocationDialog dialog) {
         initComponents();
         this.mainFrame = mainFrame;
@@ -46,7 +47,7 @@ public class NewLocation extends javax.swing.JPanel {
         this.listDay = new ArrayList();
         setEnable(false);
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -232,7 +233,19 @@ public class NewLocation extends javax.swing.JPanel {
 
         jLabel6.setText("Open Time:");
 
+        openTimeBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openTimeBoxActionPerformed(evt);
+            }
+        });
+
         jLabel7.setText("Close Time:");
+
+        closeTimeBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeTimeBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -366,19 +379,19 @@ public class NewLocation extends javax.swing.JPanel {
             String message = "Percentage must be a number !";
             String title = "Error";
             JOptionPane.showOptionDialog(this.dialog, message, title, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-            
+
             return;
         }
-        mainFrame.locationListPanel.addNewRow(name, kindName, quantity, percentage, currentFactory, listDay);
-        mainFrame.setEnabled(true);
-        dialog.dispose();
+        this.mainFrame.locationListPanel.addNewRow(this.name, this.kindName, this.quantity, this.percentage, this.currentFactory, this.listDay, this.openTime, this.closeTime);
+        this.mainFrame.setEnabled(true);
+        this.dialog.dispose();
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         mainFrame.setEnabled(true);
         dialog.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
-    
+
     public void setEnable(boolean enable) {
         this.openTimeBox.setEnabled(enable);
         this.closeTimeBox.setEnabled(enable);
@@ -390,12 +403,29 @@ public class NewLocation extends javax.swing.JPanel {
         this.saturdayBox.setEnabled(enable);
         this.sundayBox.setEnabled(enable);
     }
+
+    public void clearChecked() {
+        this.mondayBox.setSelected(false);
+        this.tuesdayBox.setSelected(false);
+        this.wednesdayBox.setSelected(false);
+        this.thursdayBox.setSelected(false);
+        this.fridayBox.setSelected(false);
+        this.saturdayBox.setSelected(false);
+        this.sundayBox.setSelected(false);
+    }
     private void kindBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kindBoxActionPerformed
         index = kindBox.getSelectedIndex();
         kindName = kindBox.getItemAt(index);
         currentFactory = locationFactories[index];
         if (currentFactory == HouseFactory.INSTANCE) {
+            clearChecked();
             setEnable(false);
+            this.listDay.clear();
+            this.openTime = 0;
+            this.closeTime = 0;
+            openTimeBox.setSelectedIndex(0);
+            closeTimeBox.setSelectedIndex(0);
+
         } else {
             setEnable(true);
         }
@@ -463,6 +493,16 @@ public class NewLocation extends javax.swing.JPanel {
             this.listDay.remove(Day.sunday);
         }
     }//GEN-LAST:event_sundayBoxActionPerformed
+
+    private void openTimeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTimeBoxActionPerformed
+        String openT = this.openTimeBox.getItemAt(this.openTimeBox.getSelectedIndex());
+        this.openTime = Integer.parseInt(openT);
+    }//GEN-LAST:event_openTimeBoxActionPerformed
+
+    private void closeTimeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeTimeBoxActionPerformed
+        String closeT = this.closeTimeBox.getItemAt(this.closeTimeBox.getSelectedIndex());
+        this.closeTime = Integer.parseInt(closeT);
+    }//GEN-LAST:event_closeTimeBoxActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

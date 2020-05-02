@@ -17,13 +17,13 @@ import models.client.Week;
  * @author Joseph
  */
 public class MainFrame extends javax.swing.JFrame {
-    
+
     public CityPanel cityPanel;
     public LocationListPanel locationListPanel;
     public ICity city;
     public City city1;
     private final String[] hours = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
-    
+
     public MainFrame() {
         initComponents();
         try {
@@ -38,15 +38,15 @@ public class MainFrame extends javax.swing.JFrame {
         locationListPanel.setSize(locationPanel.getSize());
         locationPanel.add(locationListPanel);
     }
-    
+
     public City getCity1() {
         return city1;
     }
-    
+
     public void setCity1(City city1) {
         this.city1 = city1;
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -538,7 +538,7 @@ public class MainFrame extends javax.swing.JFrame {
             jPanel1.remove(cityPanel);
         }
         int width, height;
-        
+
         try {
             width = Integer.parseInt(widthTxt.getText());
             height = Integer.parseInt(heighTxt.getText());
@@ -547,7 +547,7 @@ public class MainFrame extends javax.swing.JFrame {
             jOptionPane.setVisible(true);
             return;
         }
-        
+
         this.cityPanel = new CityPanel(width, height, this, city1);
         this.city1.setCityPanel(cityPanel);
         locationListPanel.initLocation();
@@ -560,11 +560,11 @@ public class MainFrame extends javax.swing.JFrame {
         cityPanel.repaint();
         this.setVisible(true);
     }//GEN-LAST:event_generateLocationActionPerformed
-    
+
 
     private void generatePopulationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generatePopulationActionPerformed
         Data.numberPopulation = 0;
-        this.cityPanel.getCity1().initPopulation();
+        this.city1.initPopulation();
         populationLabel.setText(Data.numberPopulation + "");
         this.cityPanel.repaint();
         this.setVisible(true);
@@ -583,7 +583,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.pauseButton.setEnabled(false);
         this.stopButton.setEnabled(true);
     }//GEN-LAST:event_pauseButtonActionPerformed
-    
+
     public void updateTime(Week week) {
         this.weekLabel.setText(week.getWeekNumber() + "");
         this.dayLabel.setText(week.getCurrentDay().name());

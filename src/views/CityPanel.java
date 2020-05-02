@@ -24,11 +24,6 @@ public class CityPanel extends javax.swing.JPanel {
         this.height = height;
         this.mainFrame = mainFrame;
         this.city1 = city;
-//        try {
-//            //city = new City(width, height, this, mainFrame);
-////        } catch (RemoteException ex) {
-////            Logger.getLogger(CityPanel.class.getName()).log(Level.SEVERE, null, ex);
-////        }
         initComponents();
     }
 
@@ -58,13 +53,6 @@ public class CityPanel extends javax.swing.JPanel {
         city1.draw(g);
     }
 
-    /* public ICity getCity() {
-        return city;
-    }
-
-    public void setCity(ICity city) {
-        this.city = city;
-    }*/
     public City getCity1() {
         return city1;
     }

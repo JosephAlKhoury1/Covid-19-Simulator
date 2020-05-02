@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import models.client.City;
 import models.client.Day;
+import models.member.Human;
 import models.member.Member;
 import views.tile.Tile;
 
@@ -23,12 +24,14 @@ public abstract class Location {
     protected int width;
     protected int height;
     protected double average_sick;
+    protected int openTime, closeTime;
     protected Map<Integer, Member> listMember;
     protected Image image;
     protected City city;
     protected List<Tile> listTile;
     protected boolean fixedLocation = false;
     protected List<Day> listDay;
+    protected List<Human> listWorker;
 
     public Location(int x, int y, double average_sick, City city) {
         this.x = x;
@@ -38,6 +41,7 @@ public abstract class Location {
         this.city = city;
         this.listTile = new ArrayList();
         this.listDay = new ArrayList();
+
     }
 
     public List<Day> getListDay() {
@@ -104,6 +108,22 @@ public abstract class Location {
         this.city.getListMember().put(m.getId(), m);
     }
 
+    public int getOpenTime() {
+        return openTime;
+    }
+
+    public void setOpenTime(int openTime) {
+        this.openTime = openTime;
+    }
+
+    public int getCloseTime() {
+        return closeTime;
+    }
+
+    public void setCloseTime(int closeTime) {
+        this.closeTime = closeTime;
+    }
+
     public void removeMember(int id) {
         this.listMember.remove(id);
     }
@@ -152,6 +172,56 @@ public abstract class Location {
     public void removeDay(Day d) {
         this.listDay.remove(d);
         d.removeLocation(this);
+    }
+
+    public void addWorker(Human h) {
+        this.listWorker.add(h);
+    }
+
+    public boolean containX(int x) {
+        if (this.x < x && this.x + this.width > x) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean containY(int y) {
+        if (this.y < y && this.y + this.height > y) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isSmallerX(int x) {
+        if (this.x > x) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isSmallerY(int y) {
+        if (this.y > y) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isHigherX(int x) {
+        if ((this.x + this.width) < x) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isHigherY(int y) {
+        if ((this.y + this.height) < y) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public abstract void draw(Graphics g);

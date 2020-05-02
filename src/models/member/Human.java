@@ -6,6 +6,7 @@
  */
 package models.member;
 
+import java.awt.Font;
 import models.client.ReligionType;
 import models.client.HumanAgeType;
 import models.client.MonteCarlo;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.client.City;
 import models.location.House;
+import models.location.Location;
 import models.location.School;
 import models.location.University;
 
@@ -32,13 +34,20 @@ public class Human extends Member {
     private HumanAgeType humanAgeType;
     private HumanStat humanStat;
 
-    private School school;
-    private University university;
+    private School school = null;
+    private University university = null;
+    private Location WorkPlace = null;
+    private boolean goSchool;
+    private boolean goUniversity;
+    private boolean goWork;
 
     @Override
     public void draw(Graphics g) {
         g.setColor(Data.getColor(humanStat));
-        g.drawOval(x, y, 5, 5);
+        g.fillOval(x, y, 10, 10);
+        if (currentLocationToGo != null) {
+            g.drawString("x=" + currentLocationToGo.getX() + " y=" + currentLocationToGo.getY(), x, y);
+        }
     }
 
     public String getFirstName() {
@@ -74,24 +83,56 @@ public class Human extends Member {
         this.age = MonteCarlo.getHumanAge(humanAgeType);
         this.setSexeType(MonteCarlo.getSexeType());
         this.humanStat = HumanStat.healthy;
+        goSchool = MonteCarlo.checkProb(this.humanAgeType.getGoSchoolPercentage());
+        goUniversity = MonteCarlo.checkProb(this.humanAgeType.getGoUniversityPercentage());
+        goWork = MonteCarlo.checkProb(this.humanAgeType.getGoWorkPercentage());
+        initHuman(city);
+        if (listLocation.size() > 0) {
+            this.currentLocationToGo = listLocation.get(0);
+        }
+    }
 
-        boolean goSchool = MonteCarlo.checkProb(humanAgeType.getGoSchoolPercentage());
-        boolean goUniversity = MonteCarlo.checkProb(humanAgeType.getGoUniversityPercentage());
-        if (goSchool) {
-            try {
-                this.school = (School) city.getLocation("School");
-                this.listLocation.add(school);
-            } catch (RemoteException ex) {
-                Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+    public void initHuman(City city) {
+        if (this.school == null) {
+            if (goSchool) {
+                try {
+                    this.school = (School) city.getLocation("School");
+                    if (this.school != null) {
+                        this.listLocation.add(school);
+                        System.out.println("school added");
+                    }
+                } catch (RemoteException ex) {
+                    Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NullPointerException ex) {
+                    this.school = null;
+                }
             }
         }
 
-        if (goUniversity) {
-            try {
-                this.university = (University) city.getLocation("University");
-                this.listLocation.add(this.university);
-            } catch (RemoteException ex) {
-                Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+        if (this.university == null) {
+            if (goUniversity) {
+                try {
+                    this.university = (University) city.getLocation("University");
+                    if (this.university != null) {
+                        this.listLocation.add(this.university);
+                    }
+                } catch (RemoteException ex) {
+                    Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NullPointerException ex) {
+                    this.university = null;
+                }
+            }
+        }
+        if (this.WorkPlace == null) {
+            if (goWork) {
+                try {
+                    this.WorkPlace = city.getLocation("Work");
+                    if (this.WorkPlace != null) {
+                        this.listLocation.add(this.WorkPlace);
+                    }
+                } catch (RemoteException ex) {
+                    Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
