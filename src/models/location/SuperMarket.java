@@ -15,32 +15,33 @@ import models.client.Data;
  *
  * @author Joseph
  */
-public class Hospital extends Location {
+public class SuperMarket extends Location {
 
-    public Hospital(int x, int y, double average_sick, City city) {
+    public SuperMarket(int x, int y, double average_sick, City city) {
         super(x, y, average_sick, city);
-        this.setWidth(LocationData.WTILEHOSPITAL * Data.TileWidth);
-        this.setHeight(LocationData.HTILEHOSPITAL * Data.TileHeight);
+        this.fixedLocation = true;
+        this.setWidth(LocationData.WTILESUPERMARKET * Data.TileWidth);
+        this.setHeight(LocationData.HTILESUPERMARKET * Data.TileHeight);
         loadImage();
     }
 
-    public Hospital() {
+    public SuperMarket() {
     }
 
     @Override
     public void draw(Graphics g) {
         g.drawImage(image, x, y, width, height, city.getCityPanel());
+        //g.drawRect(x, y, width, height);
         Toolkit.getDefaultToolkit().sync();
     }
 
     @Override
     protected void loadImage() {
-        ImageIcon ii = new ImageIcon("C:\\Users\\Joseph\\Documents\\NetBeansProjects\\Covid-19Sim\\src\\models\\resources\\hospital.png");
+        ImageIcon ii = new ImageIcon("C:\\Users\\Joseph\\Documents\\NetBeansProjects\\Covid-19 Simulator\\src\\models\\resources\\superMarket.png");
         image = ii.getImage();
     }
 
     @Override
     public void initPopulation() {
     }
-
 }

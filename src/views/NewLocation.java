@@ -19,7 +19,7 @@ public class NewLocation extends javax.swing.JPanel {
     private final MainFrame mainFrame;
     private final NewLocationDialog dialog;
     private final String name;
-    private final String[] locationName = {"House", "Hospital", "School", "University", "Church", "Mosque", "RefugeeCamp", "DisplacementCamp", "Restaurant"};
+    private final String[] locationName = {"House", "Hospital", "School", "University", "Church", "Mosque", "RefugeeCamp", "DisplacementCamp", "Restaurant", "SuperMarket"};
     private final String[] hours = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
     private final LocationFactory[] locationFactories = {HouseFactory.INSTANCE,
         HospitalFactory.INSTANCE,
@@ -29,7 +29,8 @@ public class NewLocation extends javax.swing.JPanel {
         MosqueFactory.INSTANCE,
         RefugeeCampFactory.INSTANCE,
         DisplacementCampFactory.INSTANCE,
-        RestaurantFactory.INSTANCE,};
+        RestaurantFactory.INSTANCE,
+        SuperMarketFactory.INSTANCE};
     private LocationFactory currentFactory = locationFactories[0];
     private String kindName = locationName[0];
     private int index = 0;

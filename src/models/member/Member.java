@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package models.member;
 
 import java.awt.Graphics;
@@ -15,12 +10,7 @@ import models.location.House;
 import models.location.Location;
 import views.tile.Tile;
 
-/**
- *
- * @author Joseph
- */
 public abstract class Member implements Runnable, Serializable {
-
     protected int x, y;
     protected int id;
     protected House ownHouse;
@@ -126,8 +116,6 @@ public abstract class Member implements Runnable, Serializable {
         this.sexeType = sexeType;
     }
 
-  
-
     public void move() {
         if (this.currentLocationToGo == null) {
             return;
@@ -153,7 +141,7 @@ public abstract class Member implements Runnable, Serializable {
             } else if (this.currentLocationToGo.isSmallerY(this.y)) {
                 this.y += step;
             } else {
-                return;
+                
             }
         }
     }

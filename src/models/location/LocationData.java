@@ -19,6 +19,10 @@ public class LocationData {
     public static final int HTILESCHOOL = 2;
     public static final int WTILEUNIVERSITY = 3;
     public static final int HTILEUNIVERSITY = 3;
+    public static final int WTILERESTAURANT = 2;
+    public static final int HTILERESTAURANT = 2;
+    public static final int WTILESUPERMARKET = 2;
+    public static final int HTILESUPERMARKET = 2;
     public static final int WTILECHURCH = 2;
     public static final int HTILECHURCH = 2;
     public static final int WTILEMOSQUE = 2;
