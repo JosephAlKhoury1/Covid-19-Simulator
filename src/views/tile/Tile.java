@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import models.client.Data;
-import models.member.Member;
+import models.client1.Data;
+import models.member1.Member;
 
 /**
  *
@@ -36,6 +36,7 @@ public class Tile {
         this.x = x;
         this.y = y;
         this.tileType = type;
+        this.panel = panel;
         this.listMember = new HashMap();
         loadImage();
     }

@@ -17,15 +17,15 @@ import java.util.logging.Logger;
  */
 public class DataSource {
      private static String url = "jdbc:mysql://localhost/";
-    private static String pilot="com.mysql.jdbc.Driver";
+    private static final String PILOT="com.mysql.jdbc.Driver";
     
     private static Connection con = null;
 
     public static Connection getConnection() {
         if (con == null) {
             try {
-                url+="cov-19simulator";
-                Class.forName(pilot);
+                url+="covid-19simulator";
+                Class.forName(PILOT);
                 con = DriverManager.getConnection(url,"root","joseph");
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(DataSource.class.getName()).log(Level.SEVERE, null, ex);

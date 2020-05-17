@@ -7,8 +7,7 @@ package server;
 
 import java.util.HashMap;
 import java.util.Map;
-import models.member.Member;
-import models.client.ICity;
+import models.client1.ICity;
 
 /**
  *
