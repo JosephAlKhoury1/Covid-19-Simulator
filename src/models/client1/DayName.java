@@ -5,24 +5,26 @@
  */
 package models.client1;
 
-import models.client.*;
-import server.*;
-
 /**
  *
  * @author Joseph
  */
 public enum DayName {
-    monday("monday"),
-    tuesday("tuesday"),
-    wednesday("wednesday"),
-    thursday("thursday"),
-    friday("friday"),
-    saturday("saturday"),
-    sunday("sunday");
+    monday("Monday"),
+    tuesday("Tuesday"),
+    wednesday("Wednesday"),
+    thursday("Thursday"),
+    friday("Friday"),
+    saturday("Saturday"),
+    sunday("Sunday");
     private String name;
 
     private DayName(String name) {
         this.name = name;
     }
+
+    public String getName() {
+        return name;
+    }
+    
 }

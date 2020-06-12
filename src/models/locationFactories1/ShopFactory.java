@@ -1,5 +1,6 @@
 package models.locationFactories1;
 
+import models.client1.City;
 import models.location1.Location;
 import models.location1.LocationData;
 import models.location1.Shop;
@@ -9,8 +10,8 @@ public class ShopFactory extends LocationFactory {
     public static final ShopFactory INSTANCE = new ShopFactory();
 
     @Override
-    public Location creatLocation(String name, int x, int y, double average_sick, double openTime, double closeTime) {
-        return new Shop(name, x, y, average_sick, openTime, closeTime);
+    public Location creatLocation(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime,  String days, City city) {
+        return new Shop(name, x, y, average_sick, fixed, openTime, closeTime, days, city);
     }
 
     @Override

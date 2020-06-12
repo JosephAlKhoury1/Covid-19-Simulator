@@ -68,15 +68,15 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         }
     }
 
-    public void addNewRow(String name, String kind, double per, int qua, double openTime, double closeTime) {
+    public void addNewRow(String name, String kind, double per, int qua, String days, int openTime, int closeTime, int fixed) {
         int index = listLocation.getSelectedIndex();
         if (index == -1) {
             index = 0;
         } else {
             index++;
         }
-        LocationCategory lc = new LocationCategory(name, kind, per, qua, openTime, closeTime, this.cityPanel.getCity1());
-        LocationProperties lp = new LocationProperties(lc, cityPanel);
+        LocationCategory lc = new LocationCategory(name, kind, per, qua, days, openTime, closeTime, fixed, this.cityPanel.getCity1());
+        LocationProperties lp = new LocationProperties(lc);
         this.mapLocation.put(lc.getName(), lp);
 
         this.cityPanel.getCity1().getMapLocation().put(lc.getName() + " " + lc.getKind(), lc);
@@ -99,7 +99,7 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         } else {
             index++;
         }
-        LocationProperties lp = new LocationProperties(lc, this.cityPanel);
+        LocationProperties lp = new LocationProperties(lc);
         this.mapLocation.put(lc.getName(), lp);
         this.locationPropertiesPanel.removeAll();
         this.locationPropertiesPanel.add(mapLocation.get(lc.getName()));

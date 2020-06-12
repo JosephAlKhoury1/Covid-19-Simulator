@@ -9,39 +9,62 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import models.client1.City;
+import models.model.HumanAge;
 import models.model.Model;
-import models.model.SymptomsType;
+import models.model.SymptomStage;
+import models.model.SymptomType;
 
 public class ModelController {
 
     public final static ModelController INSTANCE = new ModelController();
-    private final String insertModel = "insert into models(name)"
-            + " values(?)";
+    private final String insertModel = "insert into models(name, ismain)"
+            + " values(?, ?)";
     private final String updateModel = "update models"
             + " set name = ?"
             + " where id = ?";
-    private final String selectAll = "select id, name"
-            + "from models";
+    private final String selectAllMain = "select id, name"
+            + " from models"
+            + " where ismain = 1";
+    private final String selectAll = "select id, name "
+            + " from models ";
+    private final String select = "select name, ismain"
+            + " from models "
+            + " where id = ?";
+    private final String setModelNonMain = "update models"
+            + " set ismain = 0"
+            + " where id = ?";
+    private final String setModelMain = "update models"
+            + " set ismain = 1"
+            + " where id = ?";
 
     private PreparedStatement insertStatement;
     private PreparedStatement updateStatement;
-    private PreparedStatement selsectAllStatement;
+    private PreparedStatement selectAllMainStatement;
+    private PreparedStatement selectAllStatement;
+    private PreparedStatement selectStatement;
+    private PreparedStatement setModelNomMainStatement;
+    private PreparedStatement setModelMainStatement;
 
     private ModelController() {
         try {
             this.insertStatement = DataSource.getConnection().prepareStatement(this.insertModel, Statement.RETURN_GENERATED_KEYS);
             this.updateStatement = DataSource.getConnection().prepareStatement(this.updateModel);
-            this.selsectAllStatement = DataSource.getConnection().prepareStatement(this.selectAll);
+            this.selectAllMainStatement = DataSource.getConnection().prepareStatement(this.selectAllMain);
+            this.selectAllStatement = DataSource.getConnection().prepareStatement(this.selectAll);
+            this.selectStatement = DataSource.getConnection().prepareStatement(this.select);
+            this.setModelNomMainStatement = DataSource.getConnection().prepareStatement(this.setModelNonMain);
+            this.setModelMainStatement = DataSource.getConnection().prepareStatement(this.setModelMain);
         } catch (SQLException ex) {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     public int insertModel(Model m) {
+        int id = -1;
         try {
             this.insertStatement.setString(1, m.getModelName());
-            int id = -1;
+            this.insertStatement.setInt(2, 1);
             int affectedRows = this.insertStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating model failed, no rows affected.");
@@ -49,11 +72,6 @@ public class ModelController {
             ResultSet generatedKeys = this.insertStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
                 id = generatedKeys.getInt(1);
-            }
-            for (SymptomsType s : m.getListSymptomsType()) {
-                s.setModelId(id);
-                m.setModelId(id);
-                SymptomsController.INSTANCE.insertSymptom(s);
             }
             return id;
         } catch (SQLException ex) {
@@ -66,12 +84,9 @@ public class ModelController {
         try {
             this.updateStatement.setString(1, m.getModelName());
             this.updateStatement.setInt(2, m.getModelId());
-            int affectedRows = this.insertStatement.executeUpdate();
+            int affectedRows = this.updateStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("update model failed, no rows affected.");
-            }
-            for (SymptomsType s : m.getListSymptomsType()) {
-                SymptomsController.INSTANCE.updateSymptom(s);
             }
             return true;
         } catch (SQLException ex) {
@@ -80,13 +95,15 @@ public class ModelController {
         return false;
     }
 
-    public List<Model> selectAll() {
+    public List<Model> selectAllMain() {
         try {
             List<Model> list = new ArrayList();
-            ResultSet set = this.selsectAllStatement.executeQuery();
+            ResultSet set = this.selectAllMainStatement.executeQuery();
             while (set.next()) {
-                List<SymptomsType> listS = SymptomsController.INSTANCE.selectAllSymptom(set.getInt(1));
-                list.add(new Model(set.getInt(1), set.getString(2), listS));
+                List<SymptomType> listS = SymptomsController.INSTANCE.selectAllSymptom(set.getInt(1));
+                List<SymptomStage> listSS = SymptomStageController.INSTANCE.selectAllModel(set.getInt(1));
+                List<HumanAge> listHA = HumanAgeController.INSTANCE.selectAllModel(set.getInt(1));
+                list.add(new Model(set.getInt(1), set.getString(2), listS, listSS, listHA));
             }
             set.close();
             return list;
@@ -94,5 +111,23 @@ public class ModelController {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    public void setModelMain(int id) {
+        try {
+            this.setModelMainStatement.setInt(1, id);
+            this.setModelMainStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void setModelNonMain(int id) {
+        try {
+            this.setModelNomMainStatement.setInt(1, id);
+            this.setModelNomMainStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

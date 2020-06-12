@@ -59,6 +59,11 @@ public class NewCityPanel extends javax.swing.JPanel {
 
         createButton.setText("Create");
         createButton.setToolTipText("");
+        createButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -107,6 +112,10 @@ public class NewCityPanel extends javax.swing.JPanel {
         this.frame.setEnabled(true);
         this.dialog.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_createButtonActionPerformed
     private class AddListener implements ActionListener, DocumentListener {
 
         private JButton button;

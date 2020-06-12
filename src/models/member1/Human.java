@@ -1,8 +1,14 @@
 package models.member1;
 
+import java.awt.Color;
 import models.client1.*;
 import java.awt.Graphics;
 import java.rmi.RemoteException;
+import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.location1.*;
@@ -16,22 +22,129 @@ public class Human extends Member {
     private String firstName;
     private String lastName;
     private ReligionType religionType;
-    private HumanAgeType humanAgeType;
+    private SexeType sexeType;
     private HumanStat humanStat;
+    Color color = Color.GREEN;
 
-    private School school = null;
-    private University university = null;
-    private Location WorkPlace = null;
-    private boolean goSchool;
-    private boolean goUniversity;
-    private boolean goWork;
+    public Human(int x, int y, House ownHouse, City city) {
+        super(x, y, ownHouse, city);
+        this.listDeleted = new ArrayList();
+        if (ownHouse.getListPopulation().size() > 0) {
+            this.humanAgeType = MonteCarlo.getHumanAgeType();
+            this.numberLocationToGo = this.humanAgeType.getPlaceNumber();
+        } else {
+            this.humanAgeType = MonteCarlo.getHumanAgeTypeWithoutChildren();
+            this.numberLocationToGo = this.humanAgeType.getPlaceNumber();
+        }
+        this.humanStat = HumanStat.healthy;
+        this.age = MonteCarlo.getHumanAge(humanAgeType);
+        this.sexeType = MonteCarlo.getSexeType();
+        boolean goWork = false;
+        boolean goUniversity = false;
+        boolean goSchool = false;
+
+        if (this.humanAgeType != null) {
+            goWork = MonteCarlo.checkProb(this.humanAgeType.getWorkPercentage());
+            if (goWork) {
+                try {
+                    Location l = city.getLocation("work");
+                    this.workPlace = new SimpleEntry(l, l.getWorkTime());
+                    if (this.workPlace != null) {
+                        this.workPlace.getKey().setFixedLocation(1);
+                        this.numberLocationToGo--;
+                    }
+                } catch (RemoteException ex) {
+                    Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            for (LocationToGo l : this.humanAgeType.getListLocationToGo()) {
+                if (l.getName().equals("School")) {
+                    goSchool = MonteCarlo.checkProb(l.getPercentage());
+                    if (goSchool) {
+                        try {
+                            this.school = this.city.getLocation("School");
+                            if (this.school != null) {
+                                this.school.setFixedLocation(1);
+                                this.numberLocationToGo--;
+                            }
+                        } catch (RemoteException ex) {
+                            Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                } else if (l.getName().equals("University")) {
+                    goUniversity = MonteCarlo.checkProb(l.getPercentage());
+                    if (goUniversity) {
+                        try {
+                            this.university = this.city.getLocation("University");
+                            if (this.university != null) {
+                                this.university.setFixedLocation(1);
+                                this.numberLocationToGo--;
+                            }
+                        } catch (RemoteException ex) {
+                            Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                } else {
+                    boolean b = MonteCarlo.checkProb(l.getPercentage());
+                    if (b) {
+                        try {
+                            Location loc = this.city.getLocation(l.getName());
+                            if (loc != null) {
+                                int index = MonteCarlo.getNextInt(this.hourIn.length);
+                                this.listLocation.put(loc, this.hourIn[index]);
+                                this.numberLocationToGo--;
+                                this.listDeleted.add(l);
+                            }
+                        } catch (RemoteException ex) {
+                            Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+
+            }
+        }
+        int o = this.numberLocationToGo;
+        while (o > 0) {
+            Location loc = city.getRandomLocation();
+            if (loc != null && this.workPlace != loc && !this.listLocation.containsKey(loc)) {
+                int index = MonteCarlo.getNextInt(this.hourIn.length);
+                this.listLocation.put(loc, this.hourIn[index]);
+                o--;
+            }
+        }
+        getLocationToGo();
+    }
+
+    int xs = 10, ys = 10;
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(Data.getColor(humanStat));
-        g.fillOval(x, y, 10, 10);
+        if (this.currentLocationToGo != null) {
+            if (this.workPlace != null) {
+                if (this.currentLocationToGo == this.workPlace.getKey()) {
+                    color = Color.BLACK;
+                    xs = 10;
+                    ys = 10;
+                }
+            } else if (this.currentLocationToGo == this.school) {
+                color = Color.RED;
+            } else if (this.currentLocationToGo == this.university) {
+                color = Color.MAGENTA;
+            } else if (this.listLocation.containsKey(this.currentLocationToGo)) {
+                color = Color.YELLOW;
+            }
+        }
+        g.setColor(color);
+        g.fillOval(x, y, xs, ys);
         if (currentLocationToGo != null) {
+//            if (this.currentLocationToGo == this.school) {
+//                color = Color.RED;
+//                g.setColor(color);
+//                g.drawString("go school x=" + currentLocationToGo.getX() + " y=" + currentLocationToGo.getY(), x, y);
+//            } else {
+//                g.setColor(color);
             g.drawString("x=" + currentLocationToGo.getX() + " y=" + currentLocationToGo.getY(), x, y);
+            //}
         }
     }
 
@@ -51,40 +164,13 @@ public class Human extends Member {
         this.lastName = lastName;
     }
 
-    public Human(String firstName, String lastName, int id, int x, int y, House ownHouse, City city) {
-        super(id, x, y, ownHouse, city);
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public Human(int id, int x, int y, House ownHouse, City city, ReligionType religionType) {
-        super(id, x, y, ownHouse, city);
-        this.religionType = religionType;
-        if (ownHouse.getListPopulation().size() > 0) {
-            this.humanAgeType = MonteCarlo.getHumanAgeType();
-        } else {
-            this.humanAgeType = MonteCarlo.getHumanAgeTypeWithoutChildren();
-        }
-        this.age = MonteCarlo.getHumanAge(humanAgeType);
-        this.setSexeType(MonteCarlo.getSexeType());
-        this.humanStat = HumanStat.healthy;
-        goSchool = MonteCarlo.checkProb(this.humanAgeType.getGoSchoolPercentage());
-        goUniversity = MonteCarlo.checkProb(this.humanAgeType.getGoUniversityPercentage());
-        goWork = MonteCarlo.checkProb(this.humanAgeType.getGoWorkPercentage());
-        initHuman(city);
-        if (listLocation.size() > 0) {
-            this.currentLocationToGo = listLocation.get(0);
-        }
-    }
-
     public void initHuman(City city) {
-        if (this.school == null) {
+        /* if (this.school == null) {
             if (goSchool) {
                 try {
                     this.school = (School) city.getLocation("School");
                     if (this.school != null) {
                         this.listLocation.add(school);
-                        System.out.println("school added");
                     }
                 } catch (RemoteException ex) {
                     Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
@@ -119,16 +205,7 @@ public class Human extends Member {
                     Logger.getLogger(Human.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }
-    }
-
-    public Human(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public Human() {
-        super();
+        }*/
     }
 
     public ReligionType getReligionType() {
@@ -139,36 +216,12 @@ public class Human extends Member {
         this.religionType = religionType;
     }
 
-    public HumanAgeType getHumanAgeType() {
-        return humanAgeType;
-    }
-
-    public void setHumanAgeType(HumanAgeType humanAgeType) {
-        this.humanAgeType = humanAgeType;
-    }
-
     public HumanStat getHumanStat() {
         return humanStat;
     }
 
     public void setHumanStat(HumanStat humanStat) {
         this.humanStat = humanStat;
-    }
-
-    public School getSchool() {
-        return school;
-    }
-
-    public void setSchool(School school) {
-        this.school = school;
-    }
-
-    public University getUniversity() {
-        return university;
-    }
-
-    public void setUniversity(University university) {
-        this.university = university;
     }
 
 }

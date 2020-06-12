@@ -1,6 +1,5 @@
 package models.model;
 
-import models.client1.ReligionType;
 
 
 public class HumanAgeType {
@@ -8,7 +7,6 @@ public class HumanAgeType {
     private int id;
     private int cityId;
     private final String type;
-    private ReligionType religionType;
     private final int min;
     private final int max;
 
@@ -69,9 +67,6 @@ public class HumanAgeType {
         return max;
     }
 
-    public ReligionType getReligionType() {
-        return religionType;
-    }
 
     public Double getGoSchoolPercentage() {
         return goSchoolPercentage;

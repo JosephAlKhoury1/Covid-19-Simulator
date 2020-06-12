@@ -3,6 +3,7 @@ package models.location1;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import models.client1.City;
 import models.client1.Data;
 
 /**
@@ -11,18 +12,18 @@ import models.client1.Data;
  */
 public class RefugeeCamp extends Location {
 
-    private double openTime;
-    private double closeTime;
+    private int openTime;
+    private int closeTime;
 
-    public RefugeeCamp(String name, int x, int y, double average_sick, int locationCategoryId) {
-        super(name, x, y, average_sick, locationCategoryId);
+    public RefugeeCamp(String name, int x, int y, double average_sick, int fixed, int locationCategoryId, City city) {
+        super(name, x, y, average_sick, "",fixed, locationCategoryId, city);
         this.setWidth(LocationData.WTILEREFUGEECAMP * Data.TileWidth);
         this.setHeight(LocationData.HTILEREFUGEECAMP * Data.TileHeight);
         loadImage();
     }
 
-    public RefugeeCamp(String name, int x, int y, double average_sick, double openTime, double closeTime) {
-        super(name, x, y, average_sick);
+    public RefugeeCamp(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, City city) {
+        super(name, x, y, average_sick,"", fixed, city);
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.setWidth(LocationData.WTILEREFUGEECAMP * Data.TileWidth);
@@ -30,27 +31,27 @@ public class RefugeeCamp extends Location {
         loadImage();
     }
 
-    public RefugeeCamp(int id, String name, int x, int y, int width, int height, double average_sick, int locationCategoryId) {
-        super(id, name, x, y, width, height, average_sick, locationCategoryId);
+    public RefugeeCamp(int id, String name, int x, int y, int width, int height, double average_sick, int fixed, int locationCategoryId, City c) {
+        super(id, name, x, y, width, height, average_sick, "",fixed, locationCategoryId, c);
         loadImage();
     }
 
     public RefugeeCamp() {
     }
 
-    public double getOpenTime() {
+    public int getOpenTime() {
         return openTime;
     }
 
-    public void setOpenTime(double openTime) {
+    public void setOpenTime(int openTime) {
         this.openTime = openTime;
     }
 
-    public double getCloseTime() {
+    public int getCloseTime() {
         return closeTime;
     }
 
-    public void setCloseTime(double closeTime) {
+    public void setCloseTime(int closeTime) {
         this.closeTime = closeTime;
     }
 
@@ -69,8 +70,9 @@ public class RefugeeCamp extends Location {
     @Override
     public void initPopulation() {
     }
-@Override
+
+    @Override
     public void save() {
-       
+
     }
 }

@@ -1,4 +1,4 @@
-package views1;
+package views1.model.panel;
 
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -6,12 +6,9 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import views.dialog1.NewModelDialog;
+import views1.MainFrame;
+import views1.model.dialog.NewModelDialog;
 
-/**
- *
- * @author Joseph
- */
 public class NewModelPanel extends javax.swing.JPanel {
 
     private final MainFrame mainframe;
@@ -89,11 +86,6 @@ public class NewModelPanel extends javax.swing.JPanel {
         createButton.setText("Create");
         createButton.setToolTipText("create the model");
         createButton.setEnabled(false);
-        createButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                createButtonActionPerformed(evt);
-            }
-        });
 
         cancelButton.setText("Cancel");
         cancelButton.setToolTipText("Cancel");
@@ -135,10 +127,6 @@ public class NewModelPanel extends javax.swing.JPanel {
         this.dialog.dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
 
-    private void createButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createButtonActionPerformed
-        this.mainframe.setModelPanelVisible();
-    }//GEN-LAST:event_createButtonActionPerformed
-
     private class AddListener implements ActionListener, DocumentListener {
 
         private final JButton button;
@@ -152,12 +140,13 @@ public class NewModelPanel extends javax.swing.JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             this.name = modelNameTxt.getText();
-            if (name.equals("") || name.startsWith(" ")) {//|| alreadyExist(this.name)) {
+            if (name.equals("") || name.startsWith(" ")) {
                 Toolkit.getDefaultToolkit().beep();
                 modelNameTxt.requestFocusInWindow();
                 modelNameTxt.selectAll();
                 return;
             }
+            mainframe.newModel(this.name);
             mainframe.setEnabled(true);
             dialog.dispose();
         }

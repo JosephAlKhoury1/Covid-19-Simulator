@@ -5,7 +5,6 @@ import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
-import models.client1.Day;
 import models.locationFactories1.*;
 import views.dialog1.NewLocationDialog;
 
@@ -18,7 +17,7 @@ public class NewLocation extends javax.swing.JPanel {
     private final MainFrame mainFrame;
     private final NewLocationDialog dialog;
     private final String name;
-    private final String[] locationName = {"House", "Hospital", "School", "University", "Church", "Mosque", "RefugeeCamp", "DisplacementCamp", "Restaurant", "SuperMarket"};
+    private final String[] locationName = {"House", "Hospital", "School", "University", "Church", "Mosque", "RefugeeCamp", "DisplacementCamp", "Restaurant", "SuperMarket", "Factory"};
     private final String[] hours = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
     private final LocationFactory[] locationFactories = {HouseFactory.INSTANCE,
         HospitalFactory.INSTANCE,
@@ -29,14 +28,17 @@ public class NewLocation extends javax.swing.JPanel {
         RefugeeCampFactory.INSTANCE,
         DisplacementCampFactory.INSTANCE,
         RestaurantFactory.INSTANCE,
-        SuperMarketFactory.INSTANCE};
+        SuperMarketFactory.INSTANCE,
+        FactoryFactory.INSTANCE,};
     private LocationFactory currentFactory = locationFactories[0];
     private String kindName = locationName[0];
     private int index = 0;
     private int quantity = 0;
+    private int fixed = 0;
     private double percentage = 50;
-    private List<Day> listDay;
+    private List<String> listDay;
     private int openTime = 0, closeTime = 0;
+    private String days = "";
 
     public NewLocation(String name, MainFrame mainFrame, NewLocationDialog dialog) {
         initComponents();
@@ -80,6 +82,7 @@ public class NewLocation extends javax.swing.JPanel {
         ;
         jLabel7 = new javax.swing.JLabel();
         closeTimeBox = new JComboBox(this.hours) ;
+        fixedJCheckBox = new javax.swing.JCheckBox();
 
         jLabel1.setText("New Location");
 
@@ -282,6 +285,13 @@ public class NewLocation extends javax.swing.JPanel {
                 .addGap(0, 8, Short.MAX_VALUE))
         );
 
+        fixedJCheckBox.setText("Fixed location");
+        fixedJCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fixedJCheckBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -323,7 +333,8 @@ public class NewLocation extends javax.swing.JPanel {
                                     .addComponent(quantityTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(percentageTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(79, 79, 79)
-                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(fixedJCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -353,7 +364,9 @@ public class NewLocation extends javax.swing.JPanel {
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fixedJCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(okButton)
                             .addComponent(cancelButton))
@@ -381,9 +394,13 @@ public class NewLocation extends javax.swing.JPanel {
             JOptionPane.showOptionDialog(this.dialog, message, title, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
             return;
         }
+
+        for (String d : this.listDay) {
+            days = days + d + " ";
+        }
         this.mainFrame.setCitySavedButtonEnable();
         this.mainFrame.getCurrentCityPanel().getCity1().setIsSaved(false);
-        this.mainFrame.locationListPanel.addNewRow(this.name, this.kindName, this.percentage, this.quantity, this.openTime, this.closeTime);
+        this.mainFrame.locationListPanel.addNewRow(this.name, this.kindName, this.percentage, this.quantity, days, this.openTime, this.closeTime, this.fixed);
         this.mainFrame.setEnabled(true);
         this.dialog.dispose();
     }//GEN-LAST:event_okButtonActionPerformed
@@ -435,63 +452,63 @@ public class NewLocation extends javax.swing.JPanel {
     private void mondayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mondayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.monday);
+            this.listDay.add("Monday");
         } else {
-            this.listDay.remove(Day.monday);
+            this.listDay.remove("Monday");
         }
     }//GEN-LAST:event_mondayBoxActionPerformed
 
     private void tuesdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tuesdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.tuesday);
+            this.listDay.add("Tuesday");
         } else {
-            this.listDay.remove(Day.tuesday);
+            this.listDay.remove("Tuesday");
         }
     }//GEN-LAST:event_tuesdayBoxActionPerformed
 
     private void wednesdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wednesdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.wednesday);
+            this.listDay.add("Wednesday");
         } else {
-            this.listDay.remove(Day.wednesday);
+            this.listDay.remove("Wednesday");
         }
     }//GEN-LAST:event_wednesdayBoxActionPerformed
 
     private void thursdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_thursdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.thursday);
+            this.listDay.add("Thursday");
         } else {
-            this.listDay.remove(Day.thursday);
+            this.listDay.remove("Thursday");
         }
     }//GEN-LAST:event_thursdayBoxActionPerformed
 
     private void fridayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fridayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.friday);
+            this.listDay.add("Friday");
         } else {
-            this.listDay.remove(Day.friday);
+            this.listDay.remove("Friday");
         }
     }//GEN-LAST:event_fridayBoxActionPerformed
 
     private void saturdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saturdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.saturday);
+            this.listDay.add("Saturday");
         } else {
-            this.listDay.remove(Day.saturday);
+            this.listDay.remove("Saturday");
         }
     }//GEN-LAST:event_saturdayBoxActionPerformed
 
     private void sundayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.sunday);
+            this.listDay.add("Sunday");
         } else {
-            this.listDay.remove(Day.sunday);
+            this.listDay.remove("Sunday");
         }
     }//GEN-LAST:event_sundayBoxActionPerformed
 
@@ -505,10 +522,19 @@ public class NewLocation extends javax.swing.JPanel {
         this.closeTime = Integer.parseInt(closeT);
     }//GEN-LAST:event_closeTimeBoxActionPerformed
 
+    private void fixedJCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedJCheckBoxActionPerformed
+        if (this.fixedJCheckBox.isSelected()) {
+            this.fixed = 1;
+        } else {
+            this.fixed = 0;
+        }
+    }//GEN-LAST:event_fixedJCheckBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JComboBox<String> closeTimeBox;
+    private javax.swing.JCheckBox fixedJCheckBox;
     private javax.swing.JCheckBox fridayBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

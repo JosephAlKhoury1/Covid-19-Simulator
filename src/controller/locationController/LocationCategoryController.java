@@ -19,12 +19,12 @@ public class LocationCategoryController {
 
     public static final LocationCategoryController INSTANCE = new LocationCategoryController();
 
-    private final String insert = "insert into locationcategories(name, kind, quantity, percentageToBeSick, openTime, closeTime, cityid)"
-            + " values(?, ?, ?, ?, ?, ?, ?)";
+    private final String insert = "insert into locationcategories(name, kind, quantity, percentageToBeSick, days, openTime, closeTime, fixed, cityid)"
+            + " values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private final String update = "update locationcategories "
-            + " set name = ? , kind = ?, quantity = ?, percentageToBeSick = ?, openTime = ?, closeTime = ?,"
+            + " set name = ? , kind = ?, quantity = ?, percentageToBeSick = ?, days= ?, openTime = ?, closeTime = ?, fixed = ? "
             + " where id = ?";
-    private final String selectAll = "select id, name, kind, quantity, percentageToBeSick, openTime, closeTime"
+    private final String selectAll = "select id, name, kind, quantity, percentageToBeSick, days, openTime, closeTime, fixed"
             + " from locationcategories "
             + " where cityid = ? ";
 
@@ -54,9 +54,11 @@ public class LocationCategoryController {
             this.insertStatement.setString(2, lc.getKind());
             this.insertStatement.setInt(3, lc.getQuantity());
             this.insertStatement.setDouble(4, lc.getPercentageToBeSick());
-            this.insertStatement.setDouble(5, lc.getOpenTime());
-            this.insertStatement.setDouble(6, lc.getCloseTime());
-            this.insertStatement.setInt(7, lc.getCityId());
+            this.insertStatement.setString(5, lc.getDays());
+            this.insertStatement.setInt(6, lc.getOpenTime());
+            this.insertStatement.setInt(7, lc.getCloseTime());
+            this.insertStatement.setInt(8, lc.getFixedLocation());
+            this.insertStatement.setInt(9, lc.getCityId());
             this.insertStatement.executeUpdate();
             ResultSet generatedKeys = this.insertStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -75,9 +77,11 @@ public class LocationCategoryController {
             this.updateStatement.setString(2, lc.getKind());
             this.updateStatement.setInt(3, lc.getQuantity());
             this.updateStatement.setDouble(4, lc.getPercentageToBeSick());
-            this.updateStatement.setDouble(5, lc.getOpenTime());
-            this.updateStatement.setDouble(6, lc.getCloseTime());
-            this.updateStatement.setInt(7, lc.getId());
+            this.updateStatement.setString(5, lc.getDays());
+            this.updateStatement.setInt(6, lc.getOpenTime());
+            this.updateStatement.setInt(7, lc.getCloseTime());
+            this.updateStatement.setInt(8, lc.getFixedLocation());
+            this.updateStatement.setInt(9, lc.getId());
             this.updateStatement.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(LocationCategoryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -97,31 +101,34 @@ public class LocationCategoryController {
                 if (null != kind) {
                     switch (kind) {
                         case "House":
-                            listLoc = HouseController.INSTANCE.selectAll(lcId);
+                            listLoc = HouseController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "Hospital":
-                            listLoc = HospitalController.INSTANCE.selectAll(lcId);
+                            listLoc = HospitalController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "Church":
-                            listLoc = ChurchController.INSTANCE.selectAll(lcId);
+                            listLoc = ChurchController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "Mosque":
-                            listLoc = MosqueController.INSTANCE.selectAll(lcId);
+                            listLoc = MosqueController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "School":
-                            listLoc = SchoolController.INSTANCE.selectAll(lcId);
+                            listLoc = SchoolController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "University":
-                            listLoc = UniversityController.INSTANCE.selectAll(lcId);
+                            listLoc = UniversityController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "Restaurant":
-                            listLoc = RestaurantController.INSTANCE.selectAll(lcId);
+                            listLoc = RestaurantController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "Shop":
-                            listLoc = ShopController.INSTANCE.selectAll(lcId);
+                            listLoc = ShopController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "SuperMarket":
-                            listLoc = SuperMarketController.INSTANCE.selectAll(lcId);
+                            listLoc = SuperMarketController.INSTANCE.selectAll(lcId, city);
+                            break;
+                        case "Factory":
+                            listLoc = FactoryController.INSTANCE.selectAll(lcId, city);
                             break;
                         case "RefugeeCamp":
                             //lc.setListLocation(Re.INSTANCE.selectAll(lcId));
@@ -133,8 +140,8 @@ public class LocationCategoryController {
                             break;
                     }
                 }
-                LocationCategory lc = new LocationCategory(set.getInt(1), set.getString(2), set.getString(3), set.getDouble(5), set.getInt(4),
-                        set.getDouble(6), set.getDouble(7), city, listLoc);
+                LocationCategory lc = new LocationCategory(set.getInt(1), set.getString(2), set.getString(3), set.getDouble(5), set.getString(6), set.getInt(4),
+                        set.getInt(7), set.getInt(8), set.getInt(9), city, listLoc);
                 list.put(set.getString(2), lc);
             }
             set.close();

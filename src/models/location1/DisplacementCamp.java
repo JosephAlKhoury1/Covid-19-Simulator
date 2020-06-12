@@ -3,6 +3,7 @@ package models.location1;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import models.client1.City;
 import models.client1.Data;
 
 /**
@@ -11,23 +12,23 @@ import models.client1.Data;
  */
 public class DisplacementCamp extends Location {
 
-    private double openTime;
-    private double closeTime;
+    private int openTime;
+    private int closeTime;
 
-    public DisplacementCamp(String name, int x, int y, double average_sick, int locationCategoryId) {
-        super(name, x, y, average_sick, locationCategoryId);
+    public DisplacementCamp(String name, int x, int y, double average_sick, int fixed, int locationCategoryId, City city) {
+        super(name, x, y, average_sick, "", locationCategoryId, fixed, city);
         this.setWidth(LocationData.WTILEDISPLACEMENTCAMP * Data.TileWidth);
         this.setHeight(LocationData.HTILEDISPLACEMENTCAMP * Data.TileHeight);
         loadImage();
     }
 
-    public DisplacementCamp(int id, String name, int x, int y, int width, int height, double average_sick, int locationCategoryId) {
-        super(id, name, x, y, width, height, average_sick, locationCategoryId);
+    public DisplacementCamp(int id, String name, int x, int y, int width, int height, double average_sick, int fixed, int locationCategoryId, City c) {
+        super(id, name, x, y, width, height, average_sick, "", fixed, locationCategoryId, c);
         loadImage();
     }
 
-    public DisplacementCamp(String name, int x, int y, double average_sick, double openTime, double closeTime) {
-        super(name, x, y, average_sick);
+    public DisplacementCamp(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, City city) {
+        super(name, x, y, average_sick, "", fixed, city);
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.setWidth(LocationData.WTILEDISPLACEMENTCAMP * Data.TileWidth);
@@ -44,21 +45,22 @@ public class DisplacementCamp extends Location {
         Toolkit.getDefaultToolkit().sync();
     }
 
-    public double getOpenTime() {
+    public int getOpenTime() {
         return openTime;
     }
 
     @Override
-    public void setOpenTime(double openTime) {
+    public void setOpenTime(int openTime) {
         this.openTime = openTime;
     }
 
-    public Double getCloseTime() {
+    @Override
+    public int getCloseTime() {
         return closeTime;
     }
 
     @Override
-    public void setCloseTime(double closeTime) {
+    public void setCloseTime(int closeTime) {
         this.closeTime = closeTime;
     }
 
@@ -71,8 +73,9 @@ public class DisplacementCamp extends Location {
     @Override
     public void initPopulation() {
     }
-@Override
+
+    @Override
     public void save() {
-        
+
     }
 }

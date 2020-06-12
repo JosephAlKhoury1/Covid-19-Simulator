@@ -13,10 +13,6 @@ import models.location1.Location;
 import models.location1.LocationCategory;
 import models.member1.Member;
 
-/**
- *
- * @author Joseph
- */
 public class Maps extends javax.swing.JPanel {
 
     private int width, height;
@@ -25,16 +21,14 @@ public class Maps extends javax.swing.JPanel {
     private final ButtonTilte button;
     private final JTabbedPane pane;
     private JScrollPane scrollPane;
-    private final CityPanel cityPanel;
 
-    public Maps(MainFrame mainFrame, CityPanel cityPanel, JTabbedPane pane) {
-        this.width = cityPanel.getCity1().getWidth();
-        this.height = cityPanel.getCity1().getHeight();
+    public Maps(MainFrame mainFrame, City c) {
+        this.width = c.getWidth();
+        this.height = c.getHeight();
         this.mainFrame = mainFrame;
-        this.city1 = cityPanel.getCity1();
-        this.cityPanel = cityPanel;
+        this.city1 = c;
         this.button = new ButtonTilte(this);
-        this.pane = pane;
+        this.pane = mainFrame.getjTabbedPane2();
         initComponents();
         this.scrollPane = new JScrollPane(this);
     }
@@ -159,6 +153,8 @@ public class Maps extends javax.swing.JPanel {
         public void actionPerformed(ActionEvent e) {
             int i = pane.indexOfComponent(scrollPane);
             pane.removeTabAt(i);
+            city1.getMapMenu().setEnabled(true);
+            // this.mp = null;
         }
     }
 
@@ -173,11 +169,11 @@ public class Maps extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 692, Short.MAX_VALUE)
+            .addGap(0, 378, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 532, Short.MAX_VALUE)
+            .addGap(0, 378, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 

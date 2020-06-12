@@ -4,6 +4,7 @@ import controller.locationController.SuperMarketController;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import models.client1.City;
 import models.client1.Data;
 import views.tile.Tile;
 
@@ -13,52 +14,64 @@ import views.tile.Tile;
  */
 public class SuperMarket extends Location {
 
-    private double openTime;
-    private double closeTime;
+    private int openTime;
+    private int closeTime;
 
-    public SuperMarket(String name, int x, int y, double average_sick, int locationCategoryId, double openTime, double closeTime) {
-        super(name, x, y, average_sick, locationCategoryId);
-        this.fixedLocation = true;
+    public SuperMarket(String name, int x, int y, double average_sick, int fixed, int locationCategoryId, int openTime, int closeTime, String days, City city) {
+        super(name, x, y, average_sick, days, fixed, locationCategoryId, city);
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.openTimeToVisit = this.openTime;
+        this.closeTimeToVisit = this.closeTime;
         this.setWidth(LocationData.WTILESUPERMARKET * Data.TileWidth);
         this.setHeight(LocationData.HTILESUPERMARKET * Data.TileHeight);
+        this.workTime = 8;
         loadImage();
     }
 
-    public SuperMarket(String name, int x, int y, double average_sick, double openTime, double closeTime) {
-        super(name, x, y, average_sick);
+    public SuperMarket(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city) {
+        super(name, x, y, average_sick, days, fixed, city);
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.openTimeToVisit = this.openTime;
+        this.closeTimeToVisit = this.closeTime;
         this.setWidth(LocationData.WTILESUPERMARKET * Data.TileWidth);
         this.setHeight(LocationData.HTILESUPERMARKET * Data.TileHeight);
+        this.workTime = 8;
         loadImage();
     }
 
-    public SuperMarket(int id, String name, int x, int y, int width, int height, double average_sick, int locationCategoryId,
-            double openTime, double closeTime) {
-        super(id, name, x, y, width, height, average_sick, locationCategoryId);
+    public SuperMarket(int id, String name, int x, int y, int width, int height, double average_sick, int fixed, int locationCategoryId,
+            int openTime, int closeTime, String days, City c) {
+        super(id, name, x, y, width, height, average_sick, days, fixed, locationCategoryId, c);
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.openTimeToVisit = this.openTime;
+        this.closeTimeToVisit = this.closeTime;
+        this.workTime = 8;
         loadImage();
     }
 
     public SuperMarket() {
     }
 
-    public double getOpenTime() {
+    @Override
+    public int getOpenTime() {
         return openTime;
     }
 
-    public void setOpenTime(double openTime) {
+    @Override
+    public void setOpenTime(int openTime) {
         this.openTime = openTime;
     }
 
-    public double getCloseTime() {
+    @Override
+    public int getCloseTime() {
         return closeTime;
     }
 
-    public void setCloseTime(double closeTime) {
+    @Override
+    public void setCloseTime(int closeTime) {
         this.closeTime = closeTime;
     }
 

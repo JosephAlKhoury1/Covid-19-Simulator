@@ -1,240 +1,238 @@
 package models.model;
 
+import controller.controllers.ModelController;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import models.location1.Location;
+import javax.swing.JMenuItem;
+import models.client1.City;
+import views1.MainFrame;
+import views1.MapModel;
+import views1.model.panel.ModelPanel;
 
-/**
- *
- * @author Joseph
- */
 public class Model {
 
     private int modelId;
     private String modelName;
-    private boolean saved = false;
-    private boolean newModel = true;
-    private HumanAgeType under4;
-    private HumanAgeType between4and10;
-    private HumanAgeType between11and18;
-    private HumanAgeType between19and27;
-    private HumanAgeType between28and40;
-    private HumanAgeType between41and50;
-    private HumanAgeType between51and60;
-    private HumanAgeType between61and70;
-    private HumanAgeType between71and80;
-    private HumanAgeType above80;
 
-    private SexeType male;
-    private SexeType female;
+    private int isMain;
+    private boolean saved;
+    private boolean newModel;
+    private boolean deleted;
 
-    private SymptomsType noSymptoms;
-    private SymptomsType mildSymptoms;
-    private SymptomsType severeSymptoms;
-    private SymptomsType criticalSymptoms;
+    private MainFrame mainFrame;
+    private ModelPanel modelPanel;
 
-    private HumanStat sick;
-    private HumanStat healthy;
-    private HumanStat immune;
-    private HumanStat infected;
-    private HumanStat dead;
-    private HumanStat inHospital;
-    private HumanStat inIcu;
+    private List<SymptomType> listSymptomsType;
+    private List<SymptomStage> listSymptomStage;
+    private List<SymptomStage> listDeleted;
+    private List<SymptomStage> listAdd;
 
-    private final List<HumanAgeType> listHumanAgeTypePercentage = new ArrayList();
-    private final List<SexeType> listSexeType = new ArrayList();
-    private final List<SymptomsType> listSymptomsType = new ArrayList();
-    private final Map<Integer, Location> mapLocation = new HashMap();
+    private List<HumanAge> listHumanAge;
+    private List<HumanAge> listHumanAgeAdd;
+    private List<HumanAge> listHumanAgeDeleted;
 
-    public Model(int modelId, String modelName, List<SymptomsType> list) {
+    private City city;
+    private MapModel currentMap;
+    private JMenuItem mapMenu, runMenu, pauseMenu, populationMenu;
+
+    public Model(int modelId, String modelName, List<SymptomType> list, List<SymptomStage> listSS, List<HumanAge> listHA) {
         this.modelId = modelId;
         this.modelName = modelName;
-        for (SymptomsType st : list) {
-            if (st.getName().equals("No symptoms")) {
-                this.noSymptoms = st;
-            } else if (st.getName().equals("Mild symptoms")) {
-                this.mildSymptoms = st;
-            } else if (st.getName().equals("Severe Symptoms")) {
-                this.severeSymptoms = st;
-            } else if (st.getName().equals("Critical symptoms")) {
-                this.criticalSymptoms = st;
+        this.listSymptomsType = list;
+        this.listSymptomStage = listSS;
+        this.listHumanAge = listHA;
+        this.listDeleted = new ArrayList();
+        this.listAdd = new ArrayList();
+        this.listHumanAgeAdd = new ArrayList();
+        this.listHumanAgeDeleted = new ArrayList();
+        this.isMain = 1;
+
+        this.mapMenu = new JMenuItem(this.modelName + " Map");
+        this.mapMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateMapLocation();
+                mapMenu.setEnabled(false);
             }
+        });
+
+        this.populationMenu = new JMenuItem(this.modelName + " Model");
+        this.populationMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.initPopulation();
+                populationMenu.setEnabled(false);
+            }
+        });
+
+        this.runMenu = new JMenuItem("Run " + this.modelName);
+        this.runMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.start();
+            }
+        });
+
+        this.pauseMenu = new JMenuItem("Pause " + this.modelName);
+        this.pauseMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.pause();
+            }
+        });
+        this.newModel = false;
+        this.saved = true;
+        this.deleted = false;
+    }
+
+    public Model(String name, MainFrame frame, City c) {
+        this.modelName = name;
+        this.mainFrame = frame;
+        this.isMain = 1;
+        this.city = c;
+        this.newModel = true;
+        this.saved = false;
+        this.deleted = false;
+        this.listDeleted = new ArrayList();
+        this.listAdd = new ArrayList();
+
+        this.mapMenu = new JMenuItem(this.modelName + " Map");
+        this.mapMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateMapLocation();
+                mapMenu.setEnabled(false);
+            }
+        });
+
+        this.populationMenu = new JMenuItem(this.modelName + " Population");
+        this.populationMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.initPopulation();
+                populationMenu.setEnabled(false);
+            }
+        });
+
+        this.runMenu = new JMenuItem("Run " + this.modelName);
+        this.runMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.start();
+            }
+        });
+
+        this.pauseMenu = new JMenuItem("Pause " + this.modelName);
+        this.pauseMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.pause();
+            }
+        });
+
+        this.listSymptomsType = new ArrayList();
+        this.listSymptomStage = new ArrayList();
+        this.listHumanAge = new ArrayList();
+        this.listHumanAgeAdd = new ArrayList();
+        this.listHumanAgeDeleted = new ArrayList();
+
+        frame.getListSymptomName().forEach((sn) -> {
+            SymptomType st = new SymptomType(sn.getName(), 0, frame.getListSymptomStageNames(), frame.getListHumanAgeName(), this);
+            this.listSymptomsType.add(st);
+        });
+
+        int index = 0;
+        for (SymptomStageName ssn : frame.getListSymptomStageNames()) {
+            this.listSymptomStage.add(new SymptomStage(ssn.getName(), 0.0, 0.0, index, this));
+            index++;
+        }
+        for (HumanAgeName han : frame.getListHumanAgeName()) {
+            this.listHumanAge.add(new HumanAge(han.getName(), han.getMinAge(), han.getMaxAge(), this));
         }
     }
 
-    public Model(String name) {
-        this.modelName = name;
-        this.male = new SexeType("male", 0d);
-        this.female = new SexeType("female", 0d);
-        this.under4 = new HumanAgeType("under4", 0, 4, 5d, 0d, 0d, 0d);
-        this.between4and10 = new HumanAgeType("between4and10", 5, 10, 0d, 0d, 0d, 0d);
-        this.between11and18 = new HumanAgeType("between11and18", 11, 18, 0d, 0d, 0d, 0d);
-        this.between19and27 = new HumanAgeType("between19and27", 19, 27, 0d, 0d, 0d, 0d);
-        this.between28and40 = new HumanAgeType("between28and40", 28, 40, 0d, 0d, 0d, 0d);
-        this.between41and50 = new HumanAgeType("between41and50", 41, 50, 0d, 0d, 0d, 0d);
-        this.between51and60 = new HumanAgeType("between51and60", 51, 60, 0d, 0d, 0d, 0d);
-        this.between61and70 = new HumanAgeType("between61and70", 61, 70, 0d, 0d, 0d, 0d);
-        this.between71and80 = new HumanAgeType("between71and80", 71, 80, 0d, 0d, 0d, 0d);
-        this.above80 = new HumanAgeType("above80", 81, 100, 0d, 0d, 0d, 0d);
-        this.noSymptoms = new SymptomsType("No symptoms", 0d, 0d, 0);
-        this.mildSymptoms = new SymptomsType("Mild symptoms", 0d, 0d, 0);
-        this.severeSymptoms = new SymptomsType("Severe Symptoms", 0d, 0d, 0);
-        this.criticalSymptoms = new SymptomsType("Critical symptoms", 0d, 0d, 0);
-        this.listSymptomsType.add(this.noSymptoms);
-        this.listSymptomsType.add(this.mildSymptoms);
-        this.listSymptomsType.add(this.severeSymptoms);
-        this.listSymptomsType.add(this.criticalSymptoms);
-
-        this.sick = new HumanStat("Sick", 0d);
-        this.immune = new HumanStat("Immune", 0d);
-        this.healthy = new HumanStat("Healthy", 0d);
-        this.infected = new HumanStat("Infected", 0d);
-        this.dead = new HumanStat("Dead", 0d);
-        this.inHospital = new HumanStat("InHospital", 0d);
-        this.inIcu = new HumanStat("InIcu", 0d);
-    }
-
-    public void initHumanAgeTypePer() {
-        this.listHumanAgeTypePercentage.add(this.under4);
-        this.listHumanAgeTypePercentage.add(this.between4and10);
-        this.listHumanAgeTypePercentage.add(this.between11and18);
-        this.listHumanAgeTypePercentage.add(this.between19and27);
-        this.listHumanAgeTypePercentage.add(this.between28and40);
-        this.listHumanAgeTypePercentage.add(this.between41and50);
-        this.listHumanAgeTypePercentage.add(this.between51and60);
-        this.listHumanAgeTypePercentage.add(this.between61and70);
-        this.listHumanAgeTypePercentage.add(this.between71and80);
-        this.listHumanAgeTypePercentage.add(this.above80);
-    }
-
-    public void initHumanSexe() {
-        this.listSexeType.add(this.male);
-        this.listSexeType.add(this.female);
-    }
-
-    public void initHumanSymptomsType() {
-        this.listSymptomsType.add(this.noSymptoms);
-        this.listSymptomsType.add(this.mildSymptoms);
-        this.listSymptomsType.add(this.severeSymptoms);
-        this.listSymptomsType.add(this.criticalSymptoms);
+    public void generateMapLocation() {
+//        this.currentMap = new MapModel(mainFrame, this);
+//        JScrollPane p = new JScrollPane(this.currentMap);
+//        this.currentMap.setScrollPane(p);
+//        this.mainFrame.getjTabbedPane2().addTab("Map", this.currentMap.getScrollPane());
+//        this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.currentMap.getButton());
+        this.city.generateMapLocation();
+//        this.maps = new Maps(this.mainFrame, this.city);
+//        JScrollPane p = new JScrollPane(this.currentMap);
+//        this.maps.setScrollPane(p);
+//        this.mainFrame.getjTabbedPane2().addTab("Map", this.maps.getScrollPane());
+//        this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.maps.getButton());
     }
 
     public String getModelName() {
         return modelName;
     }
 
-    public HumanAgeType getUnder4() {
-        return under4;
+    public JMenuItem getRunMenu() {
+        return runMenu;
     }
 
-    public HumanAgeType getBetween4and10() {
-        return between4and10;
+    public JMenuItem getPopulationMenu() {
+        return populationMenu;
     }
 
-    public HumanAgeType getBetween11and18() {
-        return between11and18;
+    public void setRunMenu(JMenuItem runMenu) {
+        this.runMenu = runMenu;
     }
 
-    public HumanAgeType getBetween19and27() {
-        return between19and27;
+    public JMenuItem getPauseMenu() {
+        return pauseMenu;
     }
 
-    public HumanAgeType getBetween28and40() {
-        return between28and40;
+    public void setPauseMenu(JMenuItem pauseMenu) {
+        this.pauseMenu = pauseMenu;
     }
 
-    public HumanAgeType getBetween41and50() {
-        return between41and50;
+    public JMenuItem getMapMenu() {
+        return mapMenu;
     }
 
-    public HumanAgeType getBetween51and60() {
-        return between51and60;
-    }
-
-    public HumanAgeType getBetween61and70() {
-        return between61and70;
-    }
-
-    public HumanAgeType getBetween71and80() {
-        return between71and80;
-    }
-
-    public HumanAgeType getAbove80() {
-        return above80;
-    }
-
-    public SexeType getMale() {
-        return male;
-    }
-
-    public SexeType getFemale() {
-        return female;
-    }
-
-    public SymptomsType getNoSymptoms() {
-        return noSymptoms;
-    }
-
-    public SymptomsType getMildSymptoms() {
-        return mildSymptoms;
-    }
-
-    public SymptomsType getSevereSymptoms() {
-        return severeSymptoms;
-    }
-
-    public SymptomsType getCriticalSymptoms() {
-        return criticalSymptoms;
-    }
-
-    public HumanStat getSick() {
-        return sick;
-    }
-
-    public HumanStat getHealthy() {
-        return healthy;
-    }
-
-    public HumanStat getImmune() {
-        return immune;
-    }
-
-    public HumanStat getInfected() {
-        return infected;
-    }
-
-    public HumanStat getDead() {
-        return dead;
-    }
-
-    public HumanStat getInHospital() {
-        return inHospital;
-    }
-
-    public HumanStat getInIcu() {
-        return inIcu;
-    }
-
-    public List<HumanAgeType> getListHumanAgeTypePercentage() {
-        return listHumanAgeTypePercentage;
-    }
-
-    public List<SexeType> getListSexeType() {
-        return listSexeType;
-    }
-
-    public List<SymptomsType> getListSymptomsType() {
-        return listSymptomsType;
-    }
-
-    public Map<Integer, Location> getMapLocation() {
-        return mapLocation;
+    public void setMapMenu(JMenuItem mapMenu) {
+        this.mapMenu = mapMenu;
     }
 
     public boolean isSaved() {
         return saved;
+    }
+
+    public MapModel getCurrentMap() {
+        return currentMap;
+    }
+
+    public void setCurrentMap(MapModel currentMap) {
+        this.currentMap = currentMap;
+    }
+
+    public void setCity(City c) {
+        this.city = c;
+    }
+
+    public List<SymptomStage> getListSymptomStage() {
+        return listSymptomStage;
+    }
+
+    public void setListSymptomStage(List<SymptomStage> listSymptomStage) {
+        this.listSymptomStage = listSymptomStage;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public int getIsMain() {
+        return isMain;
+    }
+
+    public void setIsMain(int isMain) {
+        this.isMain = isMain;
     }
 
     public void setSaved(boolean saved) {
@@ -261,4 +259,168 @@ public class Model {
         this.modelName = modelName;
     }
 
+    public MainFrame getMainFrame() {
+        return mainFrame;
+    }
+
+    public void setMainFrame(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
+        for (SymptomType ss : this.listSymptomsType) {
+            ss.setModel(this);
+        }
+        /*for (SymptomStage st : this.listSymptomStage) {
+            st.setModel(this);
+        }*/
+    }
+
+    public List<SymptomType> getListSymptomsType() {
+        return listSymptomsType;
+    }
+
+    public void setListSymptomsType(List<SymptomType> listSymptomsType) {
+        this.listSymptomsType = listSymptomsType;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public ModelPanel getModelPanel() {
+        return modelPanel;
+    }
+
+    public void setModelPanel(ModelPanel modelPanel) {
+        this.modelPanel = modelPanel;
+    }
+
+    public void removeSymptomStage(List<SymptomStage> list) {
+        listSymptomsType.forEach((st) -> {
+            st.updateSymptomStage(list);
+        });
+        for (SymptomStage sts : list) {
+            if (sts.isIsNew()) {
+                if (!sts.isDeleted()) {
+                    SymptomStage ss = new SymptomStage(sts.getName(), sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), this);
+                    this.listSymptomStage.add(ss);
+                    //this.listAdd.add(ss);
+                } else {
+                }
+            } else {
+                for (SymptomStage st : this.listSymptomStage) {
+                    if (st.getName().equals(sts.getName())) {
+                        if (sts.isDeleted()) {
+                            st.setDeleted(true);
+                            this.listDeleted.add(st);
+                        } else {
+                            st.setIndex(sts.getIndex());
+                            st.setSaved(false);
+                        }
+                    }
+                }
+            }
+        }
+        for (SymptomStage st : this.listDeleted) {
+            this.listSymptomStage.remove(st);
+        }
+
+        SymptomStage[] tab = new SymptomStage[listSymptomStage.size()];
+        for (SymptomStage ss : listSymptomStage) {
+            tab[ss.getIndex()] = ss;
+        }
+
+        listSymptomStage.clear();
+
+        for (SymptomStage ss : tab) {
+            listSymptomStage.add(ss);
+        }
+    }
+
+    public void removeHumanAge(List<HumanAge> list) {
+        for (SymptomType st : this.listSymptomsType) {
+            st.updateHumanAge(list);
+        }
+        for (HumanAge ha : list) {
+            if (ha.isIsNew()) {
+                if (!ha.isDeleted()) {
+                    HumanAge han = new HumanAge(ha.getName(), ha.getMinAge(), ha.getMaxAge(), this);
+                    this.listHumanAge.add(han);
+                    this.listHumanAgeAdd.add(han);
+                } else {
+
+                }
+            } else {
+                if (ha.isDeleted()) {
+                    HumanAge tmp = null;
+                    for (HumanAge hat : this.listHumanAge) {
+                        if (hat.getName().equals(ha.getName())) {
+                            hat.setDeleted(true);
+                            tmp = hat;
+                            break;
+                        }
+                    }
+                    if (this.listHumanAgeAdd.contains(tmp)) {
+                        this.listHumanAgeAdd.remove(tmp);
+                    }
+                    this.listHumanAge.remove(tmp);
+                    this.listHumanAgeDeleted.add(tmp);
+                } else {
+
+                }
+            }
+        }
+    }
+
+    public List<HumanAge> getListHumanAge() {
+        return listHumanAge;
+    }
+
+    public void setListHumanAge(List<HumanAge> listHumanAge) {
+        this.listHumanAge = listHumanAge;
+    }
+
+    public void save() {
+        if (this.isNewModel()) {
+            this.modelId = ModelController.INSTANCE.insertModel(this);
+            this.setNewModel(false);
+            this.setSaved(true);
+        } else {
+            if (!this.isSaved()) {
+                ModelController.INSTANCE.updateModel(this);
+                this.setSaved(true);
+            }
+        }
+
+        this.listSymptomsType.stream().map((st) -> {
+            st.setModel(this);
+            return st;
+        }).forEachOrdered((st) -> {
+            st.save();
+        });
+
+        for (SymptomStage ss : this.listSymptomStage) {
+            //ss.setModel(this);
+            ss.save1();
+        }
+        for (SymptomStage ss : this.listDeleted) {
+            // ss.setModel(this);
+            ss.save1();
+        }
+        for (HumanAge ha : this.listHumanAge) {
+            ha.setModel(this);
+            ha.save1();
+        }
+        for (HumanAge ha : this.listHumanAgeDeleted) {
+            ha.setModel(this);
+            ha.save1();
+        }
+        this.listHumanAgeDeleted.clear();
+        this.listHumanAgeAdd.clear();
+        this.listAdd.clear();
+        this.listDeleted.clear();
+
+    }
 }

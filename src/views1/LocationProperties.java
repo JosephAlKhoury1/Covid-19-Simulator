@@ -1,68 +1,70 @@
 package views1;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import models.client1.Day;
-import models.location1.Location;
 import models.location1.LocationCategory;
 import models.locationFactories1.HouseFactory;
 
 public class LocationProperties extends javax.swing.JPanel {
 
     private LocationCategory locationCategory;
-    private CityPanel cityPanel;
-    private List<Day> listDay;
-    private List<Location> listLocations;
-    private double openTime, closeTime;
+    private boolean first = true;
     private final String[] hours = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
 
-    public LocationProperties(LocationCategory lc, CityPanel cityPanel) {
+    public LocationProperties(LocationCategory lc) {
         this.locationCategory = lc;
-        this.cityPanel = cityPanel;
-        this.listDay = new ArrayList();
-        this.listLocations = new ArrayList();
         initComponents();
         this.nameLabel1.setText(lc.getName());
         this.kindLabel1.setText(lc.getKind());
         this.quantityLabel1.setText(lc.getQuantity() + "");
         this.percentageLabel1.setText(lc.getPercentageToBeSick() + "");
 
+        String[] tab = lc.getDays().split(" ");
+        for (String s : tab) {
+            switch (s) {
+                case "Monday":
+                    this.mondayBox.setSelected(true);
+                    break;
+                case "Tuesday":
+                    this.tuesdayBox.setSelected(true);
+                    break;
+                case "Wednesday":
+                    this.wednesdayBox.setSelected(true);
+                    break;
+                case "Thursday":
+                    this.thursdayBox.setSelected(true);
+                    break;
+                case "Friday":
+                    this.fridayBox.setSelected(true);
+                    break;
+                case "Saturday":
+                    this.saturdayBox.setSelected(true);
+                    break;
+                case "Sunday":
+                    this.sundayBox.setSelected(true);
+                    break;
+                default:
+                    break;
+            }
+        }
         if (lc.getFactory() == HouseFactory.INSTANCE) {
             jPanel1.setVisible(false);
             jPanel2.setVisible(false);
-        } else {
-            for (Day d : listDay) {
-                if (d == Day.monday) {
-                    mondayBox.setSelected(true);
-                }
-                if (d == Day.tuesday) {
-                    tuesdayBox.setSelected(true);
-                }
-                if (d == Day.wednesday) {
-                    wednesdayBox.setSelected(true);
-                }
-                if (d == Day.thursday) {
-                    thursdayBox.setSelected(true);
-                }
-                if (d == Day.friday) {
-                    fridayBox.setSelected(true);
-                }
-                if (d == Day.saturday) {
-                    saturdayBox.setSelected(true);
-                }
-                if (d == Day.sunday) {
-                    sundayBox.setSelected(true);
-                }
+        }
+
+        for (int i = 0; i < hours.length; i++) {
+            if (this.locationCategory.getOpenTime() == Integer.parseInt(this.hours[i])) {
+                this.openTimeBox.setSelectedIndex(i);
+            } else if (this.locationCategory.getCloseTime() == Integer.parseInt(this.hours[i])) {
+                this.closeTimeBox.setSelectedIndex(i);
             }
         }
-        this.openTimeBox.setSelectedItem(this.openTime);
-        this.closeTimeBox.setSelectedItem(this.closeTime);
-    }
-
-    public List<Location> getListLocations() {
-        return listLocations;
+        if (lc.getFixedLocation() == 1) {
+            this.fixedJComboBox.setSelected(true);
+        } else {
+            this.fixedJComboBox.setSelected(false);
+        }
+        first = false;
     }
 
     @SuppressWarnings("unchecked")
@@ -79,6 +81,7 @@ public class LocationProperties extends javax.swing.JPanel {
         quantityLabel1 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         percentageLabel1 = new javax.swing.JLabel();
+        fixedJComboBox = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         mondayBox = new javax.swing.JCheckBox();
         tuesdayBox = new javax.swing.JCheckBox();
@@ -121,6 +124,14 @@ public class LocationProperties extends javax.swing.JPanel {
         percentageLabel1.setText("50");
         percentageLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        fixedJComboBox.setText("Fixed location");
+        fixedJComboBox.setToolTipText("");
+        fixedJComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fixedJComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -128,25 +139,30 @@ public class LocationProperties extends javax.swing.JPanel {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(quantityLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(percentageLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
+                                .addGap(102, 102, 102))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(kindLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                                    .addComponent(nameLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(quantityLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(percentageLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(102, 102, 102))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(kindLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
-                            .addComponent(nameLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(fixedJComboBox)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,7 +183,9 @@ public class LocationProperties extends javax.swing.JPanel {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(percentageLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fixedJComboBox)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -295,9 +313,9 @@ public class LocationProperties extends javax.swing.JPanel {
                     .addComponent(jLabel10)
                     .addComponent(jLabel11))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(openTimeBox, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(closeTimeBox, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(closeTimeBox, 0, 60, Short.MAX_VALUE)
+                    .addComponent(openTimeBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -330,165 +348,122 @@ public class LocationProperties extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(0, 0, 0)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(0, 0, 0)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
+                .addGap(0, 0, 0)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void mondayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mondayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.monday);
-            for (Location l : listLocations) {
-                l.addDay(Day.monday);
-            }
+            this.locationCategory.addDay(this.locationCategory.getCity().getWeek().getMONDAY());
         } else {
-            this.listDay.remove(Day.monday);
-            for (Location l : listLocations) {
-                l.removeDay(Day.monday);
-            }
+            this.locationCategory.removeDay(this.locationCategory.getCity().getWeek().getMONDAY());
         }
+        System.out.println("list days size = " + this.locationCategory.getListDay().size());
     }//GEN-LAST:event_mondayBoxActionPerformed
 
     private void tuesdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tuesdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.tuesday);
-            for (Location l : listLocations) {
-                l.addDay(Day.tuesday);
-            }
+            this.locationCategory.addDay(this.locationCategory.getCity().getWeek().getTUESDAY());
         } else {
-            this.listDay.remove(Day.tuesday);
-            for (Location l : listLocations) {
-                l.removeDay(Day.tuesday);
-            }
+            this.locationCategory.removeDay(this.locationCategory.getCity().getWeek().getTUESDAY());
         }
     }//GEN-LAST:event_tuesdayBoxActionPerformed
 
     private void wednesdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wednesdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.wednesday);
-            for (Location l : listLocations) {
-                l.addDay(Day.wednesday);
-            }
+            this.locationCategory.addDay(this.locationCategory.getCity().getWeek().getWEDNESDAY());
         } else {
-            this.listDay.remove(Day.wednesday);
-            for (Location l : listLocations) {
-                l.removeDay(Day.wednesday);
-            }
+            this.locationCategory.removeDay(this.locationCategory.getCity().getWeek().getWEDNESDAY());
         }
     }//GEN-LAST:event_wednesdayBoxActionPerformed
 
     private void thursdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_thursdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.thursday);
-            for (Location l : listLocations) {
-                l.addDay(Day.thursday);
-            }
+            this.locationCategory.addDay(this.locationCategory.getCity().getWeek().getTHURSDAY());
         } else {
-            this.listDay.remove(Day.thursday);
-            for (Location l : listLocations) {
-                l.removeDay(Day.thursday);
-            }
+            this.locationCategory.removeDay(this.locationCategory.getCity().getWeek().getTHURSDAY());
         }
     }//GEN-LAST:event_thursdayBoxActionPerformed
 
     private void fridayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fridayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.friday);
-            for (Location l : listLocations) {
-                l.addDay(Day.friday);
-            }
+            this.locationCategory.addDay(this.locationCategory.getCity().getWeek().getFRIDAY());
         } else {
-            this.listDay.remove(Day.friday);
-            for (Location l : listLocations) {
-                l.removeDay(Day.friday);
-            }
+            this.locationCategory.removeDay(this.locationCategory.getCity().getWeek().getFRIDAY());
         }
     }//GEN-LAST:event_fridayBoxActionPerformed
 
     private void saturdayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saturdayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.saturday);
-            for (Location l : listLocations) {
-                l.addDay(Day.saturday);
-            }
+            this.locationCategory.addDay(this.locationCategory.getCity().getWeek().getSATURDAY());
         } else {
-            this.listDay.remove(Day.saturday);
-            for (Location l : listLocations) {
-                l.removeDay(Day.saturday);
-            }
+            this.locationCategory.removeDay(this.locationCategory.getCity().getWeek().getSATURDAY());
         }
     }//GEN-LAST:event_saturdayBoxActionPerformed
 
     private void sundayBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayBoxActionPerformed
         JCheckBox cb = (JCheckBox) evt.getSource();
         if (cb.isSelected()) {
-            this.listDay.add(Day.sunday);
-            for (Location l : listLocations) {
-                l.addDay(Day.sunday);
-            }
+            this.locationCategory.addDay(this.locationCategory.getCity().getWeek().getSUNDAY());
         } else {
-            this.listDay.remove(Day.sunday);
-            for (Location l : listLocations) {
-                l.removeDay(Day.sunday);
-            }
+            this.locationCategory.removeDay(this.locationCategory.getCity().getWeek().getSUNDAY());
         }
     }//GEN-LAST:event_sundayBoxActionPerformed
 
     private void openTimeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTimeBoxActionPerformed
-        String openT = openTimeBox.getItemAt(openTimeBox.getSelectedIndex());
-        this.openTime = Integer.parseInt(openT);
-        for (Location l : listLocations) {
-            l.setOpenTime(openTime);
+        if (!first) {
+            String openT = openTimeBox.getItemAt(openTimeBox.getSelectedIndex());
+            this.locationCategory.setOpenTime(Integer.parseInt(openT));
         }
     }//GEN-LAST:event_openTimeBoxActionPerformed
 
     private void closeTimeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeTimeBoxActionPerformed
-        String closeT = closeTimeBox.getItemAt(closeTimeBox.getSelectedIndex());
-        this.closeTime = Integer.parseInt(closeT);
-        for (Location l : listLocations) {
-            l.setOpenTime(closeTime);
+        if (!first) {
+            String closeT = closeTimeBox.getItemAt(closeTimeBox.getSelectedIndex());
+            this.locationCategory.setCloseTime(Integer.parseInt(closeT));
         }
     }//GEN-LAST:event_closeTimeBoxActionPerformed
+
+    private void fixedJComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedJComboBoxActionPerformed
+        if (this.fixedJComboBox.isSelected()) {
+            this.locationCategory.setFixedLocation(1);
+        } else {
+            this.locationCategory.setFixedLocation(0);
+        }
+
+    }//GEN-LAST:event_fixedJComboBoxActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> closeTimeBox;
+    private javax.swing.JCheckBox fixedJComboBox;
     private javax.swing.JCheckBox fridayBox;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JLabel kindLabel;
     private javax.swing.JLabel kindLabel1;
     private javax.swing.JCheckBox mondayBox;
-    private javax.swing.JLabel nameLabel;
     private javax.swing.JLabel nameLabel1;
     private javax.swing.JComboBox<String> openTimeBox;
-    private javax.swing.JLabel percentageLabel;
     private javax.swing.JLabel percentageLabel1;
-    private javax.swing.JLabel quantityLabel;
     private javax.swing.JLabel quantityLabel1;
     private javax.swing.JCheckBox saturdayBox;
     private javax.swing.JCheckBox sundayBox;

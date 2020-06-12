@@ -4,6 +4,7 @@ import controller.locationController.UniversityController;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import models.client1.City;
 import models.client1.Data;
 import views.tile.Tile;
 
@@ -13,52 +14,64 @@ import views.tile.Tile;
  */
 public class University extends Location {
 
-    private double openTime;
-    private double closeTime;
+    private int openTime;
+    private int closeTime;
 
-    public University(String name, int x, int y, double average_sick, int locationCategoryId, double openTime, double closeTime) {
-        super(name, x, y, average_sick, locationCategoryId);
+    public University(String name, int x, int y, double average_sick, int fixed, int locationCategoryId, int openTime, int closeTime, String days, City city) {
+        super(name, x, y, average_sick, days, fixed, locationCategoryId, city);
         this.openTime = openTime;
         this.closeTime = closeTime;
-        this.fixedLocation = true;
+        this.openTimeToVisit = this.openTime;
+        this.closeTimeToVisit = this.closeTime;
         this.setWidth(LocationData.WTILEUNIVERSITY * Data.TileWidth);
         this.setHeight(LocationData.HTILEUNIVERSITY * Data.TileHeight);
+        this.workTime = this.closeTime - this.openTime;
         loadImage();
     }
 
-    public University(String name, int x, int y, double average_sick, double openTime, double closeTime) {
-        super(name, x, y, average_sick);
+    public University(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city) {
+        super(name, x, y, average_sick, days, fixed, city);
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.openTimeToVisit = this.openTime;
+        this.closeTimeToVisit = this.closeTime;
         this.setWidth(LocationData.WTILEUNIVERSITY * Data.TileWidth);
         this.setHeight(LocationData.HTILEUNIVERSITY * Data.TileHeight);
+        this.workTime = this.closeTime - this.openTime;
         loadImage();
     }
 
-    public University(int id, String name, int x, int y, int width, int height, double average_sick,
-            int locationCategoryId, double openTime, double closeTime) {
-        super(id, name, x, y, width, height, average_sick, locationCategoryId);
+    public University(int id, String name, int x, int y, int width, int height, double average_sick, int fixed,
+            int locationCategoryId, int openTime, int closeTime, String days, City c) {
+        super(id, name, x, y, width, height, average_sick, days, fixed, locationCategoryId, c);
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.openTimeToVisit = this.openTime;
+        this.closeTimeToVisit = this.closeTime;
+        this.workTime = this.closeTime - this.openTime;
         loadImage();
     }
 
     public University() {
     }
 
-    public double getOpenTime() {
+    @Override
+    public int getOpenTime() {
         return openTime;
     }
 
-    public void setOpenTime(double openTime) {
+    @Override
+    public void setOpenTime(int openTime) {
         this.openTime = openTime;
     }
 
-    public double getCloseTime() {
+    @Override
+    public int getCloseTime() {
         return closeTime;
     }
 
-    public void setCloseTime(double closeTime) {
+    @Override
+    public void setCloseTime(int closeTime) {
         this.closeTime = closeTime;
     }
 

@@ -6,11 +6,13 @@ import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
+import models.client1.City;
 import models.client1.Data;
 import models.client1.MonteCarlo;
 import models.client1.ReligionType;
 import models.member1.Human;
 import models.member1.Member;
+import tools.FileUtilities;
 import views.tile.Tile;
 
 /**
@@ -23,8 +25,8 @@ public class House extends Location {
     private List<Member> listPopulation;
     private ReligionType religionType;
 
-    public House(String name, int x, int y, double average_sick, int locationCategoryId) {
-        super(name, x, y, average_sick, locationCategoryId);
+    public House(String name, int x, int y, double average_sick, int fixed, int locationCategoryId, City city) {
+        super(name, x, y, average_sick, "", fixed, locationCategoryId, city);
         this.religionType = MonteCarlo.getHouseReligionType();
         this.setWidth(LocationData.WTILEHOUSE * Data.TileWidth);
         this.setHeight(LocationData.HTILEHOUSE * Data.TileHeight);
@@ -32,17 +34,19 @@ public class House extends Location {
         loadImage();
     }
 
-    public House(String name, int x, int y, double average_sick) {
-        super(name, x, y, average_sick);
+    public House(String name, int x, int y, double average_sick, int fixed, City city) {
+        super(name, x, y, average_sick, "", fixed, city);
+        this.religionType = MonteCarlo.getHouseReligionType();
         this.setWidth(LocationData.WTILEHOUSE * Data.TileWidth);
         this.setHeight(LocationData.WTILEHOUSE * Data.TileHeight);
         this.listPopulation = new ArrayList();
         loadImage();
     }
 
-    public House(int id, String name, int x, int y, int width, int height, double average_sick, int locationCategoryId) {
-        super(id, name, x, y, width, height, average_sick, locationCategoryId);
+    public House(int id, String name, int x, int y, int width, int height, double average_sick, int fixed, int locationCategoryId, City c) {
+        super(id, name, x, y, width, height, average_sick, "", fixed, locationCategoryId,c);
         this.listPopulation = new ArrayList();
+        this.religionType = MonteCarlo.getHouseReligionType();
         loadImage();
     }
 
@@ -74,7 +78,9 @@ public class House extends Location {
         this.nbPopulation = MonteCarlo.getHousePopulation();
         this.listPopulation.clear();
         for (int i = 0; i < nbPopulation; i++) {
-            Human h = new Human(Data.numberPopulation++, x, y, this, city, this.religionType);
+            Human h = new Human(x, y, this, city);
+            h.setId(Data.populationNumber);
+            Data.populationNumber++;
             addMember(h);
             this.listPopulation.add(h);
         }
@@ -89,11 +95,11 @@ public class House extends Location {
     }
 
     @Override
-    public void setOpenTime(double openTime) {
+    public void setOpenTime(int openTime) {
     }
 
     @Override
-    public void setCloseTime(double closeTime) {
+    public void setCloseTime(int closeTime) {
     }
 
     @Override
@@ -121,4 +127,15 @@ public class House extends Location {
             }
         }
     }
+
+    @Override
+    public int getOpenTime() {
+        return 0;
+    }
+
+    @Override
+    public int getCloseTime() {
+        return 0;
+    }
+
 }

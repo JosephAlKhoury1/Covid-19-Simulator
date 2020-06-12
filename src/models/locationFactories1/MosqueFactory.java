@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package models.locationFactories1;
 
+import models.client1.City;
 import models.location1.*;
 
 /**
@@ -16,8 +12,8 @@ public class MosqueFactory extends LocationFactory {
     public static final MosqueFactory INSTANCE = new MosqueFactory();
 
     @Override
-    public Location creatLocation(String name, int x, int y, double average_sick, double openTime, double closeTime) {
-        return new Mosque(name, x, y, average_sick, openTime, closeTime);
+    public Location creatLocation(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city) {
+        return new Mosque(name, x, y, average_sick, fixed, openTime, closeTime, days, city);
     }
 
     @Override

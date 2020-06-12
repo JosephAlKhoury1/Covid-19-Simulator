@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.locationController;
 
 import controller.datasource.DataSource;
@@ -14,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import models.client1.City;
 import models.location1.House;
 import models.location1.Location;
 
@@ -25,12 +21,12 @@ public class HouseController {
 
     public final static HouseController INSTANCE = new HouseController();
 
-    private final String insert = "insert into house(name, x, y, width, height, sickPercentage, locationCategoryId)"
-            + " values(?, ?, ?, ?, ?, ?, ?) ";
+    private final String insert = "insert into house(name, x, y, width, height, sickPercentage, fixed, locationCategoryId)"
+            + " values(?, ?, ?, ?, ?, ?, ?, ?) ";
     private final String update = "update house"
-            + " set sickPercentage = ?"
+            + " set sickPercentage = ?, fixed = ?"
             + " where id = ? ";
-    private final String selectAll = "select id, name, x, y, width, height, sickPercentage, locationCategoryId"
+    private final String selectAll = "select id, name, x, y, width, height, sickPercentage, fixed, locationCategoryId"
             + " from house"
             + " where locationCategoryId = ? ";
 
@@ -63,7 +59,8 @@ public class HouseController {
             this.insertStatement.setInt(4, c.getWidth());
             this.insertStatement.setInt(5, c.getHeight());
             this.insertStatement.setDouble(6, c.getAverage_sick());
-            this.insertStatement.setInt(7, c.getLocationCategoryId());
+            this.insertStatement.setInt(7, c.getFixedLocation());
+            this.insertStatement.setInt(8, c.getLocationCategoryId());
             this.insertStatement.executeUpdate();
             ResultSet generatedKeys = this.insertStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -79,7 +76,8 @@ public class HouseController {
     public boolean update(House c) {
         try {
             this.updateStatement.setDouble(1, c.getAverage_sick());
-            this.updateStatement.setInt(2, c.getId());
+            this.updateStatement.setInt(2, c.getFixedLocation());
+            this.updateStatement.setInt(3, c.getId());
             this.updateStatement.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(LocationCategoryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -87,14 +85,15 @@ public class HouseController {
         return true;
     }
 
-    public List<Location> selectAll(int categoryId) {
+    public List<Location> selectAll(int categoryId, City city) {
         List<Location> list = new ArrayList();
         try {
             this.selectAllStatement.setInt(1, categoryId);
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
-                list.add(new House(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
-                        set.getInt(5), set.getInt(6), set.getDouble(7), set.getInt(8)));
+                House h = new House(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
+                        set.getInt(5), set.getInt(6), set.getDouble(7), set.getInt(8), set.getInt(9),city);
+                list.add(h);
             }
             set.close();
             return list;

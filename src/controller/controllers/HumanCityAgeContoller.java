@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.controllers;
 
 import controller.datasource.DataSource;
@@ -15,7 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.client1.HumanCityAgeType;
-import models.model.HumanAgeType;
+import models.client1.LocationToGo;
 
 /**
  *
@@ -25,15 +20,14 @@ public class HumanCityAgeContoller {
 
     public static final HumanCityAgeContoller INSTANCE = new HumanCityAgeContoller();
 
-    private final String insert = "insert into humanCityAgeType(name, minAge, maxAge, humanPercentage, goSchoolPercentage,"
-            + " goUniversityPercentage, goWorkPercentage, cityId)"
-            + "values(?,?,?,?,?,?,?,?)";
-    private final String update = "update humanCityAgeType set humanPercentage=?, goSchoolPercentage=?, goUniversityPercentage, goWorkPercentage=?"
-            + "where id=?";
-    private final String selectAll = "select id, cityId, name, minAge, maxAge, humanPercentage, "
-            + "goSchoolPercentage, goUniversityPercentage, goWorkPercentage"
-            + " from humanCityAgeType  "
-            + " where cityId=? ";
+    private final String insert = "insert into humancityagetype(name, minAge, maxAge, humanPercentage, placeNumber, workPercentage, cityId)"
+            + " values(?,?,?,?,?,?,?)";
+    private final String update = "update humancityagetype  "
+            + " set name = ?, minAge = ?, maxAge = ?, humanPercentage = ?, placeNumber = ?, workPercentage = ? "
+            + " where id = ?";
+    private final String selectAll = "select id, name, minAge, maxAge, humanPercentage, placeNumber, workPercentage "
+            + " from humancityagetype  "
+            + " where cityId = ? ";
 
     private PreparedStatement insertStatement;
     private PreparedStatement updateStatement;
@@ -50,30 +44,40 @@ public class HumanCityAgeContoller {
     }
 
     public int insertHumanAgeType(HumanCityAgeType hat) {
+        int id = -1;
         try {
-            this.insertStatement.setString(1, hat.getType());
+            this.insertStatement.setString(1, hat.getName());
             this.insertStatement.setInt(2, hat.getMin());
             this.insertStatement.setInt(3, hat.getMax());
             this.insertStatement.setDouble(4, hat.getHumanPercentage());
-            this.insertStatement.setDouble(5, hat.getGoSchoolPercentage());
-            this.insertStatement.setDouble(6, hat.getGoUniversityPercentage());
-            this.insertStatement.setDouble(7, hat.getGoWorkPercentage());
-            this.insertStatement.setInt(8, hat.getCityId());
-            int id = this.insertStatement.executeUpdate();
-            return id;
+            this.insertStatement.setInt(5, hat.getPlaceNumber());
+            this.insertStatement.setDouble(6, hat.getWorkPercentage());
+            this.insertStatement.setInt(7, hat.getCity().getId());
+
+            int affectedRows = this.insertStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating Human age type failed, no rows affected.");
+            }
+            ResultSet generatedKeys = this.insertStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                id = generatedKeys.getInt(1);
+            }
+            hat.setId(id);
         } catch (SQLException ex) {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return -1;
+        return id;
     }
 
-    public boolean updateHumanAgeType(HumanAgeType hat) {
+    public boolean updateHumanAgeType(HumanCityAgeType hat) {
         try {
-            this.updateStatement.setDouble(1, hat.getHumanPercentage());
-            this.updateStatement.setDouble(1, hat.getGoSchoolPercentage());
-            this.updateStatement.setDouble(3, hat.getGoUniversityPercentage());
-            this.updateStatement.setDouble(4, hat.getGoWorkPercentage());
-            this.updateStatement.setInt(5, hat.getId());
+            this.updateStatement.setString(1, hat.getName());
+            this.updateStatement.setInt(2, hat.getMin());
+            this.updateStatement.setInt(3, hat.getMax());
+            this.updateStatement.setDouble(4, hat.getHumanPercentage());
+            this.updateStatement.setInt(5, hat.getPlaceNumber());
+            this.updateStatement.setDouble(6, hat.getWorkPercentage());
+            this.updateStatement.setInt(7, hat.getId());
             this.updateStatement.executeUpdate();
             return true;
         } catch (SQLException ex) {
@@ -88,8 +92,9 @@ public class HumanCityAgeContoller {
             this.selectAllStatement.setInt(1, cityId);
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
-                list.add(new HumanCityAgeType(set.getInt(1), set.getInt(2), set.getString(3), set.getInt(4), set.getInt(5),
-                        set.getDouble(6), set.getDouble(7), set.getDouble(8), set.getDouble(9)));
+                List<LocationToGo> listLocationTo = LocationToGoController.INSTANCE.selectAll(set.getInt(1));
+                List<String> listN = LocationToGoController.INSTANCE.selectAllName(set.getInt(1));
+                list.add(new HumanCityAgeType(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4), set.getDouble(5), set.getInt(6), set.getDouble(7), listLocationTo, listN));
             }
             set.close();
             return list;

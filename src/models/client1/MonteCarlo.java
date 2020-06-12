@@ -1,6 +1,5 @@
 package models.client1;
 
-import models.client.*;
 import java.util.Random;
 
 /**
@@ -25,9 +24,12 @@ public class MonteCarlo {
     }
 
     public static int getHousePopulation() {
+        if (Data.housePopulationPercentage.isEmpty()) {
+            return 0;
+        }
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.housePopulationPercentage.size());
-            Double prob = Data.housePopulationPercentage.get(index) / 100d;
+            Double prob = Data.housePopulationPercentage.get(index).getPercentage() / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
                 return index;
@@ -35,55 +37,58 @@ public class MonteCarlo {
         }
     }
 
-    public static HumanAgeType getHumanAgeTypeWithoutChildren() {
+    public static HumanCityAgeType getHumanAgeTypeWithoutChildren() {
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.populationAgePercentageWithoutChildren.size());
-            HumanAgeType ht = (HumanAgeType) Data.populationAgePercentageWithoutChildren.keySet().toArray()[index];
-            Double prob = Data.populationAgePercentageWithoutChildren.get(ht) / 100d;
+            HumanCityAgeType ht = (HumanCityAgeType) Data.populationAgePercentageWithoutChildren.get(index);
+            Double prob = ht.getHumanPercentage() / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
-                return (HumanAgeType) Data.populationAgePercentageWithoutChildren.keySet().toArray()[index];
+                return ht;
             }
         }
     }
 
-    public static HumanAgeType getHumanAgeType() {
+    public static HumanCityAgeType getHumanAgeType() {
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.populationAgePercentage.size());
-            HumanAgeType ht = (HumanAgeType) Data.populationAgePercentage.keySet().toArray()[index];
-            Double prob = Data.populationAgePercentage.get(ht) / 100d;
+            HumanCityAgeType ht = (HumanCityAgeType) Data.populationAgePercentage.get(index);
+            Double prob = ht.getHumanPercentage() / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
-                return (HumanAgeType) Data.populationAgePercentage.keySet().toArray()[index];
+                return ht;
             }
         }
     }
 
-    public static int getHumanAge(HumanAgeType humanAgeType) {
+    public static int getHumanAge(HumanCityAgeType humanAgeType) {
         return getNextIntBetween2Number(humanAgeType.getMin(), humanAgeType.getMax());
     }
 
     public static ReligionType getHouseReligionType() {
+        if (Data.houseReligionTypePercentage.size() == 0) {
+            return null;
+        }
+        ReligionType rt = null;
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.houseReligionTypePercentage.size());
-            ReligionType rt = (ReligionType) Data.houseReligionTypePercentage.keySet().toArray()[index];
-            Double prob = Data.houseReligionTypePercentage.get(rt) / 100d;
+            rt = (ReligionType) Data.houseReligionTypePercentage.get(index);
+            Double prob = rt.getPercentage() / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
-                System.out.println("index=" + index);
-                return (ReligionType) Data.houseReligionTypePercentage.keySet().toArray()[index];
+                return rt;
             }
         }
     }
 
     public static SexeType getSexeType() {
         while (true) {
-            int index = uniformFixedSeed.nextInt(Data.humanSex.size());
-            SexeType st = (SexeType) Data.humanSex.keySet().toArray()[index];
-            Double prob = Data.humanSex.get(st) / 100d;
+            int index = uniformFixedSeed.nextInt(Data.sexeTypePercentage.size());
+            SexeType st = (SexeType) Data.sexeTypePercentage.get(index);
+            Double prob = st.getPercentage() / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
-                return (SexeType) Data.humanSex.keySet().toArray()[index];
+                return st;
             }
         }
     }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.locationController;
 
 import controller.datasource.DataSource;
@@ -14,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import models.client1.City;
 import models.location1.Location;
 import models.location1.Shop;
 
@@ -25,12 +21,12 @@ public class ShopController {
 
     public static final ShopController INSTANCE = new ShopController();
 
-    private final String insert = "insert into shop(name, x, y, width, height, sickPercentage, openTime, closeTime, locationCategoryId)"
-            + " values(?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+    private final String insert = "insert into shop(name, x, y, width, height, sickPercentage, fixed, openTime, closeTime, days, locationCategoryId)"
+            + " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
     private final String update = "update shop"
-            + " set sickPercentage = ?"
+            + " set sickPercentage = ?, fixed = ?, days = ?, openTime = ?, closeTime = ?"
             + " where id = ? ";
-    private final String selectAll = "select id, name, x, y, width, height, sickPercentage, openTime, closeTime, locationCategoryId"
+    private final String selectAll = "select id, name, x, y, width, height, sickPercentage, fixed, openTime, closeTime, days, locationCategoryId"
             + " from shop"
             + " where locationCategoryId = ? ";
 
@@ -63,9 +59,11 @@ public class ShopController {
             this.insertStatement.setInt(4, c.getWidth());
             this.insertStatement.setInt(5, c.getHeight());
             this.insertStatement.setDouble(6, c.getAverage_sick());
-            this.insertStatement.setDouble(7, c.getOpenTime());
-            this.insertStatement.setDouble(8, c.getCloseTime());
-            this.insertStatement.setInt(9, c.getLocationCategoryId());
+            this.insertStatement.setInt(7, c.getFixedLocation());
+            this.insertStatement.setInt(8, c.getOpenTime());
+            this.insertStatement.setInt(9, c.getCloseTime());
+            this.insertStatement.setString(10, c.getDays());
+            this.insertStatement.setInt(11, c.getLocationCategoryId());
             this.insertStatement.executeUpdate();
             ResultSet generatedKeys = this.insertStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -82,7 +80,11 @@ public class ShopController {
     public boolean update(Shop c) {
         try {
             this.updateStatement.setDouble(1, c.getAverage_sick());
-            this.updateStatement.setInt(2, c.getId());
+            this.updateStatement.setInt(2, c.getFixedLocation());
+            this.updateStatement.setString(3, c.getDays());
+            this.updateStatement.setInt(4, c.getOpenTime());
+            this.updateStatement.setInt(5, c.getCloseTime());
+            this.updateStatement.setInt(6, c.getId());
             this.updateStatement.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(ChurchController.class.getName()).log(Level.SEVERE, null, ex);
@@ -90,14 +92,15 @@ public class ShopController {
         return true;
     }
 
-    public List<Location> selectAll(int categoryId) {
+    public List<Location> selectAll(int categoryId, City city) {
         List<Location> list = new ArrayList();
         try {
             this.selectAllStatement.setInt(1, categoryId);
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
-                list.add(new Shop(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
-                        set.getInt(5), set.getInt(6), set.getDouble(7), set.getDouble(8), set.getDouble(9), set.getInt(10)));
+                Shop s = new Shop(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
+                        set.getInt(5), set.getInt(6), set.getDouble(7), set.getInt(8), set.getInt(9), set.getInt(10), set.getString(11), set.getInt(12),city);
+                list.add(s);
             }
             set.close();
         } catch (SQLException ex) {
@@ -105,8 +108,8 @@ public class ShopController {
         }
         return list;
     }
-    
-     public void delete(int id){
+
+    public void delete(int id) {
         try {
             this.deleteStatement.setInt(1, id);
             this.deleteStatement.executeUpdate();

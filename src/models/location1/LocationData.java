@@ -5,7 +5,6 @@
  */
 package models.location1;
 
-
 /**
  *
  * @author Joseph
@@ -30,6 +29,8 @@ public class LocationData {
     public static final int HTILEMOSQUE = 2;
     public static final int WTILESHOP = 2;
     public static final int HTILESHOP = 2;
+    public static final int WTILEFACTORY = 2;
+    public static final int HTILEFACTORY = 2;
     public static final int WTILEDISPLACEMENTCAMP = 5;
     public static final int HTILEDISPLACEMENTCAMP = 5;
     public static final int WTILEREFUGEECAMP = 5;

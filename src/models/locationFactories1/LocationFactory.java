@@ -1,5 +1,6 @@
 package models.locationFactories1;
 
+import models.client1.City;
 import models.location1.Location;
 
 /**
@@ -8,7 +9,7 @@ import models.location1.Location;
  */
 public abstract class LocationFactory {
 
-    public abstract Location creatLocation(String name, int x, int y, double average_sick, double openTime, double closeTime);
+    public abstract Location creatLocation(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city);
 
     public abstract int getWTile();
 

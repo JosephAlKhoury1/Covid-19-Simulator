@@ -4,6 +4,7 @@ import controller.locationController.HospitalController;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.ImageIcon;
+import models.client1.City;
 import models.client1.Data;
 import views.tile.Tile;
 
@@ -13,51 +14,65 @@ import views.tile.Tile;
  */
 public class Hospital extends Location {
 
-    private double openTime;
-    private double closeTime;
+    private int openTime;
+    private int closeTime;
 
-    public Hospital(String name, int x, int y, double average_sick, int locationCategoryId, double openTime, double closeTime) {
-        super(name, x, y, average_sick, locationCategoryId);
+    public Hospital(String name, int x, int y, double average_sick, int fixed, int locationCategoryId, int openTime, int closeTime, String days, City city) {
+        super(name, x, y, average_sick, days, fixed, locationCategoryId, city);
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.workTime = 8;
+        this.openTimeToVisit = 8;
+        this.closeTimeToVisit = 19;
+        this.setWidth(LocationData.WTILEHOSPITAL * Data.TileWidth);
+        this.setHeight(LocationData.HTILEHOSPITAL * Data.TileHeight);
+        loadImage();
+
+    }
+
+    public Hospital(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city) {
+        super(name, x, y, average_sick, days, fixed, city);
+        this.openTime = openTime;
+        this.closeTime = closeTime;
+        this.workTime = 8;
+        this.openTimeToVisit = 8;
+        this.closeTimeToVisit = 19;
         this.setWidth(LocationData.WTILEHOSPITAL * Data.TileWidth);
         this.setHeight(LocationData.HTILEHOSPITAL * Data.TileHeight);
         loadImage();
     }
 
-    public Hospital(String name, int x, int y, double average_sick, double openTime, double closeTime) {
-        super(name, x, y, average_sick);
+    public Hospital(int id, String name, int x, int y, int width, int height, double average_sick, int fixed,
+            int openTime, int closeTime, String days, int locationCategoryId, City c) {
+        super(id, name, x, y, width, height, average_sick, days, fixed, locationCategoryId, c);
         this.openTime = openTime;
         this.closeTime = closeTime;
-        this.setWidth(LocationData.WTILEHOSPITAL * Data.TileWidth);
-        this.setHeight(LocationData.HTILEHOSPITAL * Data.TileHeight);
-        loadImage();
-    }
-
-    public Hospital(int id, String name, int x, int y, int width, int height, double average_sick,
-            double openTime, double closeTime, int locationCategoryId) {
-        super(id, name, x, y, width, height, average_sick, locationCategoryId);
-        this.openTime = openTime;
-        this.closeTime = closeTime;
+        this.workTime = 8;
+        this.openTimeToVisit = 8;
+        this.closeTimeToVisit = 19;
         loadImage();
     }
 
     public Hospital() {
     }
 
-    public double getOpenTime() {
+    @Override
+    public int getOpenTime() {
         return openTime;
     }
 
-    public void setOpenTime(double openTime) {
+    @Override
+    public void setOpenTime(int openTime) {
         this.openTime = openTime;
     }
 
-    public double getCloseTime() {
+    @Override
+    public int getCloseTime() {
         return closeTime;
     }
 
-    public void setCloseTime(double closeTime) {
+    @Override
+    public void setCloseTime(int closeTime) {
         this.closeTime = closeTime;
     }
 

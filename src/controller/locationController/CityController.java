@@ -1,6 +1,9 @@
 package controller.locationController;
 
+import controller.controllers.HousePopulationController;
 import controller.controllers.HumanCityAgeContoller;
+import controller.controllers.ReligionTypeController;
+import controller.controllers.SexeTypeController;
 import controller.datasource.DataSource;
 import java.rmi.RemoteException;
 import java.sql.PreparedStatement;
@@ -13,13 +16,16 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.client1.City;
+import models.client1.HousePopulation;
 import models.client1.HumanCityAgeType;
+import models.client1.ReligionType;
+import models.client1.SexeType;
 import models.location1.LocationCategory;
 
 public class CityController {
-
+    
     public static final CityController INSTANCE = new CityController();
-
+    
     private final String insert = "insert into cities(name,population,width,heigth, main, countryId)"
             + " values(?, ?, ?, ?, ?, ?)";
     private final String update = "update cities"
@@ -27,26 +33,26 @@ public class CityController {
             + " where id=?";
     private final String selectAll = "select id , name"
             + " from cities";
-
+    
     private final String select = "select id, name, population, width , heigth, main, countryId "
             + " from cities"
             + " where id=?";
-
+    
     private final String getMainCity = "select id, name, population, width, heigth, main, countryId"
             + " from cities "
             + " where main=?";
-
+    
     private final String setCityNonMain = "update cities "
             + " set main = 0 "
             + " where id=? ";
-
+    
     private PreparedStatement insertStatement;
     private PreparedStatement updateStatement;
     private PreparedStatement selectAllStatement;
     private PreparedStatement selectStatement;
     private PreparedStatement getMainCityStatement;
     private PreparedStatement setCityNonMainStatement;
-
+    
     private CityController() {
         try {
             this.insertStatement = DataSource.getConnection().prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
@@ -59,7 +65,7 @@ public class CityController {
             Logger.getLogger(CityController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public int insert(City c) {
         int id = -1;
         try {
@@ -80,7 +86,7 @@ public class CityController {
         }
         return id;
     }
-
+    
     public boolean update(City c) {
         try {
             this.updateStatement.setString(1, c.getName());
@@ -96,7 +102,7 @@ public class CityController {
         }
         return false;
     }
-
+    
     public Map<Integer, String> selectAll() {
         Map<Integer, String> list = new HashMap();
         try {
@@ -110,44 +116,54 @@ public class CityController {
         }
         return list;
     }
-
+    
     public City select(int id) {
         City c = null;
         try {
             List<HumanCityAgeType> listHumanAgeType = null;
+            List<ReligionType> listR = null;
+            List<HousePopulation> listHP = null;
+            List<SexeType> listSt = null;
             this.selectStatement.setInt(1, id);
             ResultSet set = this.selectStatement.executeQuery();
             int cityId = -1;
             if (set.next()) {
                 cityId = set.getInt(1);
-                c = new City(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
-                        set.getInt(5), 1, set.getInt(6), listHumanAgeType);
-            }
-            if (c != null) {
                 listHumanAgeType = HumanCityAgeContoller.INSTANCE.selectAllHumaAgeType(cityId);
+                listR = ReligionTypeController.INSTANCE.selectAll(cityId);
+                listHP = HousePopulationController.INSTANCE.selectAll(cityId);
+                listSt = SexeTypeController.INSTANCE.selectAl(cityId);
+                c = new City(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
+                        set.getInt(5), 1, set.getInt(6), listHumanAgeType, listR, listHP, listSt);
                 Map<String, LocationCategory> mapLocation = LocationCategoryController.INSTANCE.selectAllMap(c);
                 c.setMapLocation(mapLocation);
-                c.setListHumanAgeType(listHumanAgeType);
+                c.setIsMain(1);
+                this.update(c);
             }
         } catch (SQLException | RemoteException ex) {
             Logger.getLogger(CityController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return c;
     }
-
+    
     public City getMainCity(int i) {
         City c = null;
         try {
             List<HumanCityAgeType> listHumanAgeType = null;
+            List<ReligionType> listR = null;
+            List<HousePopulation> listHP = null;
+            List<SexeType> listSt = null;
             this.getMainCityStatement.setInt(1, i);
             ResultSet set = this.getMainCityStatement.executeQuery();
+            int cityId = -1;
             if (set.next()) {
-                int cityId = set.getInt(1);
+                cityId = set.getInt(1);
                 listHumanAgeType = HumanCityAgeContoller.INSTANCE.selectAllHumaAgeType(cityId);
+                listR = ReligionTypeController.INSTANCE.selectAll(cityId);
+                listHP = HousePopulationController.INSTANCE.selectAll(cityId);
+                listSt = SexeTypeController.INSTANCE.selectAl(cityId);
                 c = new City(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
-                        set.getInt(5), 1, set.getInt(6), listHumanAgeType);
-            }
-            if (c != null) {
+                        set.getInt(5), 1, set.getInt(6), listHumanAgeType, listR, listHP, listSt);
                 Map<String, LocationCategory> mapLocation = LocationCategoryController.INSTANCE.selectAllMap(c);
                 c.setMapLocation(mapLocation);
             }
@@ -156,7 +172,7 @@ public class CityController {
         }
         return c;
     }
-
+    
     public void setCityNonMain(int id) {
         try {
             this.setCityNonMainStatement.setInt(1, id);
