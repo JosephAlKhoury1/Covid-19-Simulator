@@ -30,10 +30,10 @@ public class ManageHumanAgeDistributionPanel extends javax.swing.JPanel {
         this.listHumanAge = new ArrayList();
 
         for (HumanAge ha : this.mainFrame.getCurrentModel().getListHumanAge()) {
-            HumanAge han = new HumanAge(ha.getName(), ha.getMinAge(), ha.getMaxAge(), ha.getModel());
+           /* HumanAge han = new HumanAge(ha.getName(), ha.getMinAge(), ha.getMaxAge(), ha.getModel());
             han.setIsNew(false);
             han.setDeleted(false);
-            this.listHumanAge.add(han);
+            this.listHumanAge.add(han);*/
         }
         for (HumanAgeName han : this.mainFrame.getListHumanAgeName()) {
             boolean old = false;
@@ -44,10 +44,10 @@ public class ManageHumanAgeDistributionPanel extends javax.swing.JPanel {
                 }
             }
             if (!old) {
-                HumanAge ha = new HumanAge(han.getName(), han.getMinAge(), han.getMaxAge(), this.mainFrame.getCurrentModel());
+               /* HumanAge ha = new HumanAge(han.getName(), han.getMinAge(), han.getMaxAge(), this.mainFrame.getCurrentModel());
                 ha.setIsNew(true);
                 ha.setDeleted(true);
-                this.listHumanAge.add(ha);
+                this.listHumanAge.add(ha);*/
             }
         }
         this.listRow = new ArrayList();

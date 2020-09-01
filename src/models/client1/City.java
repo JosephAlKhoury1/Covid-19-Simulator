@@ -20,6 +20,7 @@ import javax.swing.SwingConstants;
 import models.location1.*;
 import models.member1.Member;
 import models.model.HumanAgeName;
+import models.model.Model;
 import models.model.ReligionName;
 import models.transportation1.Transportation;
 import tools.FileUtilities;
@@ -28,6 +29,7 @@ import views.tile.TileType;
 import views1.CityPanel;
 import views1.MainFrame;
 import views1.Maps;
+import views1.model.panel.StatistiquePanel;
 
 public class City extends UnicastRemoteObject implements ICity, Runnable, Cloneable {
 
@@ -82,6 +84,16 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     private Thread thread;
     private JMenuItem mapMenu, runMenu, pauseMenu, populationMenu;
     private JSeparator separator, runSeparator, pauseSeparator, separatorPopulation;
+
+    private int speed = 5;
+
+    private StatistiquePanel statistiquePanel;
+    private List<Member> listHealth;
+    private List<Member> listSick;
+    private List<Member> listDeath;
+    private List<Member> listImmune;
+
+    private Model model;
 
     public City(int id, String name, int nbPopulation, int width, int height, int isMain,
             int countryId, List<HumanCityAgeType> list, List<ReligionType> listR, List<HousePopulation> listHp, List<SexeType> listSt) throws RemoteException {
@@ -182,6 +194,14 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
             st.setCity(this);
         });
 
+        this.listHealth = new ArrayList();
+        this.listDeath = new ArrayList();
+        this.listSick = new ArrayList();
+        this.listImmune = new ArrayList();
+
+        if (this.model != null) {
+            this.statistiquePanel = new StatistiquePanel(this.model);
+        }
     }
 
     public City(String name, int nbPopulation, int width, int height,
@@ -289,6 +309,12 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.topCities = new HashMap();
 
         Data.initData(this.listrelReligionTypes, this.listHousePopulations, this.listHumanAgeType, this.listSexeType);
+
+        this.listHealth = new ArrayList();
+        this.listDeath = new ArrayList();
+        this.listSick = new ArrayList();
+        this.listImmune = new ArrayList();
+
     }
 
     public List<HumanCityAgeType> getListHumanAgeType() {
@@ -302,6 +328,14 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.currentMap.setScrollPane(p);
         this.mainFrame.getjTabbedPane2().addTab("Map", this.currentMap.getScrollPane());
         this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.currentMap.getButton());
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public int getWidth() {
@@ -392,6 +426,22 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.id = id;
     }
 
+    public List<Member> getListHealth() {
+        return listHealth;
+    }
+
+    public List<Member> getListSick() {
+        return listSick;
+    }
+
+    public List<Member> getListDeath() {
+        return listDeath;
+    }
+
+    public List<Member> getListImmune() {
+        return listImmune;
+    }
+
     public void addLeftCity(City c) {
         this.leftCities.put(leftCities.size(), c);
         c.addRigthCity(this);
@@ -449,6 +499,7 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
                 l.initPopulation();
             });
         });
+        this.statistiquePanel.updateState();
         FileUtilities.saveStat(this.listMember);
     }
 
@@ -557,11 +608,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.listHousePopulationsDeleted.add(hp);
     }
 
-    public void removeSexeType(SexeType s) {
-        this.listSexeType.remove(s);
-        this.listSexeTypeDeleted.add(s);
-    }
-
     public Location getLocationDay(String kind) {
         List<String> list = new ArrayList();
         for (Entry<String, LocationCategory> e : this.currentDay.getListLocationCategory().entrySet()) {
@@ -580,6 +626,21 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
             }
         }
         return null;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+        if (this.model != null) {
+            this.statistiquePanel = new StatistiquePanel(this.model);
+        }
+    }
+
+    public StatistiquePanel getStatistiquePanel() {
+        return statistiquePanel;
     }
 
     public Location getRandomLocation() {
@@ -745,9 +806,13 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     public void run() {
         while (true) {
             try {
-                this.thread.sleep(5);
+                this.thread.sleep(speed);
                 week.changeTime();
-                mainFrame.updateTime(week);
+                //mainFrame.updateTime(week);
+                if (statistiquePanel != null) {
+                    statistiquePanel.updateState();
+                    statistiquePanel.updateTime(week);
+                }
                 for (Entry<Integer, Member> e : listMember.entrySet()) {
                     e.getValue().move();
                 }
@@ -927,5 +992,17 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.listMember.entrySet().forEach((e) -> {
             e.getValue().setHour(hour);
         });
+    }
+
+    public void changeState(int num) {
+        for (Member m : this.listSick) {
+            this.listHealth.add(m);
+        }
+        this.listSick.clear();
+        for (int i = 0; i < num; i++) {
+            int y = MonteCarlo.getNextInt(this.listHealth.size());
+            this.listSick.add(this.listHealth.remove(y));
+        }
+        this.statistiquePanel.updateState();
     }
 }

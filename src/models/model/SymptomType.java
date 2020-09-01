@@ -1,5 +1,6 @@
 package models.model;
 
+import controller.controllers.SymptomStageTypeController;
 import controller.controllers.SymptomsController;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -14,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -27,11 +29,9 @@ public class SymptomType extends javax.swing.JPanel {
     private List<SymptomStage> listSymptomStage;
     private List<SymptomStage> listDeleted;
     private List<SymptomStage> listAdd;
-
-    private List<HumanAge> listHumanAge;
-    private List<HumanAge> listHumanAgeAdd;
-    private List<HumanAge> listHumanAgeDeleted;
     private int contagiousDay;
+
+    private double percentage;
 
     private boolean saved, inNew, deleted;
 
@@ -42,94 +42,28 @@ public class SymptomType extends javax.swing.JPanel {
     private JLabel name1, name2;
     private JTextField dayTxt;
 
-    private JPanel agePanel;
-    private Component cAgePanel;
+    private JPanel panel;
+    private List<SymptomStageType> listSage;
 
-    public SymptomType(int id, String name, int contagiousDay, List<SymptomStage> list, List<HumanAge> listHumanAge) {
-        initComponents();
-        this.id = id;
-        this.name = name;
-        this.contagiousDay = contagiousDay;
-        this.listSymptomStage = list;
-        this.listDeleted = new ArrayList();
-        this.listAdd = new ArrayList();
-        this.listHumanAge = listHumanAge;
-        this.listHumanAgeAdd = new ArrayList();
-        this.listHumanAgeDeleted = new ArrayList();
-        this.saved = true;
-        this.inNew = false;
-        this.deleted = false;
-
-        name1 = new javax.swing.JLabel();
-        name1.setText(name);
-        name1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        name1.setToolTipText("");
-        name1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        name1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        name1.setMaximumSize(new java.awt.Dimension(130, 35));
-        name1.setMinimumSize(new java.awt.Dimension(130, 35));
-        name1.setPreferredSize(new java.awt.Dimension(130, 35));
-
-        this.cName1 = Box.createVerticalStrut(3);
-
-        name2 = new javax.swing.JLabel();
-        name2.setText(name);
-        name2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        name2.setToolTipText("");
-        name2.setAlignmentX(Component.LEFT_ALIGNMENT);
-        name2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        name2.setMaximumSize(new java.awt.Dimension(130, 35));
-        name2.setMinimumSize(new java.awt.Dimension(130, 35));
-        name2.setPreferredSize(new java.awt.Dimension(130, 35));
-
-        this.cName2 = Box.createVerticalStrut(3);
-
-        dayTxt = new JTextField();
-        dayTxt.setText(contagiousDay + "");
-        dayTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        dayTxt.setToolTipText("");
-        dayTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        dayTxt.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        dayTxt.setMaximumSize(new java.awt.Dimension(130, 35));
-        dayTxt.setMinimumSize(new java.awt.Dimension(130, 35));
-        dayTxt.setPreferredSize(new java.awt.Dimension(130, 35));
-
-        this.listener = new JTextFieldIntegerListener(dayTxt, this);
-        this.dayTxt.addFocusListener(listener);
-        this.dayTxt.getDocument().addDocumentListener(listener);
-
-        this.symptomeStagePanel.setLayout(new BoxLayout(this.symptomeStagePanel, BoxLayout.X_AXIS));
-        for (SymptomStage ss : this.listSymptomStage) {
-            ss.setSymptomType(this);
-            this.symptomeStagePanel.add(ss.getDayTxt());
-            this.symptomeStagePanel.add(ss.getComponent());
-        }
-
-        this.agePanel = new JPanel();
-        this.agePanel.setPreferredSize(new Dimension(this.listHumanAge.size() * 120, 35));
-        this.agePanel.setMinimumSize(new Dimension(this.listHumanAge.size() * 120, 35));
-        this.agePanel.setMaximumSize(new Dimension(this.listHumanAge.size() * 1200, 35));
-        this.agePanel.setBorder(BorderFactory.createEtchedBorder());
-        this.agePanel.setLayout(new BoxLayout(this.agePanel, BoxLayout.X_AXIS));
-        for (HumanAge ha : this.listHumanAge) {
-            ha.setSymptomeType(this);
-            this.agePanel.add(ha.getPercentageTxt());
-            this.agePanel.add(ha.getcPercentage());
-        }
-
-        this.cAgePanel = Box.createVerticalStrut(3);
+    public List<SymptomStageType> getListSage() {
+        return listSage;
     }
 
-    public SymptomType(String name, int contagiousDay, List<SymptomStageName> list, List<HumanAgeName> listHumanAgeName, Model m) {
+    public void setListSage(List<SymptomStageType> listSage) {
+        this.listSage = listSage;
+        for(SymptomStageType stt:listSage){
+          this.symptomeStagePanel.add(stt.getPanel());
+        }
+    }
+
+   
+    public SymptomType(String name, int contagiousDay, List<SymptomStageName> list, List<SymptomStage> listSymptomStage, Model m) {
         initComponents();
         this.name = name;
         this.model = m;
         this.contagiousDay = contagiousDay;
         this.listDeleted = new ArrayList();
         this.listAdd = new ArrayList();
-        this.listHumanAgeAdd = new ArrayList();
-        this.listHumanAgeDeleted = new ArrayList();
-        this.listHumanAge = new ArrayList();
         this.listSymptomStage = new ArrayList();
 
         name1 = new JLabel();
@@ -175,54 +109,88 @@ public class SymptomType extends javax.swing.JPanel {
         this.dayTxt.addFocusListener(listener);
         this.dayTxt.getDocument().addDocumentListener(listener);
 
-        int index = 0;
+        //int index = 0;
         this.symptomeStagePanel.setLayout(new BoxLayout(this.symptomeStagePanel, BoxLayout.X_AXIS));
-        list.forEach((sn) -> {
-            SymptomStage ss = new SymptomStage(sn.getName(), 0, 0.0, 0.0, index, model);
-            ss.setSymptomType(this);
-            this.listSymptomStage.add(ss);
-            this.symptomeStagePanel.add(ss.getDayTxt());
-            this.symptomeStagePanel.add(ss.getComponent());
-        });
 
-        this.agePanel = new JPanel();
-        this.agePanel.setPreferredSize(new Dimension(listHumanAgeName.size() * 120, 35));
-        this.agePanel.setMinimumSize(new Dimension(listHumanAgeName.size() * 120, 35));
-        this.agePanel.setMaximumSize(new Dimension(listHumanAgeName.size() * 1200, 35));
-        this.agePanel.setBorder(BorderFactory.createEtchedBorder());
-        this.agePanel.setLayout(new BoxLayout(this.agePanel, BoxLayout.X_AXIS));
-        for (HumanAgeName han : listHumanAgeName) {
-            HumanAge ha = new HumanAge(han.getName(), 0.0, han.getMinAge(), han.getMaxAge(), this, m);
-            this.listHumanAge.add(ha);
-            this.agePanel.add(ha.getPercentageTxt());
-            this.agePanel.add(ha.getcPercentage());
+        this.listSage = new ArrayList();
+        for (SymptomStage stg : listSymptomStage) {
+            SymptomStageType stt = new SymptomStageType(this, stg, 0, 0.0);
+            this.listSage.add(stt);
+            this.symptomeStagePanel.add(stt.getPanel());
         }
 
-        this.cAgePanel = Box.createVerticalStrut(3);
+    }
+
+    public SymptomType(int id, String name, int contagiousDay) {
+        initComponents();
+        this.id = id;
+        this.name = name;
+        this.contagiousDay = contagiousDay;
+        this.listDeleted = new ArrayList();
+        this.listAdd = new ArrayList();
+        this.listSymptomStage = new ArrayList();
+
+        name1 = new JLabel();
+        name1.setText(name);
+        name1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        name1.setToolTipText("");
+        name1.setAlignmentX(Component.LEFT_ALIGNMENT);
+        name1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        name1.setMaximumSize(new java.awt.Dimension(130, 35));
+        name1.setMinimumSize(new java.awt.Dimension(130, 35));
+        name1.setPreferredSize(new java.awt.Dimension(130, 35));
+
+        this.cName1 = Box.createVerticalStrut(3);
+
+        name2 = new javax.swing.JLabel();
+        name2.setText(name);
+        name2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        name2.setToolTipText("");
+        name2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        name2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        name2.setMaximumSize(new java.awt.Dimension(130, 35));
+        name2.setMinimumSize(new java.awt.Dimension(130, 35));
+        name2.setPreferredSize(new java.awt.Dimension(130, 35));
+
+        this.cName2 = Box.createVerticalStrut(3);
+
+        dayTxt = new JTextField();
+        dayTxt.setText(contagiousDay + "");
+        dayTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        dayTxt.setToolTipText("");
+        dayTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        dayTxt.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        dayTxt.setMaximumSize(new java.awt.Dimension(130, 35));
+        dayTxt.setMinimumSize(new java.awt.Dimension(130, 35));
+        dayTxt.setPreferredSize(new java.awt.Dimension(130, 35));
+
+        this.saved = false;
+        this.inNew = true;
+        this.deleted = false;
+        this.dayTxt.setText(contagiousDay + "");
+
+        this.listener = new JTextFieldIntegerListener(dayTxt, this);
+        this.dayTxt.addFocusListener(listener);
+        this.dayTxt.getDocument().addDocumentListener(listener);
+
+        //int index = 0;
+        this.symptomeStagePanel.setLayout(new BoxLayout(this.symptomeStagePanel, BoxLayout.X_AXIS));
     }
 
     public int getId() {
         return id;
     }
 
-    public JPanel getAgePanel() {
-        return agePanel;
+    public double getPercentage() {
+        return percentage;
     }
 
-    public void setAgePanel(JPanel agePanel) {
-        this.agePanel = agePanel;
+    public void setPercentage(double percentage) {
+        this.percentage = percentage;
     }
 
     public JPanel getSymptomeStagePanel() {
         return symptomeStagePanel;
-    }
-
-    public Component getcAgePanel() {
-        return cAgePanel;
-    }
-
-    public void setcAgePanel(Component cAgePanel) {
-        this.cAgePanel = cAgePanel;
     }
 
     public void setSymptomeStagePanel(JPanel symptomeStagePanel) {
@@ -277,9 +245,9 @@ public class SymptomType extends javax.swing.JPanel {
         /*for (SymptomStage st : this.listSymptomStage) {
             st.setModel(model);
         }*/
-        for (HumanAge ha : this.listHumanAge) {
-            ha.setModel(model);
-        }
+//        for (HumanAge ha : this.listHumanAge) {
+//            ha.setModel(model);
+//        }
     }
 
     public Component getcName1() {
@@ -332,9 +300,6 @@ public class SymptomType extends javax.swing.JPanel {
 
     public void save() {
         if (this.isDeleted()) {
-            for (SymptomStage st : this.listSymptomStage) {
-                st.save();
-            }
             SymptomsController.INSTANCE.delete(this.id);
             return;
         }
@@ -351,29 +316,15 @@ public class SymptomType extends javax.swing.JPanel {
             }
         }
 
-        this.listSymptomStage.forEach((st) -> {
-            st.save();
-        });
-        for (SymptomStage st : this.listAdd) {
-            st.save();
-            this.listSymptomStage.add(st);
-        }
-        for (SymptomStage st : this.listDeleted) {
-            st.save();
-        }
-        for (HumanAge ha : this.listHumanAge) {
-            ha.save();
-        }
-        for (HumanAge ha : this.listHumanAgeAdd) {
-            ha.save();
-        }
-        for (HumanAge ha : this.listHumanAgeDeleted) {
-            ha.save();
-        }
+        save1();
         this.listAdd.clear();
         this.listDeleted.clear();
-        this.listHumanAgeAdd.clear();
-        this.listHumanAgeDeleted.clear();
+    }
+
+    public void save1() {
+        for (SymptomStageType stt : this.listSage) {
+            stt.save();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -382,13 +333,11 @@ public class SymptomType extends javax.swing.JPanel {
 
         symptomeStagePanel = new javax.swing.JPanel();
 
-        setBackground(new java.awt.Color(255, 0, 0));
         setMaximumSize(new java.awt.Dimension(341411, 35));
         setMinimumSize(new java.awt.Dimension(0, 35));
         setName(""); // NOI18N
         setPreferredSize(new java.awt.Dimension(800, 35));
 
-        symptomeStagePanel.setBackground(new java.awt.Color(51, 255, 0));
         symptomeStagePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         symptomeStagePanel.setMaximumSize(new java.awt.Dimension(32767, 31));
         symptomeStagePanel.setMinimumSize(new java.awt.Dimension(100, 31));
@@ -448,7 +397,7 @@ public class SymptomType extends javax.swing.JPanel {
         for (SymptomStage sts : list) {
             if (sts.isIsNew()) {
                 if (!sts.isDeleted()) {
-                    SymptomStage ss = new SymptomStage(sts.getName(), 0, sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), this.model);
+                    SymptomStage ss = new SymptomStage(sts.getName(), 0, 0.0, sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), this.model);
                     ss.setSymptomType(this);
                     this.listSymptomStage.add(ss);
                     //this.listAdd.add(ss);
@@ -499,53 +448,51 @@ public class SymptomType extends javax.swing.JPanel {
         this.updateSymptomStagePanel();;
     }
 
-    private void updateHumanAgeList(List<HumanAge> list) {
-        for (HumanAge ha : list) {
-            if (ha.isIsNew()) {
-                if (!ha.isDeleted()) {
-                    HumanAge han = new HumanAge(ha.getName(), 0.0, ha.getMinAge(), ha.getMaxAge(), this, ha.getModel());
-                    this.listHumanAge.add(han);
-                    this.listHumanAgeAdd.add(han);
-                } else {
-
-                }
-            } else {
-                if (ha.isDeleted()) {
-                    HumanAge tmp = null;
-                    for (HumanAge hat : this.listHumanAge) {
-                        if (hat.getName().equals(ha.getName())) {
-                            hat.setDeleted(true);
-                            tmp = hat;
-                            break;
-                        }
-                    }
-                    if (this.listHumanAgeAdd.contains(tmp)) {
-                        this.listHumanAgeAdd.remove(tmp);
-                    }
-                    this.listHumanAge.remove(tmp);
-                    this.listHumanAgeDeleted.add(tmp);
-                } else {
-
-                }
-            }
-        }
-    }
-
-    private void updateHumanAgePanel() {
-        this.agePanel.removeAll();
-        this.agePanel.setPreferredSize(new Dimension(this.listHumanAge.size() * 120, 35));
-        for (HumanAge ha : this.listHumanAge) {
-            ha.setSymptomeType(this);
-            this.agePanel.add(ha.getPercentageTxt());
-            this.agePanel.add(ha.getcPercentage());
-        }
-        this.agePanel.revalidate();
-    }
-
-    public void updateHumanAge(List<HumanAge> list) {
-        this.updateHumanAgeList(list);
-        this.updateHumanAgePanel();
-    }
+//    private void updateHumanAgeList(List<HumanAge> list) {
+//        for (HumanAge ha : list) {
+//            if (ha.isIsNew()) {
+//                if (!ha.isDeleted()) {
+//                    HumanAge han = new HumanAge(ha.getName(), 0.0, ha.getMinAge(), ha.getMaxAge(), this, ha.getModel());
+//                    this.listHumanAge.add(han);
+//                    this.listHumanAgeAdd.add(han);
+//                } else {
+//
+//                }
+//            } else {
+//                if (ha.isDeleted()) {
+//                    HumanAge tmp = null;
+//                    for (HumanAge hat : this.listHumanAge) {
+//                        if (hat.getName().equals(ha.getName())) {
+//                            hat.setDeleted(true);
+//                            tmp = hat;
+//                            break;
+//                        }
+//                    }
+//                    if (this.listHumanAgeAdd.contains(tmp)) {
+//                        this.listHumanAgeAdd.remove(tmp);
+//                    }
+//                    this.listHumanAge.remove(tmp);
+//                    this.listHumanAgeDeleted.add(tmp);
+//                } else {
+//
+//                }
+//            }
+//        }
+//    }
+//    private void updateHumanAgePanel() {
+//        this.agePanel.removeAll();
+//        this.agePanel.setPreferredSize(new Dimension(this.listHumanAge.size() * 120, 35));
+//        for (HumanAge ha : this.listHumanAge) {
+//            ha.setSymptomeType(this);
+//            this.agePanel.add(ha.getPercentageTxt());
+//            this.agePanel.add(ha.getcPercentage());
+//        }
+//        this.agePanel.revalidate();
+//    }
+//    public void updateHumanAge(List<HumanAge> list) {
+//        this.updateHumanAgeList(list);
+//        this.updateHumanAgePanel();
+//    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel symptomeStagePanel;
     // End of variables declaration//GEN-END:variables

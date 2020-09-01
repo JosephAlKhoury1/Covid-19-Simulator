@@ -4,14 +4,13 @@ import java.awt.Color;
 import models.client1.*;
 import java.awt.Graphics;
 import java.rmi.RemoteException;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.location1.*;
+import models.model.HumanStat;
+import models.model.SymptomType;
 
 /**
  *
@@ -24,6 +23,7 @@ public class Human extends Member {
     private ReligionType religionType;
     private SexeType sexeType;
     private HumanStat humanStat;
+    private SymptomType symptomType;
     Color color = Color.GREEN;
 
     public Human(int x, int y, House ownHouse, City city) {
@@ -36,8 +36,12 @@ public class Human extends Member {
             this.humanAgeType = MonteCarlo.getHumanAgeTypeWithoutChildren();
             this.numberLocationToGo = this.humanAgeType.getPlaceNumber();
         }
-        this.humanStat = HumanStat.healthy;
+        // this.humanStat = HumanStat.healthy;
+        if (city.getModel() != null) {
+            //this.humanStat = city.getModel();
+        }
         this.age = MonteCarlo.getHumanAge(humanAgeType);
+        
         this.sexeType = MonteCarlo.getSexeType();
         boolean goWork = false;
         boolean goUniversity = false;
@@ -119,32 +123,10 @@ public class Human extends Member {
 
     @Override
     public void draw(Graphics g) {
-        if (this.currentLocationToGo != null) {
-            if (this.workPlace != null) {
-                if (this.currentLocationToGo == this.workPlace.getKey()) {
-                    color = Color.BLACK;
-                    xs = 10;
-                    ys = 10;
-                }
-            } else if (this.currentLocationToGo == this.school) {
-                color = Color.RED;
-            } else if (this.currentLocationToGo == this.university) {
-                color = Color.MAGENTA;
-            } else if (this.listLocation.containsKey(this.currentLocationToGo)) {
-                color = Color.YELLOW;
-            }
-        }
         g.setColor(color);
         g.fillOval(x, y, xs, ys);
         if (currentLocationToGo != null) {
-//            if (this.currentLocationToGo == this.school) {
-//                color = Color.RED;
-//                g.setColor(color);
-//                g.drawString("go school x=" + currentLocationToGo.getX() + " y=" + currentLocationToGo.getY(), x, y);
-//            } else {
-//                g.setColor(color);
             g.drawString("x=" + currentLocationToGo.getX() + " y=" + currentLocationToGo.getY(), x, y);
-            //}
         }
     }
 
@@ -223,5 +205,4 @@ public class Human extends Member {
     public void setHumanStat(HumanStat humanStat) {
         this.humanStat = humanStat;
     }
-
 }

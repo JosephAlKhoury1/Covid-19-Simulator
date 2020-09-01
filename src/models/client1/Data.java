@@ -70,7 +70,7 @@ public class Data {
 //        iniPopulationAgePercentage();
     }
 
-    public static Color getColor(HumanStat humanStat) {
+    /*public static Color getColor(HumanStat humanStat) {
         if (null != humanStat) {
             switch (humanStat) {
                 case healthy:
@@ -90,5 +90,5 @@ public class Data {
             }
         }
         return null;
-    }
+    }*/
 }

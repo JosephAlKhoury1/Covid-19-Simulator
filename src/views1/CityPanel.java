@@ -9,12 +9,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import models.client1.City;
 import models.client1.Data;
 import models.client1.HousePopulation;
@@ -238,7 +241,6 @@ public class CityPanel extends javax.swing.JPanel {
         public ButtonTilte(CityPanel mp) {
             initComponents();
             this.mp = mp;
-            //this.jButton1.addActionListener(this);
         }
 
         public CityPanel getMp() {
@@ -247,34 +249,15 @@ public class CityPanel extends javax.swing.JPanel {
 
         private void initComponents() {
 
-            jLabel1 = new javax.swing.JLabel();
-            //jButton1 = new javax.swing.JButton();
-
-            jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            jLabel1 = new JLabel();
+            jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
             jLabel1.setText(currentCity.getName() + " city");
 
-            // jButton1.setText("X");
-            //jButton1.setToolTipText("");
-            //jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-            this.setLayout(layout);
-            layout.setHorizontalGroup(
-                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(14, 14, 14)
-                            //.addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
-                            ));
-            layout.setVerticalGroup(
-                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            //.addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            ));
+            this.add(this.jLabel1);
         }
 
-        //private javax.swing.JButton jButton1;
-        private javax.swing.JLabel jLabel1;
+        private JLabel jLabel1;
 
         @Override
         public void actionPerformed(ActionEvent e) {

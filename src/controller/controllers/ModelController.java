@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.client1.City;
 import models.model.HumanAge;
 import models.model.Model;
 import models.model.SymptomStage;
@@ -100,9 +99,16 @@ public class ModelController {
             List<Model> list = new ArrayList();
             ResultSet set = this.selectAllMainStatement.executeQuery();
             while (set.next()) {
-                List<SymptomType> listS = SymptomsController.INSTANCE.selectAllSymptom(set.getInt(1));
                 List<SymptomStage> listSS = SymptomStageController.INSTANCE.selectAllModel(set.getInt(1));
-                List<HumanAge> listHA = HumanAgeController.INSTANCE.selectAllModel(set.getInt(1));
+                List<SymptomType> listS = SymptomsController.INSTANCE.selectAllSymptom(set.getInt(1));
+                List<HumanAge> listHA = HumanAgeController.INSTANCE.selectAll(set.getInt(1));
+                for (SymptomType st : listS) {
+                    st.setListSage(SymptomStageTypeController.INSTANCE.selectAll(st, listSS));
+
+                }
+                for (HumanAge ha : listHA) {
+                  ha.setListSymptomAges(HumanAgeSymptomController.INSTANCE.selectAll(ha, listS));
+                }
                 list.add(new Model(set.getInt(1), set.getString(2), listS, listSS, listHA));
             }
             set.close();

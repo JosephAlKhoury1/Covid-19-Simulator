@@ -36,7 +36,7 @@ public class SymptomStageController {
             + "values(?, ?, ?, ?, ?)";
     private final String updateModel = "update symptomStagesModel set name = ?, deathPercentage = ?, immunePercentage = ?, col = ?"
             + " where id = ?";
-    private final String selectAllModel = "select id, name, deathPercentage, immunePercentage, col "
+    private final String selectAllModel = "select id, name, immunePercentage,deathPercentage,  col "
             + " from symptomStagesModel "
             + " where modelId = ? ";
     private final String deleteModel = "delete "
@@ -162,7 +162,7 @@ public class SymptomStageController {
             this.selectAllStatement.setInt(1, SymptomId);
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
-                list.add(new SymptomStage(set.getInt(1), set.getString(2), set.getInt(3), set.getDouble(4), set.getDouble(5), set.getInt(6)));
+                //list.add(new SymptomStage(set.getInt(1), set.getString(2), set.getInt(3), set.getDouble(4), set.getDouble(5), set.getInt(6)));
             }
             set.close();
             return list;
@@ -179,7 +179,7 @@ public class SymptomStageController {
             ResultSet set = this.selectAllModelStatement.executeQuery();
             while (set.next()) {
                 HumanStat humanState = HumanStateController.INSTANCE.select(set.getInt(1));
-                list.add(new SymptomStage(set.getInt(1), set.getString(2), set.getDouble(3), set.getDouble(4), set.getInt(5), humanState));
+                list.add(new SymptomStage(set.getInt(1), set.getString(2), set.getDouble(3), set.getDouble(4), set.getInt(5)));
             }
             set.close();
             return list;

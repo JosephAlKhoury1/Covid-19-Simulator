@@ -24,27 +24,27 @@ public class Model {
     private MainFrame mainFrame;
     private ModelPanel modelPanel;
 
-    private List<SymptomType> listSymptomsType;
-    private List<SymptomStage> listSymptomStage;
-    private List<SymptomStage> listDeleted;
-    private List<SymptomStage> listAdd;
-
     private List<HumanAge> listHumanAge;
     private List<HumanAge> listHumanAgeAdd;
     private List<HumanAge> listHumanAgeDeleted;
+
+    private List<SymptomType> listSymptomType;
+
+    private List<SymptomStage> listSymptomStage1s, listStageDeleted;
 
     private City city;
     private MapModel currentMap;
     private JMenuItem mapMenu, runMenu, pauseMenu, populationMenu;
 
+    private boolean run = false, pause = false, stop = false;
+
     public Model(int modelId, String modelName, List<SymptomType> list, List<SymptomStage> listSS, List<HumanAge> listHA) {
         this.modelId = modelId;
         this.modelName = modelName;
-        this.listSymptomsType = list;
-        this.listSymptomStage = listSS;
+
         this.listHumanAge = listHA;
-        this.listDeleted = new ArrayList();
-        this.listAdd = new ArrayList();
+        this.listSymptomStage1s = listSS;
+        this.listSymptomType = list;
         this.listHumanAgeAdd = new ArrayList();
         this.listHumanAgeDeleted = new ArrayList();
         this.isMain = 1;
@@ -72,6 +72,12 @@ public class Model {
             @Override
             public void actionPerformed(ActionEvent e) {
                 city.start();
+                setRun(true);
+                setPause(false);
+                mainFrame.getRunButton().setEnabled(false);
+                mainFrame.getPauseButton().setEnabled(true);
+                runMenu.setEnabled(false);
+                pauseMenu.setEnabled(true);
             }
         });
 
@@ -80,11 +86,18 @@ public class Model {
             @Override
             public void actionPerformed(ActionEvent e) {
                 city.pause();
+                setPause(true);
+                setRun(false);
+                mainFrame.getRunButton().setEnabled(true);
+                mainFrame.getPauseButton().setEnabled(false);
+                runMenu.setEnabled(true);
+                pauseMenu.setEnabled(false);
             }
         });
         this.newModel = false;
         this.saved = true;
         this.deleted = false;
+
     }
 
     public Model(String name, MainFrame frame, City c) {
@@ -92,11 +105,12 @@ public class Model {
         this.mainFrame = frame;
         this.isMain = 1;
         this.city = c;
+        if (this.city != null) {
+            this.city.setModel(this);
+        }
         this.newModel = true;
         this.saved = false;
         this.deleted = false;
-        this.listDeleted = new ArrayList();
-        this.listAdd = new ArrayList();
 
         this.mapMenu = new JMenuItem(this.modelName + " Map");
         this.mapMenu.addActionListener(new ActionListener() {
@@ -132,39 +146,39 @@ public class Model {
             }
         });
 
-        this.listSymptomsType = new ArrayList();
-        this.listSymptomStage = new ArrayList();
         this.listHumanAge = new ArrayList();
         this.listHumanAgeAdd = new ArrayList();
         this.listHumanAgeDeleted = new ArrayList();
 
-        frame.getListSymptomName().forEach((sn) -> {
-            SymptomType st = new SymptomType(sn.getName(), 0, frame.getListSymptomStageNames(), frame.getListHumanAgeName(), this);
-            this.listSymptomsType.add(st);
-        });
+        this.listSymptomType = new ArrayList();
+        this.listSymptomStage1s = new ArrayList();
+        this.listStageDeleted = new ArrayList();
 
-        int index = 0;
-        for (SymptomStageName ssn : frame.getListSymptomStageNames()) {
-            this.listSymptomStage.add(new SymptomStage(ssn.getName(), 0.0, 0.0, index, this));
-            index++;
+        for (SymptomStageName stn : this.mainFrame.getListSymptomStageNames()) {
+            SymptomStage stgn = new SymptomStage(stn.getName(), 0.0, 0.0, 0, this);
+            this.listSymptomStage1s.add(stgn);
         }
-        for (HumanAgeName han : frame.getListHumanAgeName()) {
-            this.listHumanAge.add(new HumanAge(han.getName(), han.getMinAge(), han.getMaxAge(), this));
+        for (SymptomName sn : this.mainFrame.getListSymptomName()) {
+            SymptomType st1 = new SymptomType(sn.getName(), 0, this.mainFrame.getListSymptomStageNames(), this.listSymptomStage1s, this);
+            this.listSymptomType.add(st1);
         }
+        for (HumanAgeName hu : this.mainFrame.getListHumanAgeName()) {
+            HumanAge hum = new HumanAge(hu.getName(), hu.getMinAge(), hu.getMaxAge(), this.listSymptomType, this);
+            this.listHumanAge.add(hum);
+        }
+
     }
 
     public void generateMapLocation() {
-//        this.currentMap = new MapModel(mainFrame, this);
-//        JScrollPane p = new JScrollPane(this.currentMap);
-//        this.currentMap.setScrollPane(p);
-//        this.mainFrame.getjTabbedPane2().addTab("Map", this.currentMap.getScrollPane());
-//        this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.currentMap.getButton());
         this.city.generateMapLocation();
-//        this.maps = new Maps(this.mainFrame, this.city);
-//        JScrollPane p = new JScrollPane(this.currentMap);
-//        this.maps.setScrollPane(p);
-//        this.mainFrame.getjTabbedPane2().addTab("Map", this.maps.getScrollPane());
-//        this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.maps.getButton());
+    }
+
+    public List<SymptomStage> getListSymptomStage1s() {
+        return listSymptomStage1s;
+    }
+
+    public void setListSymptomStage1s(List<SymptomStage> listSymptomStage1s) {
+        this.listSymptomStage1s = listSymptomStage1s;
     }
 
     public String getModelName() {
@@ -173,6 +187,14 @@ public class Model {
 
     public JMenuItem getRunMenu() {
         return runMenu;
+    }
+
+    public List<SymptomType> getListSymptomType() {
+        return listSymptomType;
+    }
+
+    public void setListSymptomType(List<SymptomType> listSymptomType) {
+        this.listSymptomType = listSymptomType;
     }
 
     public JMenuItem getPopulationMenu() {
@@ -211,16 +233,32 @@ public class Model {
         this.currentMap = currentMap;
     }
 
+    public boolean isRun() {
+        return run;
+    }
+
+    public void setRun(boolean run) {
+        this.run = run;
+    }
+
+    public boolean isPause() {
+        return pause;
+    }
+
+    public void setPause(boolean pause) {
+        this.pause = pause;
+    }
+
+    public boolean isStop() {
+        return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
+    }
+
     public void setCity(City c) {
         this.city = c;
-    }
-
-    public List<SymptomStage> getListSymptomStage() {
-        return listSymptomStage;
-    }
-
-    public void setListSymptomStage(List<SymptomStage> listSymptomStage) {
-        this.listSymptomStage = listSymptomStage;
     }
 
     public City getCity() {
@@ -265,20 +303,10 @@ public class Model {
 
     public void setMainFrame(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-        for (SymptomType ss : this.listSymptomsType) {
-            ss.setModel(this);
-        }
+
         /*for (SymptomStage st : this.listSymptomStage) {
             st.setModel(this);
         }*/
-    }
-
-    public List<SymptomType> getListSymptomsType() {
-        return listSymptomsType;
-    }
-
-    public void setListSymptomsType(List<SymptomType> listSymptomsType) {
-        this.listSymptomsType = listSymptomsType;
     }
 
     public boolean isDeleted() {
@@ -297,58 +325,16 @@ public class Model {
         this.modelPanel = modelPanel;
     }
 
-    public void removeSymptomStage(List<SymptomStage> list) {
-        listSymptomsType.forEach((st) -> {
-            st.updateSymptomStage(list);
-        });
-        for (SymptomStage sts : list) {
-            if (sts.isIsNew()) {
-                if (!sts.isDeleted()) {
-                    SymptomStage ss = new SymptomStage(sts.getName(), sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), this);
-                    this.listSymptomStage.add(ss);
-                    //this.listAdd.add(ss);
-                } else {
-                }
-            } else {
-                for (SymptomStage st : this.listSymptomStage) {
-                    if (st.getName().equals(sts.getName())) {
-                        if (sts.isDeleted()) {
-                            st.setDeleted(true);
-                            this.listDeleted.add(st);
-                        } else {
-                            st.setIndex(sts.getIndex());
-                            st.setSaved(false);
-                        }
-                    }
-                }
-            }
-        }
-        for (SymptomStage st : this.listDeleted) {
-            this.listSymptomStage.remove(st);
-        }
-
-        SymptomStage[] tab = new SymptomStage[listSymptomStage.size()];
-        for (SymptomStage ss : listSymptomStage) {
-            tab[ss.getIndex()] = ss;
-        }
-
-        listSymptomStage.clear();
-
-        for (SymptomStage ss : tab) {
-            listSymptomStage.add(ss);
-        }
-    }
-
     public void removeHumanAge(List<HumanAge> list) {
-        for (SymptomType st : this.listSymptomsType) {
-            st.updateHumanAge(list);
-        }
+//        for (SymptomType st : this.listSymptomsType) {
+//            st.updateHumanAge(list);
+//        }
         for (HumanAge ha : list) {
             if (ha.isIsNew()) {
                 if (!ha.isDeleted()) {
-                    HumanAge han = new HumanAge(ha.getName(), ha.getMinAge(), ha.getMaxAge(), this);
-                    this.listHumanAge.add(han);
-                    this.listHumanAgeAdd.add(han);
+                    //HumanAge han = new HumanAge(ha.getName(), ha.getMinAge(), ha.getMaxAge(), this);
+                    //this.listHumanAge.add(han);
+                    //this.listHumanAgeAdd.add(han);
                 } else {
 
                 }
@@ -394,33 +380,72 @@ public class Model {
             }
         }
 
-        this.listSymptomsType.stream().map((st) -> {
-            st.setModel(this);
-            return st;
-        }).forEachOrdered((st) -> {
-            st.save();
-        });
+        for (SymptomStage stage : this.listSymptomStage1s) {
+            stage.setModel(this);
+            stage.save1();
+        }
 
-        for (SymptomStage ss : this.listSymptomStage) {
-            //ss.setModel(this);
-            ss.save1();
+        for (SymptomType st : this.listSymptomType) {
+            st.setModel(this);
+            st.save();
         }
-        for (SymptomStage ss : this.listDeleted) {
-            // ss.setModel(this);
-            ss.save1();
-        }
+
         for (HumanAge ha : this.listHumanAge) {
             ha.setModel(this);
-            ha.save1();
+            ha.save();
         }
-        for (HumanAge ha : this.listHumanAgeDeleted) {
+
+        /*for (HumanAge ha : this.listHumanAgeDeleted) {
             ha.setModel(this);
             ha.save1();
-        }
+        }*/
         this.listHumanAgeDeleted.clear();
         this.listHumanAgeAdd.clear();
-        this.listAdd.clear();
-        this.listDeleted.clear();
+    }
 
+    public void removeSymptomStage(List<SymptomStage> list) {
+        listSymptomType.forEach((st) -> {
+            st.updateSymptomStage(list);
+        });
+        for (SymptomStage sts : list) {
+            if (sts.isIsNew()) {
+                if (!sts.isDeleted()) {
+                    SymptomStage ss = new SymptomStage(sts.getName(), sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), this);
+                    this.listSymptomStage1s.add(ss);
+                    //this.listAdd.add(ss);
+                } else {
+                }
+            } else {
+                for (SymptomStage st : this.listSymptomStage1s) {
+                    if (st.getName().equals(sts.getName())) {
+                        if (sts.isDeleted()) {
+                            st.setDeleted(true);
+                            this.listStageDeleted.add(st);
+                        } else {
+                            st.setIndex(sts.getIndex());
+                            st.setSaved(false);
+                        }
+                    }
+                }
+            }
+        }
+        for (SymptomStage st : this.listStageDeleted) {
+            this.listSymptomStage1s.remove(st);
+        }
+
+        SymptomStage[] tab = new SymptomStage[listSymptomStage1s.size()];
+        for (SymptomStage ss : listSymptomStage1s) {
+            tab[ss.getIndex()] = ss;
+        }
+
+        listSymptomStage1s.clear();
+
+        for (SymptomStage ss : tab) {
+            listSymptomStage1s.add(ss);
+        }
+    }
+
+    public void changeState(int num) {
+        this.city.changeState(num);
     }
 }

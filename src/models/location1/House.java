@@ -12,13 +12,8 @@ import models.client1.MonteCarlo;
 import models.client1.ReligionType;
 import models.member1.Human;
 import models.member1.Member;
-import tools.FileUtilities;
 import views.tile.Tile;
 
-/**
- *
- * @author Joseph
- */
 public class House extends Location {
 
     private int nbPopulation = 0;
@@ -41,16 +36,15 @@ public class House extends Location {
         this.setHeight(LocationData.WTILEHOUSE * Data.TileHeight);
         this.listPopulation = new ArrayList();
         loadImage();
+       
     }
 
     public House(int id, String name, int x, int y, int width, int height, double average_sick, int fixed, int locationCategoryId, City c) {
-        super(id, name, x, y, width, height, average_sick, "", fixed, locationCategoryId,c);
+        super(id, name, x, y, width, height, average_sick, "", fixed, locationCategoryId, c);
         this.listPopulation = new ArrayList();
         this.religionType = MonteCarlo.getHouseReligionType();
         loadImage();
-    }
-
-    public House() {
+        //initPopulation();
     }
 
     @Override

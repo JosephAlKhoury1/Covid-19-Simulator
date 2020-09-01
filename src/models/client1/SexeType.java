@@ -327,7 +327,7 @@ public class SexeType extends javax.swing.JPanel {
                     if (reply == JOptionPane.YES_OPTION) {
                         this.sexType.setDeleted(true);
                         city.getMainFrame().getCurrentCityPanel().removeSexeType(this.sexType);
-                        city.removeSexeType(this.sexType);
+                        //  city.removeSexeType(this.sexType);
                         city.getMainFrame().setCitySavedButtonEnable();
                     } else if (reply == JOptionPane.NO_OPTION) {
                         insertZero(this.currentString);

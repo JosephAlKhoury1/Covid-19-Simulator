@@ -256,7 +256,7 @@ public class ManageHumanStatPanel extends javax.swing.JPanel implements ListSele
             frame.getHumanStatTab()[i] = frame.getListHumanStatName().get(i).getName();
         }
         for (Model m : frame.getListModel()) {
-            for (SymptomStage ss : m.getListSymptomStage()) {
+            for (SymptomStage ss : m.getListSymptomStage1s()) {
                 String selected = ss.getHumanStatBox().getItemAt(ss.getHumanStatBox().getSelectedIndex());
                 ss.getHumanStatBox().removeAllItems();
                 int index = 0;

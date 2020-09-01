@@ -20,16 +20,16 @@ public class HumanAgeController {
 
     public static final HumanAgeController INSTANCE = new HumanAgeController();
 
-    private final String insert = "insert into humanage(name, minAge, maxAge, percentage, symptomId)"
-            + "values(?, ?, ?, ?, ?)";
-    private final String update = "update humanage "
-            + " set name = ?, minAge = ?, maxAge = ?, percentage = ? "
+    private final String insert = "insert into humaneage(name, minAge, maxAge, modelId)"
+            + "values(?, ?, ?, ?)";
+    private final String update = "update humaneage "
+            + " set name = ?, minAge = ?, maxAge = ?"
             + " where id = ?";
-    private final String selectAll = "select id, name, minAge, maxAge, percentage"
-            + " from humanage"
-            + " where symptomId = ?";
+    private final String selectAll = "select id, name, minAge, maxAge"
+            + " from humaneage"
+            + " where modelId = ?";
     private final String delete = "delete "
-            + " from humanage "
+            + " from humaneage "
             + " where id = ? ";
 
     private final String insertModel = "insert into humanagemodel(name, minAge, maxAge, modelId)"
@@ -74,8 +74,8 @@ public class HumanAgeController {
             this.insertStatement.setString(1, ss.getName());
             this.insertStatement.setInt(2, ss.getMinAge());
             this.insertStatement.setInt(3, ss.getMaxAge());
-            this.insertStatement.setDouble(4, ss.getPercentage());
-            this.insertStatement.setInt(5, ss.getSymptomeType().getId());
+            this.insertStatement.setInt(4, ss.getModel().getModelId());
+
             int id = -1;
             int affectedRows = this.insertStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -121,8 +121,7 @@ public class HumanAgeController {
             this.updateStatement.setString(1, ss.getName());
             this.updateStatement.setInt(2, ss.getMinAge());
             this.updateStatement.setInt(3, ss.getMaxAge());
-            this.updateStatement.setDouble(4, ss.getPercentage());
-            this.updateStatement.setInt(5, ss.getId());
+            this.updateStatement.setInt(4, ss.getId());
             int affectedRows = this.updateStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating symptom failed, no rows affected.");
@@ -151,13 +150,13 @@ public class HumanAgeController {
         return false;
     }
 
-    public List<HumanAge> selectAll(int SymptomId) {
+    public List<HumanAge> selectAll(int modelId) {
         try {
             List<HumanAge> list = new ArrayList();
-            this.selectAllStatement.setInt(1, SymptomId);
+            this.selectAllStatement.setInt(1, modelId);
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
-                list.add(new HumanAge(set.getInt(1), set.getString(2), set.getDouble(5), set.getInt(3), set.getInt(4)));
+                list.add(new HumanAge(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4)));
             }
             set.close();
             return list;

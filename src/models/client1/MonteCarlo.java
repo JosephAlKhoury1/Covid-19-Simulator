@@ -2,14 +2,11 @@ package models.client1;
 
 import java.util.Random;
 
-/**
- *
- * @author Joseph
- */
 public class MonteCarlo {
 
     static Random uniformVarSeed = new Random();
     static Random uniformFixedSeed = new Random(123);
+    static int[] housePopulation = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
     public static int getNextInt(int max) {
         return uniformFixedSeed.nextInt(max);
@@ -25,7 +22,8 @@ public class MonteCarlo {
 
     public static int getHousePopulation() {
         if (Data.housePopulationPercentage.isEmpty()) {
-            return 0;
+            int num = uniformFixedSeed.nextInt(housePopulation.length);
+            return housePopulation[num];
         }
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.housePopulationPercentage.size());
@@ -66,7 +64,7 @@ public class MonteCarlo {
     }
 
     public static ReligionType getHouseReligionType() {
-        if (Data.houseReligionTypePercentage.size() == 0) {
+        if (Data.houseReligionTypePercentage.isEmpty()) {
             return null;
         }
         ReligionType rt = null;
@@ -82,6 +80,9 @@ public class MonteCarlo {
     }
 
     public static SexeType getSexeType() {
+        if (Data.sexeTypePercentage.isEmpty()) {
+            return null;
+        }
         while (true) {
             int index = uniformFixedSeed.nextInt(Data.sexeTypePercentage.size());
             SexeType st = (SexeType) Data.sexeTypePercentage.get(index);

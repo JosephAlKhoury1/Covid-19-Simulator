@@ -93,7 +93,7 @@ public class SymptomsController {
             while (set.next()) {
                 List<SymptomStage> listSS = SymptomStageController.INSTANCE.selectAll(set.getInt(1));
                 List<HumanAge> listHA = HumanAgeController.INSTANCE.selectAll(set.getInt(1));
-                list.add(new SymptomType(set.getInt(1), set.getString(2), set.getInt(3), listSS, listHA));
+                list.add(new SymptomType(set.getInt(1), set.getString(2), set.getInt(3)));
             }
             set.close();
             return list;

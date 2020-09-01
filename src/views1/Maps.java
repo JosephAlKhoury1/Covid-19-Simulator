@@ -5,9 +5,15 @@ import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingConstants;
 import models.client1.City;
 import models.location1.Location;
 import models.location1.LocationCategory;
@@ -119,31 +125,21 @@ public class Maps extends javax.swing.JPanel {
 
         private void initComponents() {
 
-            jLabel1 = new javax.swing.JLabel();
-            jButton1 = new javax.swing.JButton();
-
-            jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+            jLabel1 = new JLabel();
+            jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
             jLabel1.setText(city1.getName() + " Map");
 
+            jButton1 = new JButton();
             jButton1.setText("X");
             jButton1.setToolTipText("");
-            jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-
-            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-            this.setLayout(layout);
-            layout.setHorizontalGroup(
-                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(14, 14, 14)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
-            );
-            layout.setVerticalGroup(
-                    layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-            );
+            jButton1.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+            this.jButton1.setMinimumSize(new Dimension(20, 20));
+            this.jButton1.setPreferredSize(new Dimension(20, 20));
+            this.jButton1.setMaximumSize(new Dimension(20, 20));
+            this.add(this.jLabel1);
+            this.add(Box.createHorizontalStrut(3));
+            this.add(this.jButton1);
         }
 
         private javax.swing.JButton jButton1;

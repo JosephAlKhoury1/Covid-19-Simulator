@@ -4,11 +4,11 @@ import controller.controllers.HumanStateController;
 import controller.controllers.SymptomStageController;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,7 +25,10 @@ public class SymptomStage extends JPanel {
     private int id;
     private String name;
     private Model model;
+
     private int dayNum;
+    private double percentageToBeInThisStage;
+
     private SymptomType symptomType;
     private double deathPercentage;
     private double immunePercentage;
@@ -34,90 +37,71 @@ public class SymptomStage extends JPanel {
     private boolean isNew, saved, deleted;
 
     private Component component;
-    private Component dComponent, iComponent;
     private JTextFieldIntegerListener listener = null;
-    private JTextFieldDoubleDeathListener dList = null;
-    private JTextFieldDoubleImmuneListener iList = null;
+
     private JTextField dayTxt;
 
-    private JTextField deathPercentageTxt, immunePercentageTxt;
-    private JLabel nameLabel1;
+    private JTextField percentageTxt;
+    private JLabel nameLabel1, nameLabel2;
     private Component cName1;
 
     private HumanStat humanState;
     private JComboBox<String> humanStatBox;
     private Component cHumanStateBox;
 
-    public SymptomStage(int id, String name, int dayNum, double d, double i, int index) {
+    private JPanel panel;
+
+    private JTextField deathPercentageTxt, immunePercentageTxt, indexTxt;
+    private JTextFieldDoubleDeathListener dList = null;
+    private JTextFieldDoubleImmuneListener iList = null;
+
+    public SymptomStage(int id, String name, double immune, double death, int index) {
         this.name = name;
         this.id = id;
-        this.dayNum = dayNum;
-        this.deathPercentage = d;
-        this.immunePercentage = i;
+        this.deathPercentage = death;
+        this.immunePercentage = immune;
         this.index = index;
-        this.listener = new JTextFieldIntegerListener(this.dayTxt, this);
-
         nameLabel1 = new JLabel(this.name + "");
         nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel1.setToolTipText("");
         nameLabel1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        nameLabel1.setMaximumSize(new Dimension(120, 18));
-        nameLabel1.setMinimumSize(new Dimension(120, 18));
-        nameLabel1.setPreferredSize(new Dimension(120, 18));
+        nameLabel1.setMaximumSize(new Dimension(140, 31));
+        nameLabel1.setMinimumSize(new Dimension(140, 31));
+        nameLabel1.setPreferredSize(new Dimension(140, 31));
+        nameLabel1.setBorder(BorderFactory.createEtchedBorder());
 
-        dayTxt = new JTextField(this.dayNum + "");
-        dayTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        dayTxt.setToolTipText("");
-        dayTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        dayTxt.setMaximumSize(new Dimension(120, 31));
-        dayTxt.setMinimumSize(new Dimension(120, 31));
-        dayTxt.setPreferredSize(new Dimension(120, 31));
-
-        this.component = Box.createHorizontalStrut(3);
-
-        this.listener = new JTextFieldIntegerListener(this.dayTxt, this);
-        this.dayTxt.addFocusListener(listener);
-        this.dayTxt.getDocument().addDocumentListener(listener);
-        this.isNew = false;
-        this.saved = true;
-        this.deleted = false;
-
-    }
-
-    public SymptomStage(int id, String name, double d, double i, int index, HumanStat humanState) {
-        this.name = name;
-        this.id = id;
-        this.deathPercentage = d;
-        this.immunePercentage = i;
-        this.index = index;
-        this.humanState = humanState;
-
-        this.isNew = false;
-        this.saved = true;
-        this.deleted = false;
-        nameLabel1 = new JLabel(this.name + "");
-        nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-        nameLabel1.setToolTipText("");
-        nameLabel1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        nameLabel1.setMaximumSize(new Dimension(120, 18));
-        nameLabel1.setMinimumSize(new Dimension(120, 18));
-        nameLabel1.setPreferredSize(new Dimension(120, 18));
+        nameLabel2 = new JLabel(this.name + "");
+        nameLabel2.setHorizontalAlignment(SwingConstants.CENTER);
+        nameLabel2.setToolTipText("");
+        nameLabel2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        nameLabel2.setMaximumSize(new Dimension(120, 31));
+        nameLabel2.setMinimumSize(new Dimension(120, 31));
+        nameLabel2.setPreferredSize(new Dimension(120, 31));
+        nameLabel2.setBorder(BorderFactory.createEtchedBorder());
 
         deathPercentageTxt = new JTextField(this.deathPercentage + "");
         deathPercentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
         deathPercentageTxt.setToolTipText("");
         deathPercentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        deathPercentageTxt.setMaximumSize(new Dimension(120, 31));
-        deathPercentageTxt.setMinimumSize(new Dimension(120, 31));
-        deathPercentageTxt.setPreferredSize(new Dimension(120, 31));
+        deathPercentageTxt.setMaximumSize(new Dimension(140, 31));
+        deathPercentageTxt.setMinimumSize(new Dimension(140, 31));
+        deathPercentageTxt.setPreferredSize(new Dimension(140, 31));
 
         immunePercentageTxt = new JTextField(this.immunePercentage + "");
         immunePercentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
         immunePercentageTxt.setToolTipText("");
         immunePercentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        immunePercentageTxt.setMaximumSize(new Dimension(120, 31));
-        immunePercentageTxt.setMinimumSize(new Dimension(120, 31));
-        immunePercentageTxt.setPreferredSize(new Dimension(120, 31));
+        immunePercentageTxt.setMaximumSize(new Dimension(140, 31));
+        immunePercentageTxt.setMinimumSize(new Dimension(140, 31));
+        immunePercentageTxt.setPreferredSize(new Dimension(140, 31));
+
+        indexTxt = new JTextField(this.index + "");
+        indexTxt.setHorizontalAlignment(SwingConstants.CENTER);
+        indexTxt.setToolTipText("");
+        indexTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        indexTxt.setMaximumSize(new Dimension(140, 31));
+        indexTxt.setMinimumSize(new Dimension(140, 31));
+        indexTxt.setPreferredSize(new Dimension(140, 31));
 
         this.iList = new JTextFieldDoubleImmuneListener(this.immunePercentageTxt, this.immunePercentage + "", this);
         this.dList = new JTextFieldDoubleDeathListener(this.deathPercentageTxt, this.deathPercentage + "", this);
@@ -126,44 +110,134 @@ public class SymptomStage extends JPanel {
         deathPercentageTxt.addFocusListener(dList);
         deathPercentageTxt.getDocument().addDocumentListener(dList);
 
-        humanStatBox = new JComboBox();
-        humanStatBox.addItem(this.humanState.getName());
-        humanStatBox.setPreferredSize(new Dimension(120, 31));
-        humanStatBox.setMinimumSize(new Dimension(120, 31));
-        humanStatBox.setMaximumSize(new Dimension(120, 31));
-        humanStatBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jComboActionEvent();
-            }
-        });
-        this.cHumanStateBox = Box.createHorizontalStrut(3);
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(581, 35));
+        this.panel.setMinimumSize(new Dimension(581, 35));
+        this.panel.setMaximumSize(new Dimension(581, 35));
+        this.panel.setBorder(BorderFactory.createEtchedBorder());
+        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
+        this.panel.add(this.nameLabel1);
+        panel.add(Box.createHorizontalStrut(6));
+
+        this.panel.add(this.immunePercentageTxt);
+        panel.add(Box.createHorizontalStrut(6));
+
+        this.panel.add(this.deathPercentageTxt);
+        panel.add(Box.createHorizontalStrut(6));
+
+        this.panel.add(this.indexTxt);
+
+        this.isNew = true;
+        this.saved = false;
+        this.deleted = false;
 
     }
 
-    public SymptomStage(String name, int dayNum, double d, double i, int index, Model model) {
+    public SymptomStage(String name, double deathPercentage, double immunePercentage, int index, Model model) {
         this.name = name;
         this.model = model;
-        this.dayNum = dayNum;
-        this.deathPercentage = d;
-        this.immunePercentage = i;
         this.index = index;
-
+        this.deathPercentage = deathPercentage;
+        this.immunePercentage = immunePercentage;
         nameLabel1 = new JLabel(this.name + "");
         nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel1.setToolTipText("");
         nameLabel1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        nameLabel1.setMaximumSize(new Dimension(120, 18));
-        nameLabel1.setMinimumSize(new Dimension(120, 18));
-        nameLabel1.setPreferredSize(new Dimension(120, 18));
+        nameLabel1.setMaximumSize(new Dimension(140, 31));
+        nameLabel1.setMinimumSize(new Dimension(140, 31));
+        nameLabel1.setPreferredSize(new Dimension(140, 31));
+        nameLabel1.setBorder(BorderFactory.createEtchedBorder());
+
+        nameLabel2 = new JLabel(this.name + "");
+        nameLabel2.setHorizontalAlignment(SwingConstants.CENTER);
+        nameLabel2.setToolTipText("");
+        nameLabel2.setAlignmentX(Component.LEFT_ALIGNMENT);
+        nameLabel2.setMaximumSize(new Dimension(120, 31));
+        nameLabel2.setMinimumSize(new Dimension(120, 31));
+        nameLabel2.setPreferredSize(new Dimension(120, 31));
+        nameLabel2.setBorder(BorderFactory.createEtchedBorder());
+
+        deathPercentageTxt = new JTextField(this.deathPercentage + "");
+        deathPercentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
+        deathPercentageTxt.setToolTipText("");
+        deathPercentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        deathPercentageTxt.setMaximumSize(new Dimension(140, 31));
+        deathPercentageTxt.setMinimumSize(new Dimension(140, 31));
+        deathPercentageTxt.setPreferredSize(new Dimension(140, 31));
+
+        immunePercentageTxt = new JTextField(this.immunePercentage + "");
+        immunePercentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
+        immunePercentageTxt.setToolTipText("");
+        immunePercentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        immunePercentageTxt.setMaximumSize(new Dimension(140, 31));
+        immunePercentageTxt.setMinimumSize(new Dimension(140, 31));
+        immunePercentageTxt.setPreferredSize(new Dimension(140, 31));
+
+        indexTxt = new JTextField(this.index + "");
+        indexTxt.setHorizontalAlignment(SwingConstants.CENTER);
+        indexTxt.setToolTipText("");
+        indexTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        indexTxt.setMaximumSize(new Dimension(140, 31));
+        indexTxt.setMinimumSize(new Dimension(140, 31));
+        indexTxt.setPreferredSize(new Dimension(140, 31));
+
+        this.iList = new JTextFieldDoubleImmuneListener(this.immunePercentageTxt, this.immunePercentage + "", this);
+        this.dList = new JTextFieldDoubleDeathListener(this.deathPercentageTxt, this.deathPercentage + "", this);
+        immunePercentageTxt.addFocusListener(iList);
+        immunePercentageTxt.getDocument().addDocumentListener(iList);
+        deathPercentageTxt.addFocusListener(dList);
+        deathPercentageTxt.getDocument().addDocumentListener(dList);
+
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(581, 35));
+        this.panel.setMinimumSize(new Dimension(581, 35));
+        this.panel.setMaximumSize(new Dimension(581, 35));
+        this.panel.setBorder(BorderFactory.createEtchedBorder());
+        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
+        this.panel.add(this.nameLabel1);
+        panel.add(Box.createHorizontalStrut(6));
+
+        this.panel.add(this.immunePercentageTxt);
+        panel.add(Box.createHorizontalStrut(6));
+
+        this.panel.add(this.deathPercentageTxt);
+        panel.add(Box.createHorizontalStrut(6));
+
+        this.panel.add(this.indexTxt);
+
+        this.isNew = true;
+        this.saved = false;
+        this.deleted = false;
+    }
+
+    public JLabel getNameLabel2() {
+        return nameLabel2;
+    }
+
+    public SymptomStage(String name, int dayNum, double percentage, double deathPercentage, double immunePercentage, int index, Model model) {
+        this.name = name;
+        this.model = model;
+        this.dayNum = dayNum;
+        this.index = index;
+        this.deathPercentage = deathPercentage;
+        this.immunePercentage = immunePercentage;
+        this.percentageToBeInThisStage = percentage;
 
         dayTxt = new JTextField(this.dayNum + "");
         dayTxt.setHorizontalAlignment(SwingConstants.CENTER);
         dayTxt.setToolTipText("");
         dayTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        dayTxt.setMaximumSize(new Dimension(120, 31));
-        dayTxt.setMinimumSize(new Dimension(120, 31));
-        dayTxt.setPreferredSize(new Dimension(120, 31));
+        dayTxt.setMaximumSize(new Dimension(55, 31));
+        dayTxt.setMinimumSize(new Dimension(55, 31));
+        dayTxt.setPreferredSize(new Dimension(55, 31));
+
+        percentageTxt = new JTextField(this.percentageToBeInThisStage + "");
+        percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
+        percentageTxt.setToolTipText("");
+        percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        percentageTxt.setMaximumSize(new Dimension(55, 31));
+        percentageTxt.setMinimumSize(new Dimension(55, 31));
+        percentageTxt.setPreferredSize(new Dimension(55, 31));
 
         this.component = Box.createHorizontalStrut(3);
 
@@ -174,9 +248,44 @@ public class SymptomStage extends JPanel {
         this.isNew = true;
         this.saved = false;
         this.deleted = false;
+
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(120, 35));
+        this.panel.setMinimumSize(new Dimension(120, 35));
+        this.panel.setMaximumSize(new Dimension(120, 35));
+        this.panel.setBorder(BorderFactory.createEtchedBorder());
+        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
+
+        this.panel.add(this.dayTxt);
+        this.panel.add(this.percentageTxt);
     }
 
-    public SymptomStage(String name, double d, double i, int index, Model model) {
+    public JPanel getPanel() {
+        return panel;
+    }
+
+    public void setPanel(JPanel panel) {
+        this.panel = panel;
+    }
+
+    public JTextField getDeathPercentageTxt() {
+        return deathPercentageTxt;
+    }
+
+    public void setDeathPercentageTxt(JTextField deathPercentageTxt) {
+        this.deathPercentageTxt = deathPercentageTxt;
+    }
+
+    public JTextField getImmunePercentageTxt() {
+        return immunePercentageTxt;
+    }
+
+    public void setImmunePercentageTxt(JTextField immunePercentageTxt) {
+        this.immunePercentageTxt = immunePercentageTxt;
+    }
+
+    ///////
+    /* public SymptomStage(String name, double d, double i, int index, Model model) {
         this.name = name;
         this.model = model;
         this.deathPercentage = d;
@@ -237,8 +346,7 @@ public class SymptomStage extends JPanel {
             }
         });
         this.cHumanStateBox = Box.createHorizontalStrut(3);
-    }
-
+    }*/
     public HumanStat getHumanState() {
         return humanState;
     }
@@ -317,22 +425,6 @@ public class SymptomStage extends JPanel {
         this.deathPercentage = deathPercentage;
     }
 
-    public Component getdComponent() {
-        return dComponent;
-    }
-
-    public void setdComponent(Component dComponent) {
-        this.dComponent = dComponent;
-    }
-
-    public Component getiComponent() {
-        return iComponent;
-    }
-
-    public void setiComponent(Component iComponent) {
-        this.iComponent = iComponent;
-    }
-
     public JTextFieldIntegerListener getListener() {
         return listener;
     }
@@ -341,7 +433,7 @@ public class SymptomStage extends JPanel {
         this.listener = listener;
     }
 
-    public JTextField getDeathPercentageTxt() {
+    /* public JTextField getDeathPercentageTxt() {
         return deathPercentageTxt;
     }
 
@@ -355,8 +447,7 @@ public class SymptomStage extends JPanel {
 
     public void setImmunePercentageTxt(JTextField immunePercentageTxt) {
         this.immunePercentageTxt = immunePercentageTxt;
-    }
-
+    }*/
     public JTextField getDayTxt() {
         return dayTxt;
     }
@@ -400,12 +491,6 @@ public class SymptomStage extends JPanel {
 
         if (this.listener != null) {
             this.listener.setMainFrame(model.getMainFrame());
-        }
-        if (this.dList != null) {
-            this.dList.setMainFrame(model.getMainFrame());
-        }
-        if (this.iList != null) {
-            this.iList.setMainFrame(model.getMainFrame());
         }
     }
 
@@ -495,7 +580,7 @@ public class SymptomStage extends JPanel {
 
             }
         }
-        this.humanState.save();
+        //this.humanState.save();
     }
 
     private class JTextFieldIntegerListener implements DocumentListener, FocusListener {
@@ -858,5 +943,4 @@ public class SymptomStage extends JPanel {
         }
 
     }
-
 }

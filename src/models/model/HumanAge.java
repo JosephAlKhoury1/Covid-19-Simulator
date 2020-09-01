@@ -5,9 +5,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -21,19 +26,44 @@ public class HumanAge {
     private String name;
     private int minAge;
     private int maxAge;
-    private double percentage;
     private Model model;
-    private SymptomType symptomeType;
 
-    private JTextField minAgeTxt, maxAgeTxt, percentageTxt;
+    private JTextField minAgeTxt, maxAgeTxt;
     private JLabel nameLabel;
-    private Component cName, cMinAge, cMaxAge, cPercentage;
+    private Component cName, cMinAge, cMaxAge;
 
     private boolean isNew, saved, deleted;
 
     private JTextFieldDoubleListener doubleListener;
     private JTextFieldMinIntegerListener minListener;
     private JTextFieldMaxIntegerListener maxListener;
+
+    private JPanel panel;
+    private Component cPanel;
+
+    private List<SymptomAge> listSymptomAges;
+
+    public List<SymptomAge> getListSymptomAges() {
+        return listSymptomAges;
+    }
+
+    public void setListSymptomAges(List<SymptomAge> listSymptomAges) {
+        this.listSymptomAges = listSymptomAges;
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(listSymptomAges.size() * 120, 35));
+        this.panel.setMinimumSize(new Dimension(listSymptomAges.size() * 120, 35));
+        this.panel.setMaximumSize(new Dimension(listSymptomAges.size() * 1200, 35));
+        this.panel.setBorder(BorderFactory.createEtchedBorder());
+        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
+
+        this.cPanel = Box.createVerticalStrut(3);
+        this.panel.add(this.nameLabel);
+        for (SymptomAge sta : listSymptomAges) {
+            this.panel.add(sta.getPercentageTxt());
+        }
+        this.panel.add(this.minAgeTxt);
+        this.panel.add(this.maxAgeTxt);
+    }
 
     public HumanAge(int id, String name, int minAge, int maxAge) {
         this.id = id;
@@ -46,19 +76,20 @@ public class HumanAge {
         this.deleted = false;
 
         this.nameLabel = new JLabel(name);
-        this.nameLabel.setPreferredSize(new Dimension(120, 18));
-        this.nameLabel.setMaximumSize(new Dimension(120, 18));
-        this.nameLabel.setMinimumSize(new Dimension(120, 18));
+        this.nameLabel.setPreferredSize(new Dimension(130, 31));
+        this.nameLabel.setMaximumSize(new Dimension(130, 31));
+        this.nameLabel.setMinimumSize(new Dimension(130, 31));
         this.nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         this.nameLabel.setToolTipText("");
         this.nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.nameLabel.setBorder(BorderFactory.createEtchedBorder());
 
-        this.cName = Box.createHorizontalStrut(3);
+        this.cName = Box.createVerticalStrut(3);
 
         this.minAgeTxt = new JTextField(this.minAge + "");
-        this.minAgeTxt.setPreferredSize(new Dimension(120, 31));
-        this.minAgeTxt.setMaximumSize(new Dimension(120, 31));
-        this.minAgeTxt.setMinimumSize(new Dimension(120, 31));
+        this.minAgeTxt.setPreferredSize(new Dimension(130, 31));
+        this.minAgeTxt.setMaximumSize(new Dimension(130, 31));
+        this.minAgeTxt.setMinimumSize(new Dimension(130, 31));
         this.minAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.minAgeTxt.setToolTipText("");
         this.minAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -66,9 +97,9 @@ public class HumanAge {
         this.cMinAge = Box.createHorizontalStrut(3);
 
         this.maxAgeTxt = new JTextField(this.maxAge + "");
-        this.maxAgeTxt.setPreferredSize(new Dimension(120, 31));
-        this.maxAgeTxt.setMaximumSize(new Dimension(120, 31));
-        this.maxAgeTxt.setMinimumSize(new Dimension(120, 31));
+        this.maxAgeTxt.setPreferredSize(new Dimension(130, 31));
+        this.maxAgeTxt.setMaximumSize(new Dimension(130, 31));
+        this.maxAgeTxt.setMinimumSize(new Dimension(130, 31));
         this.maxAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.maxAgeTxt.setToolTipText("");
         this.maxAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -84,30 +115,30 @@ public class HumanAge {
         this.maxAgeTxt.getDocument().addDocumentListener(this.maxListener);
     }
 
-    public HumanAge(String name, int minAge, int maxAge, Model model) {
+    public HumanAge(String name, int minAge, int maxAge, List<SymptomType> listSymptom, Model model) {
         this.name = name;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.model = model;
-
         this.isNew = true;
         this.saved = false;
         this.deleted = false;
 
         this.nameLabel = new JLabel(name);
-        this.nameLabel.setPreferredSize(new Dimension(120, 18));
-        this.nameLabel.setMaximumSize(new Dimension(120, 18));
-        this.nameLabel.setMinimumSize(new Dimension(120, 18));
+        this.nameLabel.setPreferredSize(new Dimension(130, 31));
+        this.nameLabel.setMaximumSize(new Dimension(130, 31));
+        this.nameLabel.setMinimumSize(new Dimension(130, 31));
         this.nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         this.nameLabel.setToolTipText("");
         this.nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.nameLabel.setBorder(BorderFactory.createEtchedBorder());
 
-        this.cName = Box.createHorizontalStrut(3);
+        this.cName = Box.createVerticalStrut(3);
 
         this.minAgeTxt = new JTextField(this.minAge + "");
-        this.minAgeTxt.setPreferredSize(new Dimension(120, 31));
-        this.minAgeTxt.setMaximumSize(new Dimension(120, 31));
-        this.minAgeTxt.setMinimumSize(new Dimension(120, 31));
+        this.minAgeTxt.setPreferredSize(new Dimension(130, 31));
+        this.minAgeTxt.setMaximumSize(new Dimension(130, 31));
+        this.minAgeTxt.setMinimumSize(new Dimension(130, 31));
         this.minAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.minAgeTxt.setToolTipText("");
         this.minAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -115,9 +146,9 @@ public class HumanAge {
         this.cMinAge = Box.createHorizontalStrut(3);
 
         this.maxAgeTxt = new JTextField(this.maxAge + "");
-        this.maxAgeTxt.setPreferredSize(new Dimension(120, 31));
-        this.maxAgeTxt.setMaximumSize(new Dimension(120, 31));
-        this.maxAgeTxt.setMinimumSize(new Dimension(120, 31));
+        this.maxAgeTxt.setPreferredSize(new Dimension(130, 31));
+        this.maxAgeTxt.setMaximumSize(new Dimension(130, 31));
+        this.maxAgeTxt.setMinimumSize(new Dimension(130, 31));
         this.maxAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.maxAgeTxt.setToolTipText("");
         this.maxAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -131,69 +162,41 @@ public class HumanAge {
         this.maxListener = new JTextFieldMaxIntegerListener(this.maxAgeTxt, this);
         this.maxAgeTxt.addFocusListener(this.maxListener);
         this.maxAgeTxt.getDocument().addDocumentListener(this.maxListener);
+
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(listSymptom.size() * 120, 35));
+        this.panel.setMinimumSize(new Dimension(listSymptom.size() * 120, 35));
+        this.panel.setMaximumSize(new Dimension(listSymptom.size() * 1200, 35));
+        this.panel.setBorder(BorderFactory.createEtchedBorder());
+        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
+
+        this.cPanel = Box.createVerticalStrut(3);
+
+        this.panel.add(this.nameLabel);
+        this.listSymptomAges = new ArrayList();
+        for (SymptomType stn : model.getListSymptomType()) {
+            SymptomAge sa = new SymptomAge(this, stn, 0);
+            this.listSymptomAges.add(sa);
+            this.panel.add(sa.getPercentageTxt());
+        }
+        this.panel.add(this.minAgeTxt);
+        this.panel.add(this.maxAgeTxt);
     }
 
-    public HumanAge(int id, String name, double percentage, int minAge, int maxAge) {
-        this.id = id;
-        this.name = name;
-        this.percentage = percentage;
-        this.minAge = minAge;
-        this.maxAge = maxAge;
-
-        this.isNew = false;
-        this.saved = true;
-        this.deleted = false;
-
-        this.percentageTxt = new JTextField(percentage + "");
-        this.percentageTxt.setPreferredSize(new Dimension(120, 31));
-        this.percentageTxt.setMaximumSize(new Dimension(120, 31));
-        this.percentageTxt.setMinimumSize(new Dimension(120, 31));
-        this.percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        this.percentageTxt.setToolTipText("");
-        this.percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        this.doubleListener = new JTextFieldDoubleListener(this.percentageTxt, this.percentage + "", this);
-        this.percentageTxt.addFocusListener(this.doubleListener);
-        this.percentageTxt.getDocument().addDocumentListener(this.doubleListener);
-
-        this.cPercentage = Box.createHorizontalStrut(3);
-
+    public Component getcPanel() {
+        return cPanel;
     }
 
-    public HumanAge(String name, double percentage, int minAge, int maxAge, SymptomType st, Model m) {
-        this.name = name;
-        this.percentage = percentage;
-        this.minAge = minAge;
-        this.maxAge = maxAge;
-        this.symptomeType = st;
-        this.model = m;
-
-        this.isNew = true;
-        this.saved = false;
-        this.deleted = false;
-
-        this.percentageTxt = new JTextField(percentage + "");
-        this.percentageTxt.setPreferredSize(new Dimension(120, 31));
-        this.percentageTxt.setMaximumSize(new Dimension(120, 31));
-        this.percentageTxt.setMinimumSize(new Dimension(120, 31));
-        this.percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        this.percentageTxt.setToolTipText("");
-        this.percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        this.doubleListener = new JTextFieldDoubleListener(this.percentageTxt, this.percentage + "", m.getMainFrame(), this);
-        this.percentageTxt.addFocusListener(this.doubleListener);
-        this.percentageTxt.getDocument().addDocumentListener(this.doubleListener);
-
-        this.cPercentage = Box.createHorizontalStrut(3);
-
+    public void setcPanel(Component cPanel) {
+        this.cPanel = cPanel;
     }
 
-    public Component getcPercentage() {
-        return cPercentage;
+    public JPanel getPanel() {
+        return panel;
     }
 
-    public void setcPercentage(Component cPercentage) {
-        this.cPercentage = cPercentage;
+    public void setPanel(JPanel panel) {
+        this.panel = panel;
     }
 
     public boolean isIsNew() {
@@ -252,14 +255,6 @@ public class HumanAge {
         this.maxAge = maxAge;
     }
 
-    public double getPercentage() {
-        return percentage;
-    }
-
-    public void setPercentage(double percentage) {
-        this.percentage = percentage;
-    }
-
     public Model getModel() {
         return model;
     }
@@ -270,14 +265,6 @@ public class HumanAge {
             this.doubleListener.setMainFrame(model.getMainFrame());
         }
 
-    }
-
-    public SymptomType getSymptomeType() {
-        return symptomeType;
-    }
-
-    public void setSymptomeType(SymptomType symptomeType) {
-        this.symptomeType = symptomeType;
     }
 
     public JTextField getMinAgeTxt() {
@@ -296,14 +283,13 @@ public class HumanAge {
         this.maxAgeTxt = maxAgeTxt;
     }
 
-    public JTextField getPercentageTxt() {
+    /* public JTextField getPercentageTxt() {
         return percentageTxt;
     }
 
     public void setPercentageTxt(JTextField percentageTxt) {
         this.percentageTxt = percentageTxt;
-    }
-
+    }*/
     public JLabel getNameLabel() {
         return nameLabel;
     }
@@ -353,6 +339,12 @@ public class HumanAge {
 
             }
         }
+
+        for (SymptomAge as : this.listSymptomAges) {
+            as.save();
+            as.setIsNew(false);
+            as.setSaved(true);
+        }
     }
 
     public void save1() {
@@ -361,12 +353,12 @@ public class HumanAge {
             return;
         }
         if (this.isIsNew()) {
-            this.id = HumanAgeController.INSTANCE.insertModel(this);
+            //this.id = HumanAgeController.INSTANCE.insertModel(this);
             this.setIsNew(false);
             this.setSaved(true);
         } else {
             if (!this.isSaved()) {
-                HumanAgeController.INSTANCE.updateModel(this);
+                // HumanAgeController.INSTANCE.updateModel(this);
                 this.setSaved(true);
             } else {
 
@@ -428,7 +420,7 @@ public class HumanAge {
                 Double d = Double.parseDouble(numTxt);
                 if (!insert) {
                     this.currentString = numTxt;
-                    this.humanAge.setPercentage(Double.parseDouble(numTxt));
+                    //this.humanAge.setPercentage(Double.parseDouble(numTxt));
                     mainFrame.setModelSavedButtonEnable();
                     this.humanAge.getModel().setSaved(false);
                     this.humanAge.setSaved(false);
@@ -462,7 +454,7 @@ public class HumanAge {
                 return;
             }
             this.currentString = s;
-            this.humanAge.setPercentage(Double.parseDouble(s));
+            // this.humanAge.setPercentage(Double.parseDouble(s));
             mainFrame.setModelSavedButtonEnable();
             this.humanAge.getModel().setSaved(false);
             this.humanAge.setSaved(false);
@@ -692,5 +684,4 @@ public class HumanAge {
         }
 
     }
-
 }

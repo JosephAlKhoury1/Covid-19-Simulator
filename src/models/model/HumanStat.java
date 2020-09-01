@@ -185,12 +185,12 @@ public class HumanStat {
             return;
         }
         if (this.isIsNew()) {
-            HumanStateController.INSTANCE.insert(this);
+            //HumanStateController.INSTANCE.insert(this);
             this.setIsNew(false);
             this.setSaved(true);
         } else {
             if (!this.isSaved()) {
-                HumanStateController.INSTANCE.update(this);
+               // HumanStateController.INSTANCE.update(this);
                 this.setSaved(true);
             }
         }

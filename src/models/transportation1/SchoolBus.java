@@ -5,7 +5,6 @@
  */
 package models.transportation1;
 
-import models.transportation.*;
 import java.awt.Graphics;
 
 

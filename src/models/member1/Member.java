@@ -17,7 +17,6 @@ import models.client1.MonteCarlo;
 import models.client1.SexeType;
 import models.location1.House;
 import models.location1.Location;
-import models.location1.LocationCategory;
 import views.tile.Tile;
 import views1.CityPanel;
 import views1.Maps;
@@ -49,6 +48,8 @@ public abstract class Member implements Runnable, Serializable, Cloneable {
     protected int hourInLocation = 0;
     protected int hour;
     protected int[] hourIn = {1, 2, 3, 4};
+    
+    
 
     public Member(int id, int x, int y, House ownHouse, City city) {
         this.id = id;

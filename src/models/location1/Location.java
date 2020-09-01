@@ -12,10 +12,6 @@ import models.member1.Member;
 import views.tile.Tile;
 import views1.Maps;
 
-/**
- *
- * @author Joseph
- */
 public abstract class Location implements Cloneable {
 
     protected int id = -1;
@@ -297,6 +293,7 @@ public abstract class Location implements Cloneable {
     public void addMember(Member m) {
         this.listMember.add(m);
         this.city.getListMember().put(m.getId(), m);
+        this.city.getListHealth().add(m);
     }
 
     public int getFixedLocation() {
