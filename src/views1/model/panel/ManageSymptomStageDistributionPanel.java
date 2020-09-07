@@ -37,7 +37,7 @@ public class ManageSymptomStageDistributionPanel extends javax.swing.JPanel {
         //this.listToAdd = new HashMap();
         this.listSymptomStages = new ArrayList();
         for (SymptomStage st : frame.getCurrentModel().getListSymptomStage1s()) {
-            SymptomStage ss = new SymptomStage(st.getName(), st.getDeathPercentage(), st.getImmunePercentage(), st.getIndex(), frame.getCurrentModel());
+            SymptomStage ss = new SymptomStage(st.getName(), st.getDeathPercentage(), st.getImmunePercentage(), st.getIndex(), st.getInHospital(),frame.getCurrentModel());
             ss.setIsNew(false);
             ss.setDeleted(false);
             this.listSymptomStages.add(ss);
@@ -54,7 +54,7 @@ public class ManageSymptomStageDistributionPanel extends javax.swing.JPanel {
                 }
             }
             if (!old) {
-                SymptomStage ss = new SymptomStage(ssn.getName(), 0.0, 0.0, -1, frame.getCurrentModel());
+                SymptomStage ss = new SymptomStage(ssn.getName(), 0.0, 0.0, -1,ssn.getInHospital(), frame.getCurrentModel());
                 ss.setIsNew(true);
                 ss.setDeleted(true);
                 this.listSymptomStages.add(ss);

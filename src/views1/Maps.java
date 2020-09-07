@@ -34,7 +34,8 @@ public class Maps extends javax.swing.JPanel {
         this.mainFrame = mainFrame;
         this.city1 = c;
         this.button = new ButtonTilte(this);
-        this.pane = mainFrame.getjTabbedPane2();
+        //this.pane = mainFrame.getjTabbedPane2();
+        this.pane = c.getModel().getModelPanel().getjTabbedPane1();
         initComponents();
         this.scrollPane = new JScrollPane(this);
     }

@@ -16,8 +16,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.model.HumanAge;
 import models.model.SymptomAge;
-import models.model.SymptomStage;
-import models.model.SymptomStageType;
 import models.model.SymptomType;
 
 /**
@@ -79,6 +77,21 @@ public class HumanAgeSymptomController {
         return -1;
     }
 
+    public boolean update(SymptomAge age) {
+        try {
+            this.updateStatement.setDouble(1, age.getPercentage());
+            this.updateStatement.setInt(2, age.getId());
+            int affectedRows = this.updateStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating symptom failed, no rows affected.");
+            }
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
     public List<SymptomAge> selectAll(HumanAge humanAge, List<SymptomType> listSymptom) {
         try {
             List<SymptomAge> list = new ArrayList();
@@ -100,5 +113,14 @@ public class HumanAgeSymptomController {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    public void delete(int id) {
+        try {
+            this.deleteStatement.setInt(1, id);
+            this.deleteStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(HumanAgeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

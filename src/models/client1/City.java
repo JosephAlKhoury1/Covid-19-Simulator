@@ -326,8 +326,10 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         //this.mainFrame.setCurrentMap(this.currentMap);
         JScrollPane p = new JScrollPane(this.currentMap);
         this.currentMap.setScrollPane(p);
-        this.mainFrame.getjTabbedPane2().addTab("Map", this.currentMap.getScrollPane());
-        this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.currentMap.getButton());
+//        this.mainFrame.getjTabbedPane2().addTab("Map", this.currentMap.getScrollPane());
+//        this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.currentMap.getButton());
+        this.model.getModelPanel().getjTabbedPane1().addTab("Map", this.currentMap.getScrollPane());
+        this.model.getModelPanel().getjTabbedPane1().setTabComponentAt(this.model.getModelPanel().getjTabbedPane1().getTabCount() - 1, this.currentMap.getButton());
     }
 
     public int getSpeed() {
@@ -802,6 +804,8 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         }
     }
 
+    public boolean dayChanged = false;
+
     @Override
     public void run() {
         while (true) {
@@ -814,14 +818,29 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
                     statistiquePanel.updateTime(week);
                 }
                 for (Entry<Integer, Member> e : listMember.entrySet()) {
-                    e.getValue().move();
+                    if (dayChanged) {
+                        e.getValue().move(dayChanged);
+                    } else {
+                        e.getValue().move();
+                    }
                 }
-                this.currentMap.repaint();
+                this.setDayChanged(false);
+                if (this.currentMap != null) {
+                    this.currentMap.repaint();
+                }
                 this.mainFrame.setVisible(true);
             } catch (InterruptedException ex) {
                 Logger.getLogger(City.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    public boolean isDayChanged() {
+        return dayChanged;
+    }
+
+    public void setDayChanged(boolean dayChanged) {
+        this.dayChanged = dayChanged;
     }
 
     public void save() {
@@ -995,13 +1014,15 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     }
 
     public void changeState(int num) {
-        for (Member m : this.listSick) {
-            this.listHealth.add(m);
-        }
-        this.listSick.clear();
+//        this.listHealth.clear();
+//        for (Entry<Integer, Member> e : this.listMember.entrySet()) {
+//            this.listHealth.add(e.getValue());
+//        }
         for (int i = 0; i < num; i++) {
             int y = MonteCarlo.getNextInt(this.listHealth.size());
-            this.listSick.add(this.listHealth.remove(y));
+            Member m = this.listHealth.get(y);
+            this.listHealth.remove(y);
+            m.setInfected(true);
         }
         this.statistiquePanel.updateState();
     }

@@ -520,12 +520,18 @@
             <Property name="text" type="java.lang.String" value="Run"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="runButtonActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="pauseButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Pause"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pauseButtonActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="stopButton">
           <Properties>
@@ -535,9 +541,11 @@
         </Component>
         <Component class="javax.swing.JSlider" name="jSlider1">
           <Properties>
+            <Property name="maximum" type="int" value="10"/>
             <Property name="paintLabels" type="boolean" value="true"/>
             <Property name="paintTicks" type="boolean" value="true"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
+            <Property name="value" type="int" value="5"/>
             <Property name="inverted" type="boolean" value="true"/>
           </Properties>
           <Events>

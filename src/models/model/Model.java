@@ -8,7 +8,6 @@ import java.util.List;
 import javax.swing.JMenuItem;
 import models.client1.City;
 import views1.MainFrame;
-import views1.MapModel;
 import views1.model.panel.ModelPanel;
 
 public class Model {
@@ -30,10 +29,11 @@ public class Model {
 
     private List<SymptomType> listSymptomType;
 
-    private List<SymptomStage> listSymptomStage1s, listStageDeleted;
+    private List<SymptomStage> listSymptomStage1sNonHospital, listSymptomStage1sHospital;
+    private List<SymptomStage> listSympStageNonHosDeleted, listSymptomStagesHosDeleted;
+    private List<SymptomStage> listSymptomStagesNonHosAdded, listSymptomStagesHosAdded;
 
     private City city;
-    private MapModel currentMap;
     private JMenuItem mapMenu, runMenu, pauseMenu, populationMenu;
 
     private boolean run = false, pause = false, stop = false;
@@ -41,9 +41,21 @@ public class Model {
     public Model(int modelId, String modelName, List<SymptomType> list, List<SymptomStage> listSS, List<HumanAge> listHA) {
         this.modelId = modelId;
         this.modelName = modelName;
-
+        this.listSymptomStage1sHospital = new ArrayList();
+        this.listSymptomStage1sNonHospital = new ArrayList();
         this.listHumanAge = listHA;
-        this.listSymptomStage1s = listSS;
+        this.listSympStageNonHosDeleted = new ArrayList();
+        this.listSymptomStagesHosDeleted = new ArrayList();
+        this.listSymptomStagesHosAdded = new ArrayList();
+        this.listSymptomStagesNonHosAdded = new ArrayList();
+        //this.listSymptomStage1s = listSS;
+        for (SymptomStage ss : listSS) {
+            if (ss.getInHospital() == 0) {
+                this.listSymptomStage1sNonHospital.add(ss);
+            } else {
+                this.listSymptomStage1sHospital.add(ss);
+            }
+        }
         this.listSymptomType = list;
         this.listHumanAgeAdd = new ArrayList();
         this.listHumanAgeDeleted = new ArrayList();
@@ -76,6 +88,7 @@ public class Model {
                 setPause(false);
                 mainFrame.getRunButton().setEnabled(false);
                 mainFrame.getPauseButton().setEnabled(true);
+                modelPanel.setDisable();
                 runMenu.setEnabled(false);
                 pauseMenu.setEnabled(true);
             }
@@ -98,12 +111,27 @@ public class Model {
         this.saved = true;
         this.deleted = false;
 
+        for (SymptomType st : list) {
+            st.setModel(this);
+        }
+        for (HumanAge ha : listHA) {
+            ha.setModel(this);
+        }
+        for (SymptomStage sta : listSS) {
+            sta.setModel(this);
+        }
     }
 
     public Model(String name, MainFrame frame, City c) {
         this.modelName = name;
         this.mainFrame = frame;
         this.isMain = 1;
+        this.listSymptomStage1sHospital = new ArrayList();
+        this.listSymptomStage1sNonHospital = new ArrayList();
+        this.listSympStageNonHosDeleted = new ArrayList();
+        this.listSymptomStagesHosDeleted = new ArrayList();
+        this.listSymptomStagesHosAdded = new ArrayList();
+        this.listSymptomStagesNonHosAdded = new ArrayList();
         this.city = c;
         if (this.city != null) {
             this.city.setModel(this);
@@ -135,6 +163,13 @@ public class Model {
             @Override
             public void actionPerformed(ActionEvent e) {
                 city.start();
+                setRun(true);
+                setPause(false);
+                mainFrame.getRunButton().setEnabled(false);
+                mainFrame.getPauseButton().setEnabled(true);
+                modelPanel.setDisable();
+                runMenu.setEnabled(false);
+                pauseMenu.setEnabled(true);
             }
         });
 
@@ -143,6 +178,12 @@ public class Model {
             @Override
             public void actionPerformed(ActionEvent e) {
                 city.pause();
+                setPause(true);
+                setRun(false);
+                mainFrame.getRunButton().setEnabled(true);
+                mainFrame.getPauseButton().setEnabled(false);
+                runMenu.setEnabled(true);
+                pauseMenu.setEnabled(false);
             }
         });
 
@@ -151,15 +192,20 @@ public class Model {
         this.listHumanAgeDeleted = new ArrayList();
 
         this.listSymptomType = new ArrayList();
-        this.listSymptomStage1s = new ArrayList();
-        this.listStageDeleted = new ArrayList();
 
+        int i = 1;
         for (SymptomStageName stn : this.mainFrame.getListSymptomStageNames()) {
-            SymptomStage stgn = new SymptomStage(stn.getName(), 0.0, 0.0, 0, this);
-            this.listSymptomStage1s.add(stgn);
+            SymptomStage stgn = new SymptomStage(stn.getName(), 0.0, 0.0, i, stn.getInHospital(), this);
+            //this.listSymptomStage1s.add(stgn);
+            if (stgn.getInHospital() == 0) {
+                this.listSymptomStage1sNonHospital.add(stgn);
+            } else {
+                this.listSymptomStage1sHospital.add(stgn);
+            }
+            i++;
         }
         for (SymptomName sn : this.mainFrame.getListSymptomName()) {
-            SymptomType st1 = new SymptomType(sn.getName(), 0, this.mainFrame.getListSymptomStageNames(), this.listSymptomStage1s, this);
+            SymptomType st1 = new SymptomType(sn.getName(), 0, this.mainFrame.getListSymptomStageNames(), this.listSymptomStage1sHospital, this.listSymptomStage1sNonHospital, this);
             this.listSymptomType.add(st1);
         }
         for (HumanAgeName hu : this.mainFrame.getListHumanAgeName()) {
@@ -173,12 +219,52 @@ public class Model {
         this.city.generateMapLocation();
     }
 
-    public List<SymptomStage> getListSymptomStage1s() {
-        return listSymptomStage1s;
+    public List<SymptomStage> getListSymptomStage1sNonHospital() {
+        return listSymptomStage1sNonHospital;
     }
 
-    public void setListSymptomStage1s(List<SymptomStage> listSymptomStage1s) {
-        this.listSymptomStage1s = listSymptomStage1s;
+    public void setListSymptomStage1sNonHospital(List<SymptomStage> listSymptomStage1sNonHospital) {
+        this.listSymptomStage1sNonHospital = listSymptomStage1sNonHospital;
+    }
+
+    public List<SymptomStage> getListSympStageNonHosDeleted() {
+        return listSympStageNonHosDeleted;
+    }
+
+    public List<SymptomStage> getListSymptomStagesNonHosAdded() {
+        return listSymptomStagesNonHosAdded;
+    }
+
+    public void setListSymptomStagesNonHosAdded(List<SymptomStage> listSymptomStagesNonHosAdded) {
+        this.listSymptomStagesNonHosAdded = listSymptomStagesNonHosAdded;
+    }
+
+    public List<SymptomStage> getListSymptomStagesHosAdded() {
+        return listSymptomStagesHosAdded;
+    }
+
+    public void setListSymptomStagesHosAdded(List<SymptomStage> listSymptomStagesHosAdded) {
+        this.listSymptomStagesHosAdded = listSymptomStagesHosAdded;
+    }
+
+    public void setListSympStageNonHosDeleted(List<SymptomStage> listSympStageNonHosDeleted) {
+        this.listSympStageNonHosDeleted = listSympStageNonHosDeleted;
+    }
+
+    public List<SymptomStage> getListSymptomStagesHosDeleted() {
+        return listSymptomStagesHosDeleted;
+    }
+
+    public void setListSymptomStagesHosDeleted(List<SymptomStage> listSymptomStagesHosDeleted) {
+        this.listSymptomStagesHosDeleted = listSymptomStagesHosDeleted;
+    }
+
+    public List<SymptomStage> getListSymptomStage1sHospital() {
+        return listSymptomStage1sHospital;
+    }
+
+    public void setListSymptomStage1sHospital(List<SymptomStage> listSymptomStage1sHospital) {
+        this.listSymptomStage1sHospital = listSymptomStage1sHospital;
     }
 
     public String getModelName() {
@@ -223,14 +309,6 @@ public class Model {
 
     public boolean isSaved() {
         return saved;
-    }
-
-    public MapModel getCurrentMap() {
-        return currentMap;
-    }
-
-    public void setCurrentMap(MapModel currentMap) {
-        this.currentMap = currentMap;
     }
 
     public boolean isRun() {
@@ -368,6 +446,14 @@ public class Model {
         this.listHumanAge = listHumanAge;
     }
 
+    public List<HumanAge> getListHumanAgeDeleted() {
+        return listHumanAgeDeleted;
+    }
+
+    public void setListHumanAgeDeleted(List<HumanAge> listHumanAgeDeleted) {
+        this.listHumanAgeDeleted = listHumanAgeDeleted;
+    }
+
     public void save() {
         if (this.isNewModel()) {
             this.modelId = ModelController.INSTANCE.insertModel(this);
@@ -380,37 +466,54 @@ public class Model {
             }
         }
 
-        for (SymptomStage stage : this.listSymptomStage1s) {
+        for (SymptomStage stage : this.listSymptomStage1sHospital) {
             stage.setModel(this);
             stage.save1();
         }
+
+        for (SymptomStage stage : this.listSymptomStage1sNonHospital) {
+            stage.setModel(this);
+            stage.save1();
+        }
+
+        for (SymptomStage stage : this.listSympStageNonHosDeleted) {
+            stage.setModel(this);
+            stage.save1();
+        }
+        this.listSympStageNonHosDeleted.clear();
+
+        for (SymptomStage stage : this.listSymptomStagesHosDeleted) {
+            stage.setModel(this);
+            stage.save1();
+        }
+        this.listSymptomStagesHosDeleted.clear();
 
         for (SymptomType st : this.listSymptomType) {
             st.setModel(this);
             st.save();
         }
-
         for (HumanAge ha : this.listHumanAge) {
             ha.setModel(this);
             ha.save();
         }
 
-        /*for (HumanAge ha : this.listHumanAgeDeleted) {
+        for (HumanAge ha : this.listHumanAgeDeleted) {
             ha.setModel(this);
-            ha.save1();
-        }*/
+            ha.save();
+        }
+
         this.listHumanAgeDeleted.clear();
         this.listHumanAgeAdd.clear();
     }
 
-    public void removeSymptomStage(List<SymptomStage> list) {
+    /* public void removeSymptomStage(List<SymptomStage> list) {
         listSymptomType.forEach((st) -> {
             st.updateSymptomStage(list);
         });
         for (SymptomStage sts : list) {
             if (sts.isIsNew()) {
                 if (!sts.isDeleted()) {
-                    SymptomStage ss = new SymptomStage(sts.getName(), sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), this);
+                    SymptomStage ss = new SymptomStage(sts.getName(), sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), sts.getInHospital(), this);
                     this.listSymptomStage1s.add(ss);
                     //this.listAdd.add(ss);
                 } else {
@@ -443,9 +546,62 @@ public class Model {
         for (SymptomStage ss : tab) {
             listSymptomStage1s.add(ss);
         }
+    }*/
+    public void addNewHumanAge() {
+        HumanAge age = new HumanAge("between 999 and 1000", 999, 1000, this.getListSymptomType(), this);
+        this.listHumanAge.add(age);
+        this.mainFrame.setModelSavedButtonEnable();
+        this.modelPanel.reinitAgePanel();
+    }
+
+    public void addNewSymptomStage(SymptomStage ss) {
+        if (ss.getInHospital() == 0) {
+            this.listSymptomStage1sNonHospital.add(ss);
+        } else {
+            this.listSymptomStage1sHospital.add(ss);
+        }
+
+        for (SymptomType st : this.listSymptomType) {
+            st.getListSage().add(new SymptomStageType(st, ss, 0, 0.0, this));
+            st.reintSymptomStagePanel();
+        }
+
+        this.modelPanel.reinitPanel();
+        this.modelPanel.reinitSymptomPanel();
+        this.mainFrame.setModelSavedButtonEnable();
     }
 
     public void changeState(int num) {
         this.city.changeState(num);
+    }
+
+    public void setEnable() {
+        for (HumanAge ha : this.listHumanAge) {
+            ha.setEnable();
+        }
+        for (SymptomType st : this.listSymptomType) {
+            st.setEnable();
+        }
+        for (SymptomStage ss : this.listSymptomStage1sHospital) {
+            ss.setEnable();
+        }
+        for (SymptomStage ss : this.listSymptomStage1sNonHospital) {
+            ss.setEnable();
+        }
+    }
+
+    public void setDisable() {
+        for (HumanAge ha : this.listHumanAge) {
+            ha.setDisable();
+        }
+        for (SymptomType st : this.listSymptomType) {
+            st.setDisable();
+        }
+        for (SymptomStage ss : this.listSymptomStage1sHospital) {
+            ss.setDisable();
+        }
+        for (SymptomStage ss : this.listSymptomStage1sNonHospital) {
+            ss.setDisable();
+        }
     }
 }

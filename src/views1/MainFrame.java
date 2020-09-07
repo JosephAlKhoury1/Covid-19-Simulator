@@ -21,7 +21,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import models.client1.City;
-import models.client1.Week;
 import models.model.HumanAgeName;
 import models.model.HumanStatName;
 import models.model.Model;
@@ -46,7 +45,6 @@ public class MainFrame extends JFrame {
     private CityPanel currentCityPanel;
     private final List<ModelPanel> listModelPanel;
     private List<Model> listModel;
-    private final List<MapModel> listMapModel;
     public LocationListPanel locationListPanel;
 
     private List<SymptomName> listSymptomName;
@@ -58,7 +56,6 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         this.listModelPanel = new ArrayList();
-        this.listMapModel = new ArrayList();
         this.listModel = new ArrayList();
         this.listSymptomName = SymptomNameController.INSTANCE.selectAll();
         this.listSymptomStageNames = SymptomStageNameController.INSTANCE.selectAll();
@@ -72,7 +69,7 @@ public class MainFrame extends JFrame {
         initComponents();
         this.statistiquePanel.setLayout(new BoxLayout(this.statistiquePanel, BoxLayout.Y_AXIS));
         this.locationPanel.setLayout(new BorderLayout());
-        //this.jTabbedPane2.removeTabAt(0);
+        this.jTabbedPane2.removeTabAt(0);
         this.currentCity = CityController.INSTANCE.getMainCity(1);
         if (this.currentCity != null) {
             this.currentCityPanel = new CityPanel(this, this.jTabbedPane2, this.currentCity);
@@ -106,13 +103,16 @@ public class MainFrame extends JFrame {
                     newCity = (City) this.currentCity.clone();
                     this.currentModel.setCity(newCity);
                     newCity.setModel(this.currentModel);
-                    this.statistiquePanel.add(newCity.getStatistiquePanel());
+                    //this.statistiquePanel.add(newCity.getStatistiquePanel());
                 }
             } catch (CloneNotSupportedException ex) {
                 Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
             this.currentModel.setMainFrame(this);
             this.currentModelPanel = new ModelPanel(this, this.currentModel, this.jTabbedPane2);
+
+            this.currentModelPanel.getStatistiquePanel().add(newCity.getStatistiquePanel());
+
             this.jTabbedPane2.addTab(this.currentModel.getModelName(), this.currentModelPanel);
             this.jTabbedPane2.setTabComponentAt(this.jTabbedPane2.getTabCount() - 1, this.currentModelPanel.getButton());
             this.listModelPanel.add(this.currentModelPanel);
@@ -245,6 +245,7 @@ public class MainFrame extends JFrame {
         this.currentModelPanel = new ModelPanel(this, name, this.jTabbedPane2, c);
         this.currentModel = this.currentModelPanel.getModel();
         this.generateLocationMenu.add(this.currentModel.getMapMenu());
+        this.generatePopulationMenu.add(this.currentModel.getPopulationMenu());
         this.runMenu.add(this.currentModel.getRunMenu());
         this.pauseMenu.add(this.currentModel.getPauseMenu());
 
@@ -362,10 +363,9 @@ public class MainFrame extends JFrame {
         this.pauseMenu.revalidate();
     }
 
-    public JTabbedPane getjTabbedPane2() {
+    /*public JTabbedPane getjTabbedPane2() {
         return jTabbedPane2;
-    }
-
+    }*/
     public void setjTabbedPane2(JTabbedPane jTabbedPane2) {
         this.jTabbedPane2 = jTabbedPane2;
     }
@@ -542,17 +542,28 @@ public class MainFrame extends JFrame {
 
         runButton.setText("Run");
         runButton.setToolTipText("");
+        runButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runButtonActionPerformed(evt);
+            }
+        });
 
         pauseButton.setText("Pause");
         pauseButton.setToolTipText("");
+        pauseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pauseButtonActionPerformed(evt);
+            }
+        });
 
         stopButton.setText("Stop");
         stopButton.setToolTipText("");
 
+        jSlider1.setMaximum(10);
         jSlider1.setPaintLabels(true);
         jSlider1.setPaintTicks(true);
         jSlider1.setToolTipText("");
-        jSlider1.setValue(50);
+        jSlider1.setValue(5);
         jSlider1.setInverted(true);
         jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -600,9 +611,7 @@ public class MainFrame extends JFrame {
             .addComponent(runButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(pauseButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(stopButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(jSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jSlider1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jMenu1.setText("File");
@@ -896,44 +905,6 @@ public class MainFrame extends JFrame {
 //        this.saveModel();
     }//GEN-LAST:event_saveModelMenuItemActionPerformed
 
-    private void jTabbedPane2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane2StateChanged
-        int index = this.jTabbedPane2.getSelectedIndex();
-        //if (index > 0) {
-        ModelPanel.ButtonTilte mp = null;
-        Maps.ButtonTilte ma = null;
-        try {
-            mp = (ModelPanel.ButtonTilte) this.jTabbedPane2.getTabComponentAt(index);
-        } catch (Exception e) {
-        }
-        try {
-            ma = (Maps.ButtonTilte) this.jTabbedPane2.getTabComponentAt(index);
-        } catch (Exception e) {
-        }
-
-        if (mp != null) {
-            this.setModelSavedButtonDisable();
-            this.currentModel = this.listModel.get(index - 2);
-            if (this.currentModel.isRun()) {
-                this.runButton.setEnabled(false);
-            } else {
-                this.runButton.setEnabled(true);
-            }
-            if (this.currentModel.isPause()) {
-                this.pauseButton.setEnabled(false);
-            } else {
-                this.pauseButton.setEnabled(true);
-            }
-            this.currentModelPanel = this.currentModel.getModelPanel();
-            if (!this.currentModel.isSaved()) {
-                this.setModelSavedButtonEnable();
-            }
-        } else {
-            this.setModelSavedButtonDisable();
-        }
-
-        // }
-    }//GEN-LAST:event_jTabbedPane2StateChanged
-
     private void newCityButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newCityButtonActionPerformed
         String ti = "New city";
         String message = "Would you like to save this city and the result?";
@@ -1054,8 +1025,73 @@ public class MainFrame extends JFrame {
     }//GEN-LAST:event_religionMenuItemActionPerformed
 
     private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
-        this.currentModel.getCity().setSpeed(this.jSlider1.getValue());
+        int value = this.jSlider1.getValue();
+        this.currentModel.getCity().setSpeed(value);
     }//GEN-LAST:event_jSlider1StateChanged
+
+    private void jTabbedPane2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane2StateChanged
+        int index = this.jTabbedPane2.getSelectedIndex();
+        ModelPanel.ButtonTilte mp = null;
+        Maps.ButtonTilte ma = null;
+        try {
+            mp = (ModelPanel.ButtonTilte) this.jTabbedPane2.getTabComponentAt(index);
+        } catch (Exception e) {
+        }
+        try {
+            ma = (Maps.ButtonTilte) this.jTabbedPane2.getTabComponentAt(index);
+        } catch (Exception e) {
+        }
+
+        if (mp != null) {
+            this.setModelSavedButtonDisable();
+            this.currentModel = this.listModel.get(index - 1);
+            this.jSlider1.setEnabled(true);
+            this.jSlider1.setValue(this.currentModel.getCity().getSpeed());
+            if (this.currentModel.isRun()) {
+                this.runButton.setEnabled(false);
+            } else {
+                this.runButton.setEnabled(true);
+            }
+            if (this.currentModel.isPause()) {
+                this.pauseButton.setEnabled(false);
+            } else {
+                this.pauseButton.setEnabled(true);
+            }
+            this.currentModelPanel = this.currentModel.getModelPanel();
+            if (!this.currentModel.isSaved()) {
+                this.setModelSavedButtonEnable();
+            }
+        } else {
+            this.setModelSavedButtonDisable();
+            this.jSlider1.setEnabled(false);
+            this.runButton.setEnabled(false);
+            this.pauseButton.setEnabled(false);
+            this.stopButton.setEnabled(false);
+        }
+
+        // }
+    }//GEN-LAST:event_jTabbedPane2StateChanged
+
+    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
+        this.currentModel.getCity().start();
+        this.currentModel.setRun(true);
+        this.currentModel.setPause(false);
+        this.getRunButton().setEnabled(false);
+        this.getPauseButton().setEnabled(true);
+        this.getCurrentModelPanel().setDisable();
+        this.currentModel.getRunMenu().setEnabled(false);
+        this.currentModel.getPauseMenu().setEnabled(true);
+    }//GEN-LAST:event_runButtonActionPerformed
+
+    private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pauseButtonActionPerformed
+        this.currentModel.getCity().pause();
+        this.currentModel.setPause(true);
+        this.currentModel.setRun(false);
+        this.getRunButton().setEnabled(true);
+        this.getPauseButton().setEnabled(false);
+        this.currentModel.getRunMenu().setEnabled(true);
+        this.currentModel.getPauseMenu().setEnabled(false);
+    }//GEN-LAST:event_pauseButtonActionPerformed
 
     public Maps getCurrentMap() {
         return currentMap;

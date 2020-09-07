@@ -19,7 +19,7 @@ public class LocationCategory implements Cloneable {
     private int cityId;
     private String kind;
     private List<Location> listLocation;
-    private double percentageToBeSick;
+    private double percentageToBeSick = 0.0;
     private int quantity;
     private int openTime, closeTime;
     private LocationFactory factory;

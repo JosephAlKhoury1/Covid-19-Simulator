@@ -28,6 +28,8 @@ import models.model.ModelLocationRow;
 import models.model.SymptomStage;
 import models.model.SymptomType;
 import views1.MainFrame;
+import views1.model.dialog.ManageHumanAgeDistributionDialog;
+import views1.model.dialog.ManageSymptomStagesDialog;
 
 public class ModelPanel extends javax.swing.JPanel {
 
@@ -35,11 +37,12 @@ public class ModelPanel extends javax.swing.JPanel {
     private final ButtonTilte button;
     private Model currentModel;
     private MainFrame mainframe;
-    
+
     private JLabel minAgeName, maxAgeName;
 
     public ModelPanel(MainFrame frame, Model model, JTabbedPane pane) {
         initComponents();
+        this.statistiquePanel.setLayout(new BoxLayout(this.statistiquePanel, BoxLayout.Y_AXIS));
         this.mainframe = frame;
         this.currentModel = model;
         this.currentModel.setModelPanel(this);
@@ -58,10 +61,37 @@ public class ModelPanel extends javax.swing.JPanel {
     }
 
     private void initSymptomPanel() {
-        this.symptomStagePanel.setLayout(new BoxLayout(this.symptomStagePanel, BoxLayout.Y_AXIS));
-        for (SymptomStage stg : this.currentModel.getListSymptomStage1s()) {
-            this.symptomStagePanel.add(stg.getPanel());
+        this.symptomStageNonHospitalPanel.setLayout(new BoxLayout(this.symptomStageNonHospitalPanel, BoxLayout.Y_AXIS));
+        this.symptomStageHospitalPanel.setLayout(new BoxLayout(this.symptomStageHospitalPanel, BoxLayout.Y_AXIS));
+
+        this.noHospitalPanel.setPreferredSize(new Dimension(this.noHospitalPanel.getWidth(), this.currentModel.getListSymptomStage1sNonHospital().size() * 38));
+        this.hospitalPanel.setPreferredSize(new Dimension(this.hospitalPanel.getWidth(), this.currentModel.getListSymptomStage1sHospital().size() * 38));
+
+        this.jPanel13.setPreferredSize(new Dimension(this.jPanel13.getWidth(), (this.currentModel.getListSymptomStage1sNonHospital().size() + this.currentModel.getListSymptomStage1sHospital().size()) * 38));
+
+        for (SymptomStage stg : this.currentModel.getListSymptomStage1sNonHospital()) {
+            this.symptomStageNonHospitalPanel.add(stg.getPanel());
         }
+        for (SymptomStage stg : this.currentModel.getListSymptomStage1sHospital()) {
+            this.symptomStageHospitalPanel.add(stg.getPanel());
+        }
+    }
+
+    public void reinitSymptomPanel() {
+        this.symptomStageHospitalPanel.removeAll();
+        this.symptomStageNonHospitalPanel.removeAll();
+        this.noHospitalPanel.setPreferredSize(new Dimension(this.noHospitalPanel.getWidth(), this.currentModel.getListSymptomStage1sNonHospital().size() * 38));
+        this.hospitalPanel.setPreferredSize(new Dimension(this.hospitalPanel.getWidth(), this.currentModel.getListSymptomStage1sHospital().size() * 38));
+
+        this.jPanel13.setPreferredSize(new Dimension(this.jPanel13.getWidth(), (this.currentModel.getListSymptomStage1sNonHospital().size() + this.currentModel.getListSymptomStage1sHospital().size()) * 38));
+
+        for (SymptomStage stg : this.currentModel.getListSymptomStage1sNonHospital()) {
+            this.symptomStageNonHospitalPanel.add(stg.getPanel());
+        }
+        for (SymptomStage stg : this.currentModel.getListSymptomStage1sHospital()) {
+            this.symptomStageHospitalPanel.add(stg.getPanel());
+        }
+        this.mainframe.setVisible(true);
     }
 
     private void initPanel() {
@@ -71,8 +101,75 @@ public class ModelPanel extends javax.swing.JPanel {
         this.symptomsDayPanel.setLayout(new BoxLayout(this.symptomsDayPanel, BoxLayout.Y_AXIS));
         this.symptomStageNamePanel.setLayout(new BoxLayout(this.symptomStageNamePanel, BoxLayout.X_AXIS));
 
-        for (SymptomStage stg : this.currentModel.getListSymptomStage1s()) {
-            this.symptomStageNamePanel.add(stg.getNameLabel2());
+        this.nonHospitalNamePanel.setPreferredSize(new Dimension(this.currentModel.getListSymptomStage1sNonHospital().size() * 122, this.nonHospitalNamePanel.getHeight()));
+        this.hospitalPanelName.setPreferredSize(new Dimension(this.currentModel.getListSymptomStage1sHospital().size() * 122, this.hospitalPanelName.getHeight()));
+
+        int index = 1;
+        while (index < this.currentModel.getListSymptomStage1sNonHospital().size() + 1) {
+            for (SymptomStage stg : this.currentModel.getListSymptomStage1sNonHospital()) {
+                if (stg.getIndex() == index) {
+                    this.symptomStageNamePanel.add(stg.getNameLabel2());
+                    index++;
+                }
+            }
+        }
+        index = this.currentModel.getListSymptomStage1sNonHospital().size() + 1;
+        while (index < (this.currentModel.getListSymptomStage1sHospital().size() + this.currentModel.getListSymptomStage1sNonHospital().size() + 1)) {
+            for (SymptomStage stg : this.currentModel.getListSymptomStage1sHospital()) {
+                if (stg.getIndex() == index) {
+                    this.symptomStageNamePanel.add(stg.getNameLabel2());
+                    index++;
+                }
+            }
+        }
+
+        for (SymptomType st : this.currentModel.getListSymptomType()) {
+            st.setModel(this.currentModel);
+            this.symptomNamePane.add(st.getName1());
+            Component c1 = Box.createVerticalStrut(3);
+            st.setcName1(c1);
+            this.symptomNamePane.add(c1);
+
+            this.contagiousDaysPanel.add(st.getDayTxt());
+            Component c2 = Box.createVerticalStrut(3);
+            st.setcContDay(c2);
+            this.contagiousDaysPanel.add(c2);
+
+            this.symptomsDayPanel.add(st);
+            Component c3 = Box.createVerticalStrut(3);
+            st.setcState(c3);
+            this.symptomsDayPanel.add(c3);
+        }
+        this.repaint();
+    }
+
+    public void reinitPanel() {
+        this.symptomStageNamePanel.removeAll();
+        this.symptomNamePane.removeAll();
+        this.symptomsDayPanel.removeAll();
+
+        this.nonHospitalNamePanel.setPreferredSize(new Dimension(this.currentModel.getListSymptomStage1sNonHospital().size() * 122, this.nonHospitalNamePanel.getHeight()));
+        this.hospitalPanelName.setPreferredSize(new Dimension(this.currentModel.getListSymptomStage1sHospital().size() * 122, this.hospitalPanelName.getHeight()));
+        this.nonHospitalNamePanel.setSize(new Dimension(this.currentModel.getListSymptomStage1sNonHospital().size() * 122, this.nonHospitalNamePanel.getHeight()));
+        this.hospitalPanelName.setSize(new Dimension(this.currentModel.getListSymptomStage1sHospital().size() * 122, this.hospitalPanelName.getHeight()));
+
+        int index = 1;
+        while (index < this.currentModel.getListSymptomStage1sNonHospital().size() + 1) {
+            for (SymptomStage stg : this.currentModel.getListSymptomStage1sNonHospital()) {
+                if (stg.getIndex() == index) {
+                    this.symptomStageNamePanel.add(stg.getNameLabel2());
+                    index++;
+                }
+            }
+        }
+        index = this.currentModel.getListSymptomStage1sNonHospital().size() + 1;
+        while (index < (this.currentModel.getListSymptomStage1sHospital().size() + this.currentModel.getListSymptomStage1sNonHospital().size() + 1)) {
+            for (SymptomStage stg : this.currentModel.getListSymptomStage1sHospital()) {
+                if (stg.getIndex() == index) {
+                    this.symptomStageNamePanel.add(stg.getNameLabel2());
+                    index++;
+                }
+            }
         }
         for (SymptomType st : this.currentModel.getListSymptomType()) {
             st.setModel(this.currentModel);
@@ -91,10 +188,20 @@ public class ModelPanel extends javax.swing.JPanel {
             st.setcState(c3);
             this.symptomsDayPanel.add(c3);
         }
+        this.symptomStageNamePanel.repaint();
+        this.symptomStageNamePanel.setVisible(true);
+        this.mainframe.setVisible(true);
+    }
+
+    public JPanel getStatistiquePanel() {
+        return statistiquePanel;
+    }
+
+    public JTabbedPane getjTabbedPane1() {
+        return jTabbedPane1;
     }
 
     private void initAgePanel() {
-
         this.minAgeName = new JLabel("Min age");
         this.minAgeName.setPreferredSize(new Dimension(130, 31));
         this.minAgeName.setMaximumSize(new Dimension(130, 31));
@@ -103,7 +210,7 @@ public class ModelPanel extends javax.swing.JPanel {
         this.minAgeName.setToolTipText("");
         this.minAgeName.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.minAgeName.setBorder(BorderFactory.createEtchedBorder());
-        
+
         this.maxAgeName = new JLabel("Max age");
         this.maxAgeName.setPreferredSize(new Dimension(130, 31));
         this.maxAgeName.setMaximumSize(new Dimension(130, 31));
@@ -112,8 +219,7 @@ public class ModelPanel extends javax.swing.JPanel {
         this.maxAgeName.setToolTipText("");
         this.maxAgeName.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.maxAgeName.setBorder(BorderFactory.createEtchedBorder());
-        
-        
+
         this.symptomsAgeNamePanel.setLayout(new BoxLayout(this.symptomsAgeNamePanel, BoxLayout.X_AXIS));
         this.symptomsAgeNamePanel.setPreferredSize(new Dimension(500, 31));
         this.symptomsAgePanel.setLayout(new BoxLayout(this.symptomsAgePanel, BoxLayout.Y_AXIS));
@@ -124,10 +230,25 @@ public class ModelPanel extends javax.swing.JPanel {
         this.symptomsAgeNamePanel.add(this.maxAgeName);
         for (HumanAge ha : this.currentModel.getListHumanAge()) {
             ha.setModel(this.currentModel);
+            this.symptomsAgePanel.add(ha.getPanel());
+            this.symptomsAgePanel.add(ha.getcPanel());
+            System.out.println("setwdfd");
+        }
+        this.symptomsAgePanel.setPreferredSize(new Dimension(this.symptomsAgePanel.getWidth(), this.currentModel.getListHumanAge().size() * 40));
+    }
 
+    public void reinitAgePanel() {
+        this.symptomsAgePanel.setPreferredSize(new Dimension(this.symptomsAgePanel.getWidth(), this.currentModel.getListHumanAge().size() * 40));
+        this.symptomsAgePanel.removeAll();
+        for (HumanAge ha : this.currentModel.getListHumanAge()) {
+            ha.setModel(this.currentModel);
             this.symptomsAgePanel.add(ha.getPanel());
             this.symptomsAgePanel.add(ha.getcPanel());
         }
+        this.symptomsAgePanel.revalidate();
+        this.symptomsAgePanel.repaint();
+        this.repaint();
+        this.setVisible(true);
     }
 
     private void initLocationPanel() {
@@ -144,13 +265,14 @@ public class ModelPanel extends javax.swing.JPanel {
 
     public ModelPanel(MainFrame frame, String name, JTabbedPane pane, City c) {
         initComponents();
+        this.statistiquePanel.setLayout(new BoxLayout(this.statistiquePanel, BoxLayout.Y_AXIS));
         this.mainframe = frame;
         this.currentModel = new Model(name, frame, c);
         this.currentModel.setModelPanel(this);
         this.pane = pane;
         this.button = new ButtonTilte(this);
         this.locationPanel.setLayout(new BoxLayout(this.locationPanel, BoxLayout.Y_AXIS));
-
+        this.statistiquePanel.add(c.getStatistiquePanel());
         initPanel();
         initAgePanel();
         initSymptomPanel();
@@ -226,11 +348,11 @@ public class ModelPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel36 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        manageSymptomStageDistributionButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jPanel11 = new javax.swing.JPanel();
@@ -248,6 +370,12 @@ public class ModelPanel extends javax.swing.JPanel {
         symptomsDayPanel = new javax.swing.JPanel();
         dayPercentagePanel = new javax.swing.JPanel();
         jPanel41 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel16 = new javax.swing.JPanel();
+        nonHospitalNamePanel = new javax.swing.JPanel();
+        nonHospitalLabel = new javax.swing.JLabel();
+        hospitalPanelName = new javax.swing.JPanel();
+        hospitalLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -261,7 +389,6 @@ public class ModelPanel extends javax.swing.JPanel {
         jLabel7 = new javax.swing.JLabel();
         symptomsAgeNamePanel = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
-        jPanel10 = new javax.swing.JPanel();
         symptomsAgePanel = new javax.swing.JPanel();
         jPanel30 = new javax.swing.JPanel();
         jPanel33 = new javax.swing.JPanel();
@@ -293,36 +420,38 @@ public class ModelPanel extends javax.swing.JPanel {
         jLabel25 = new javax.swing.JLabel();
         jLabel26 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        symptomStagePanel = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        manageStageButton = new javax.swing.JButton();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        jPanel13 = new javax.swing.JPanel();
+        noHospitalPanel = new javax.swing.JPanel();
+        symptomStageNonHospitalPanel = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        hospitalPanel = new javax.swing.JPanel();
+        symptomStageHospitalPanel = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jPanel14 = new javax.swing.JPanel();
+        statistiquePanel = new javax.swing.JPanel();
 
         jScrollPane1.setPreferredSize(new java.awt.Dimension(1000, 750));
 
-        jPanel36.setPreferredSize(new java.awt.Dimension(1000, 1500));
+        jPanel36.setPreferredSize(new java.awt.Dimension(1000, 1600));
 
         jPanel8.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel8.setPreferredSize(new java.awt.Dimension(1000, 400));
 
         jPanel1.setPreferredSize(new java.awt.Dimension(996, 35));
 
-        manageSymptomStageDistributionButton.setText("ManageButton");
-        manageSymptomStageDistributionButton.setToolTipText("");
-        manageSymptomStageDistributionButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                manageSymptomStageDistributionButtonActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(manageSymptomStageDistributionButton))
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(manageSymptomStageDistributionButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(0, 35, Short.MAX_VALUE)
         );
 
         jPanel3.setPreferredSize(new java.awt.Dimension(996, 373));
@@ -369,7 +498,7 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
         );
 
         jPanel18.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -419,8 +548,8 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(symptomStageNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-            .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(symptomStageNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
+            .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
             .addComponent(jPanel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
@@ -442,7 +571,7 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         symptomNamePaneLayout.setVerticalGroup(
             symptomNamePaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 276, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         contagiousDaysPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -472,7 +601,7 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         symptomsDayPanelLayout.setVerticalGroup(
             symptomsDayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 276, Short.MAX_VALUE)
+            .addGap(0, 242, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel19Layout = new javax.swing.GroupLayout(jPanel19);
@@ -488,9 +617,9 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         jPanel19Layout.setVerticalGroup(
             jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(symptomNamePane, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
-            .addComponent(symptomsDayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
-            .addComponent(contagiousDaysPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+            .addComponent(symptomsDayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+            .addComponent(contagiousDaysPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+            .addComponent(symptomNamePane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
         );
 
         jScrollPane3.setViewportView(jPanel19);
@@ -524,6 +653,88 @@ public class ModelPanel extends javax.swing.JPanel {
             .addComponent(jPanel41, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
+        jPanel12.setBackground(new java.awt.Color(255, 0, 51));
+        jPanel12.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel12.setPreferredSize(new java.awt.Dimension(1500, 38));
+
+        jPanel16.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel16.setMaximumSize(new java.awt.Dimension(136, 32767));
+        jPanel16.setMinimumSize(new java.awt.Dimension(136, 100));
+        jPanel16.setName(""); // NOI18N
+
+        javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
+        jPanel16.setLayout(jPanel16Layout);
+        jPanel16Layout.setHorizontalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel16Layout.setVerticalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        nonHospitalNamePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        nonHospitalLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        nonHospitalLabel.setText("Non hospital");
+        nonHospitalLabel.setToolTipText("");
+        nonHospitalLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        javax.swing.GroupLayout nonHospitalNamePanelLayout = new javax.swing.GroupLayout(nonHospitalNamePanel);
+        nonHospitalNamePanel.setLayout(nonHospitalNamePanelLayout);
+        nonHospitalNamePanelLayout.setHorizontalGroup(
+            nonHospitalNamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(nonHospitalLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        nonHospitalNamePanelLayout.setVerticalGroup(
+            nonHospitalNamePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(nonHospitalLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        hospitalPanelName.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        hospitalLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        hospitalLabel.setText("Hospital");
+        hospitalLabel.setToolTipText("");
+        hospitalLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        hospitalLabel.setMaximumSize(new java.awt.Dimension(54545, 18));
+        hospitalLabel.setMinimumSize(new java.awt.Dimension(0, 18));
+
+        javax.swing.GroupLayout hospitalPanelNameLayout = new javax.swing.GroupLayout(hospitalPanelName);
+        hospitalPanelName.setLayout(hospitalPanelNameLayout);
+        hospitalPanelNameLayout.setHorizontalGroup(
+            hospitalPanelNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(hospitalLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        hospitalPanelNameLayout.setVerticalGroup(
+            hospitalPanelNameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(hospitalLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
+        jPanel12.setLayout(jPanel12Layout);
+        jPanel12Layout.setHorizontalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel12Layout.createSequentialGroup()
+                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(nonHospitalNamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(hospitalPanelName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel12Layout.setVerticalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel12Layout.createSequentialGroup()
+                .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(nonHospitalNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel12Layout.createSequentialGroup()
+                        .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(hospitalPanelName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
@@ -531,15 +742,20 @@ public class ModelPanel extends javax.swing.JPanel {
             .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 1500, Short.MAX_VALUE)
             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 1500, Short.MAX_VALUE)
             .addComponent(dayPercentagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1500, Short.MAX_VALUE)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, 1312, Short.MAX_VALUE)
+                .addGap(0, 188, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel11Layout.createSequentialGroup()
-                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(dayPercentagePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 282, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
         );
 
         jScrollPane2.setViewportView(jPanel11);
@@ -565,8 +781,8 @@ public class ModelPanel extends javax.swing.JPanel {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 764, Short.MAX_VALUE))
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 708, Short.MAX_VALUE))
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -583,7 +799,7 @@ public class ModelPanel extends javax.swing.JPanel {
 
         jLabel2.setText("Distribution of symptoms over ages ");
 
-        manageAgeButton.setText("Manage");
+        manageAgeButton.setText("+");
         manageAgeButton.setToolTipText("");
         manageAgeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -634,9 +850,7 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         jPanel27Layout.setVerticalGroup(
             jPanel27Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel27Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
         );
 
         symptomsAgeNamePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -660,25 +874,23 @@ public class ModelPanel extends javax.swing.JPanel {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jPanel27, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(symptomsAgeNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 906, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addComponent(symptomsAgeNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 856, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addGap(1, 1, 1)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel27, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(symptomsAgeNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
-                .addGap(0, 6, Short.MAX_VALUE))
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(symptomsAgeNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                    .addComponent(jPanel27, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)))
         );
 
         jScrollPane5.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane5.setPreferredSize(new java.awt.Dimension(900, 102));
 
-        jPanel10.setPreferredSize(new java.awt.Dimension(900, 100));
-
         symptomsAgePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        symptomsAgePanel.setPreferredSize(new java.awt.Dimension(1048, 406));
 
         javax.swing.GroupLayout symptomsAgePanelLayout = new javax.swing.GroupLayout(symptomsAgePanel);
         symptomsAgePanel.setLayout(symptomsAgePanelLayout);
@@ -688,28 +900,17 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         symptomsAgePanelLayout.setVerticalGroup(
             symptomsAgePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 262, Short.MAX_VALUE)
+            .addGap(0, 402, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(symptomsAgePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(symptomsAgePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        jScrollPane5.setViewportView(jPanel10);
+        jScrollPane5.setViewportView(symptomsAgePanel);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
-            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, 1050, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 994, Short.MAX_VALUE)
+            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -739,7 +940,7 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 996, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -896,18 +1097,18 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel35.setLayout(jPanel35Layout);
         jPanel35Layout.setHorizontalGroup(
             jPanel35Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
         jPanel35Layout.setVerticalGroup(
             jPanel35Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
+            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel30Layout = new javax.swing.GroupLayout(jPanel30);
         jPanel30.setLayout(jPanel30Layout);
         jPanel30Layout.setHorizontalGroup(
             jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel33, javax.swing.GroupLayout.DEFAULT_SIZE, 1052, Short.MAX_VALUE)
+            .addComponent(jPanel33, javax.swing.GroupLayout.DEFAULT_SIZE, 996, Short.MAX_VALUE)
             .addComponent(jPanel35, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel30Layout.setVerticalGroup(
@@ -1015,7 +1216,8 @@ public class ModelPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6)
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(50, Short.MAX_VALUE))
         );
         jPanel24Layout.setVerticalGroup(
             jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1028,40 +1230,169 @@ public class ModelPanel extends javax.swing.JPanel {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        symptomStagePanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        symptomStagePanel.setPreferredSize(new java.awt.Dimension(581, 318));
+        jPanel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        javax.swing.GroupLayout symptomStagePanelLayout = new javax.swing.GroupLayout(symptomStagePanel);
-        symptomStagePanel.setLayout(symptomStagePanelLayout);
-        symptomStagePanelLayout.setHorizontalGroup(
-            symptomStagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 577, Short.MAX_VALUE)
+        jLabel6.setText("Symptom stages");
+        jLabel6.setToolTipText("");
+
+        manageStageButton.setText("+");
+        manageStageButton.setToolTipText("");
+        manageStageButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manageStageButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(manageStageButton))
         );
-        symptomStagePanelLayout.setVerticalGroup(
-            symptomStagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 314, Short.MAX_VALUE)
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(manageStageButton))
+        );
+
+        jPanel13.setPreferredSize(new java.awt.Dimension(750, 270));
+
+        noHospitalPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        symptomStageNonHospitalPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        symptomStageNonHospitalPanel.setPreferredSize(new java.awt.Dimension(595, 4));
+
+        javax.swing.GroupLayout symptomStageNonHospitalPanelLayout = new javax.swing.GroupLayout(symptomStageNonHospitalPanel);
+        symptomStageNonHospitalPanel.setLayout(symptomStageNonHospitalPanelLayout);
+        symptomStageNonHospitalPanelLayout.setHorizontalGroup(
+            symptomStageNonHospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 628, Short.MAX_VALUE)
+        );
+        symptomStageNonHospitalPanelLayout.setVerticalGroup(
+            symptomStageNonHospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 130, Short.MAX_VALUE)
+        );
+
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("No Hospital");
+
+        javax.swing.GroupLayout noHospitalPanelLayout = new javax.swing.GroupLayout(noHospitalPanel);
+        noHospitalPanel.setLayout(noHospitalPanelLayout);
+        noHospitalPanelLayout.setHorizontalGroup(
+            noHospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, noHospitalPanelLayout.createSequentialGroup()
+                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(symptomStageNonHospitalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE))
+        );
+        noHospitalPanelLayout.setVerticalGroup(
+            noHospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(symptomStageNonHospitalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+            .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+        );
+
+        hospitalPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        symptomStageHospitalPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        symptomStageHospitalPanel.setPreferredSize(new java.awt.Dimension(625, 4));
+
+        javax.swing.GroupLayout symptomStageHospitalPanelLayout = new javax.swing.GroupLayout(symptomStageHospitalPanel);
+        symptomStageHospitalPanel.setLayout(symptomStageHospitalPanelLayout);
+        symptomStageHospitalPanelLayout.setHorizontalGroup(
+            symptomStageHospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        symptomStageHospitalPanelLayout.setVerticalGroup(
+            symptomStageHospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel9.setText("Hospital");
+        jLabel9.setToolTipText("");
+        jLabel9.setMaximumSize(new java.awt.Dimension(54, 14));
+        jLabel9.setMinimumSize(new java.awt.Dimension(54, 14));
+        jLabel9.setPreferredSize(new java.awt.Dimension(54, 14));
+
+        javax.swing.GroupLayout hospitalPanelLayout = new javax.swing.GroupLayout(hospitalPanel);
+        hospitalPanel.setLayout(hospitalPanelLayout);
+        hospitalPanelLayout.setHorizontalGroup(
+            hospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(hospitalPanelLayout.createSequentialGroup()
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(symptomStageHospitalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE))
+        );
+        hospitalPanelLayout.setVerticalGroup(
+            hospitalPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(symptomStageHospitalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
+        jPanel13.setLayout(jPanel13Layout);
+        jPanel13Layout.setHorizontalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(noHospitalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(hospitalPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel13Layout.setVerticalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel13Layout.createSequentialGroup()
+                .addComponent(noHospitalPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(hospitalPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jScrollPane7.setViewportView(jPanel13);
+
+        jPanel14.setPreferredSize(new java.awt.Dimension(187, 0));
+
+        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
+        jPanel14.setLayout(jPanel14Layout);
+        jPanel14Layout.setHorizontalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 187, Short.MAX_VALUE)
+        );
+        jPanel14Layout.setVerticalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel23Layout = new javax.swing.GroupLayout(jPanel23);
         jPanel23.setLayout(jPanel23Layout);
         jPanel23Layout.setHorizontalGroup(
             jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(symptomStagePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel23Layout.createSequentialGroup()
+                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane7)
         );
         jPanel23Layout.setVerticalGroup(
             jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel23Layout.createSequentialGroup()
-                .addComponent(jPanel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(symptomStagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout jPanel36Layout = new javax.swing.GroupLayout(jPanel36);
         jPanel36.setLayout(jPanel36Layout);
         jPanel36Layout.setHorizontalGroup(
             jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1056, Short.MAX_VALUE)
+            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel36Layout.createSequentialGroup()
                 .addGroup(jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1072,7 +1403,7 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel36Layout.setVerticalGroup(
             jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel36Layout.createSequentialGroup()
-                .addComponent(jPanel23, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
@@ -1080,34 +1411,52 @@ public class ModelPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel37, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel30, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanel36);
+
+        jTabbedPane1.addTab("Properties", null, jScrollPane1, "");
+
+        javax.swing.GroupLayout statistiquePanelLayout = new javax.swing.GroupLayout(statistiquePanel);
+        statistiquePanel.setLayout(statistiquePanelLayout);
+        statistiquePanelLayout.setHorizontalGroup(
+            statistiquePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        statistiquePanelLayout.setVerticalGroup(
+            statistiquePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Statistique", null, statistiquePanel, "");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1058, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1537, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
+
+        jTabbedPane1.getAccessibleContext().setAccessibleDescription("");
     }// </editor-fold>//GEN-END:initComponents
 
-    private void manageSymptomStageDistributionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageSymptomStageDistributionButtonActionPerformed
-        /*ManageSymptomStageDistributionDialog dialog = new ManageSymptomStageDistributionDialog(mainframe);
-        this.mainframe.setEnabled(false);
-        dialog.setVisible(true);*/
-    }//GEN-LAST:event_manageSymptomStageDistributionButtonActionPerformed
-
     private void manageAgeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageAgeButtonActionPerformed
-        /* ManageHumanAgeDistributionDialog dialog = new ManageHumanAgeDistributionDialog(mainframe);
+        /*ManageHumanAgeDistributionDialog dialog = new ManageHumanAgeDistributionDialog(mainframe);
         this.mainframe.setEnabled(false);
         dialog.setVisible(true);*/
+        this.currentModel.addNewHumanAge();
     }//GEN-LAST:event_manageAgeButtonActionPerformed
+
+    private void manageStageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageStageButtonActionPerformed
+        ManageSymptomStagesDialog dialog = new ManageSymptomStagesDialog(mainframe);
+        dialog.setVisible(true);
+        this.mainframe.setEnabled(false);
+    }//GEN-LAST:event_manageStageButtonActionPerformed
 
     public void updateSymptomeStagePanel() {
         this.symptomStageNamePanel.removeAll();
@@ -1145,6 +1494,20 @@ public class ModelPanel extends javax.swing.JPanel {
 
         }
         this.repaint();
+    }
+
+    public void setEnable() {
+        this.currentModel.setEnable();
+        this.manageAgeButton.setEnabled(true);
+        this.manageStageButton.setEnabled(true);
+        this.infectedNunberTxt.setEnabled(true);
+    }
+
+    public void setDisable() {
+        this.currentModel.setDisable();
+        this.manageAgeButton.setEnabled(false);
+        this.manageStageButton.setEnabled(false);
+        this.infectedNunberTxt.setEnabled(false);
     }
 
     private class JTextFieldIntegerListener implements DocumentListener, FocusListener {
@@ -1236,6 +1599,9 @@ public class ModelPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel contagiousDaysPanel;
     private javax.swing.JPanel dayPercentagePanel;
+    private javax.swing.JLabel hospitalLabel;
+    private javax.swing.JPanel hospitalPanel;
+    private javax.swing.JPanel hospitalPanelName;
     private javax.swing.JTextField infectedNunberTxt;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
@@ -1258,11 +1624,18 @@ public class ModelPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
@@ -1292,13 +1665,20 @@ public class ModelPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel locationPanel;
     private javax.swing.JButton manageAgeButton;
-    private javax.swing.JButton manageSymptomStageDistributionButton;
+    private javax.swing.JButton manageStageButton;
     private javax.swing.JPanel modelLocationPanel;
+    private javax.swing.JPanel noHospitalPanel;
+    private javax.swing.JLabel nonHospitalLabel;
+    private javax.swing.JPanel nonHospitalNamePanel;
+    private javax.swing.JPanel statistiquePanel;
     private javax.swing.JPanel symptomNamePane;
+    private javax.swing.JPanel symptomStageHospitalPanel;
     private javax.swing.JPanel symptomStageNamePanel;
-    private javax.swing.JPanel symptomStagePanel;
+    private javax.swing.JPanel symptomStageNonHospitalPanel;
     private javax.swing.JPanel symptomsAgeNamePanel;
     private javax.swing.JPanel symptomsAgePanel;
     private javax.swing.JPanel symptomsDayPanel;

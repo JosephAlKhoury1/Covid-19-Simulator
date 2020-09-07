@@ -13,10 +13,6 @@ import models.model.HumanAge;
 import models.model.SymptomStage;
 import models.model.SymptomType;
 
-/**
- *
- * @author Joseph
- */
 public class SymptomsController {
 
     public static final SymptomsController INSTANCE = new SymptomsController();

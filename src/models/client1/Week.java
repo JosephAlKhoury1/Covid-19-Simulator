@@ -64,6 +64,7 @@ public class Week {
             if (this.hour == 24) {
                 this.hour = 0;
                 int i = currentDay.getIndex();
+                this.city.setDayChanged(true);
                 i++;
                 if (i > 6) {
                     currentDay = listDay.get(0);

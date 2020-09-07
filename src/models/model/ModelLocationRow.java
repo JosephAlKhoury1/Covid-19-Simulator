@@ -1,13 +1,23 @@
 package models.model;
 
 import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import models.location1.Location;
 import models.location1.LocationCategory;
 
 public class ModelLocationRow extends javax.swing.JPanel {
 
     private LocationCategory locationCategory;
     private Model model;
+    private double percentageToBeSick = 0.0;
+    private JTextFieldDoubleListener listner;
     private final String[] hours = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"};
 
     public ModelLocationRow(LocationCategory lc, Model m) {
@@ -61,6 +71,9 @@ public class ModelLocationRow extends javax.swing.JPanel {
                 this.closeTimeComboBox.setSelectedIndex(i);
             }
         }
+        this.listner=new JTextFieldDoubleListener(percentageToBeSickTxt, this);
+        this.percentageToBeSickTxt.getDocument().addDocumentListener(listner);
+        this.percentageToBeSickTxt.addFocusListener(listner);
     }
 
     @SuppressWarnings("unchecked")
@@ -87,6 +100,7 @@ public class ModelLocationRow extends javax.swing.JPanel {
         ;
         closeTimeComboBox = new JComboBox(this.hours)
         ;
+        percentageToBeSickTxt = new javax.swing.JTextField();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -294,6 +308,10 @@ public class ModelLocationRow extends javax.swing.JPanel {
             }
         });
 
+        percentageToBeSickTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        percentageToBeSickTxt.setText("0.0");
+        percentageToBeSickTxt.setToolTipText("");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -318,7 +336,8 @@ public class ModelLocationRow extends javax.swing.JPanel {
                 .addComponent(openTimeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(closeTimeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addComponent(percentageToBeSickTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -332,13 +351,16 @@ public class ModelLocationRow extends javax.swing.JPanel {
             .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(openTimeComboBox)
             .addComponent(closeTimeComboBox)
+            .addComponent(percentageToBeSickTxt)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 1, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -412,7 +434,120 @@ public class ModelLocationRow extends javax.swing.JPanel {
         this.locationCategory.setCloseTimeModel(Integer.parseInt(h));
     }//GEN-LAST:event_closeTimeComboBoxActionPerformed
 
+    public double getPercentageToBeSick() {
+        return percentageToBeSick;
+    }
 
+    public void setPercentageToBeSick(double percentageToBeSick) {
+        this.percentageToBeSick = percentageToBeSick;
+        this.locationCategory.setPercentageToBeSick(percentageToBeSick);
+        for(Location l:this.locationCategory.getListLocation()){
+          l.setPercentageToBeSick(percentageToBeSick);
+        }
+    }
+
+    private class JTextFieldDoubleListener implements DocumentListener, FocusListener {
+
+        private final JTextField jtextField;
+        private String currentString;
+        private final String greaterMessage = "Number can't be greater 100!";
+        private final String numberFormat = "Parameter have to be a number!";
+        private final String badNumberValueTitle = "Bad Parameter";
+        private boolean insert = false;
+        private ModelLocationRow row;
+
+        public JTextFieldDoubleListener(JTextField textField, ModelLocationRow stage) {
+            this.jtextField = textField;
+            this.row = stage;
+            this.currentString = row.getPercentageToBeSick() + "";
+        }
+
+        private void insertZero(String s) {
+            Runnable doHighlight = () -> {
+                jtextField.setText(s);
+            };
+            SwingUtilities.invokeLater(doHighlight);
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            String numTxt = this.jtextField.getText();
+            if (numTxt.contains("f") || numTxt.contains("d")) {
+                this.insert = true;
+                Runnable doHighlight = () -> {
+                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                };
+                SwingUtilities.invokeLater(doHighlight);
+                insertZero(this.currentString);
+            }
+            try {
+                Double d = Double.parseDouble(numTxt);
+                if (!insert) {
+                    this.currentString = numTxt;
+                   row.setPercentageToBeSick(Double.parseDouble(numTxt));
+                }
+                if (d > 100) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(model.getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(this.currentString);
+                    this.insert = false;
+                }
+            } catch (NumberFormatException ex) {
+                this.insert = true;
+                Runnable doHighlight = () -> {
+                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                };
+                SwingUtilities.invokeLater(doHighlight);
+                insertZero(this.currentString);
+            }
+            this.insert = false;
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            if (insert) {
+                return;
+            }
+            String s = this.jtextField.getText();
+            if (s.length() <= 0 || s.equals("")) {
+                return;
+            }
+            this.currentString = s;
+            this.row.setPercentageToBeSick(Double.parseDouble(s));
+           
+
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            insert = false;
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            String numTxt = this.jtextField.getText();
+            if (numTxt.equals("")) {
+                insert = true;
+                insertZero(this.currentString);
+            } else if (numTxt.startsWith(".")) {
+                this.currentString = "0" + this.currentString;
+                insert = true;
+                insertZero(this.currentString);
+            } else if (numTxt.endsWith(".")) {
+                this.currentString = this.currentString + "0";
+                insertZero(this.currentString);
+            } else {
+                insert = false;
+            }
+        }
+
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> closeTimeComboBox;
     private javax.swing.JCheckBox fridayBox;
@@ -427,6 +562,7 @@ public class ModelLocationRow extends javax.swing.JPanel {
     private javax.swing.JCheckBox mondayBox;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JComboBox<String> openTimeComboBox;
+    private javax.swing.JTextField percentageToBeSickTxt;
     private javax.swing.JCheckBox saturdayBox;
     private javax.swing.JCheckBox sundayBox;
     private javax.swing.JCheckBox thursdayBox;

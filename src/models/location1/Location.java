@@ -25,6 +25,7 @@ public abstract class Location implements Cloneable {
     protected Maps map;
     protected String days;
     protected int workTime;
+    protected double percentageToBeSick = 0.0;
 
     protected List<Member> listMember;
 
@@ -193,6 +194,14 @@ public abstract class Location implements Cloneable {
 
     public void setSaved(boolean saved) {
         this.saved = saved;
+    }
+
+    public double getPercentageToBeSick() {
+        return percentageToBeSick;
+    }
+
+    public void setPercentageToBeSick(double percentageToBeSick) {
+        this.percentageToBeSick = percentageToBeSick;
     }
 
     public void setMap(Maps map) {
@@ -476,6 +485,14 @@ public abstract class Location implements Cloneable {
             Logger.getLogger(Location.class.getName()).log(Level.SEVERE, null, ex);
         }
         return lNew;
+    }
+
+    public List<Member> getListMember() {
+        return listMember;
+    }
+
+    public void setListMember(List<Member> listMember) {
+        this.listMember = listMember;
     }
 
 }

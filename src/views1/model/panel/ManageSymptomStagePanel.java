@@ -250,7 +250,7 @@ public class ManageSymptomStagePanel extends javax.swing.JPanel implements ListS
                 nameTxt.requestFocusInWindow();
                 nameTxt.selectAll();
             } else {
-                listAdded.add(new SymptomStageName(newName));
+                listAdded.add(new SymptomStageName(newName, 1));
                 listModel.insertElementAt(newName, listModel.getSize());
                 listSymptoms.setSelectedIndex(listModel.getSize() - 1);
                 listSymptoms.ensureIndexIsVisible(listModel.getSize() - 1);

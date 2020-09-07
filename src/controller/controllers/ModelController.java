@@ -104,7 +104,6 @@ public class ModelController {
                 List<HumanAge> listHA = HumanAgeController.INSTANCE.selectAll(set.getInt(1));
                 for (SymptomType st : listS) {
                     st.setListSage(SymptomStageTypeController.INSTANCE.selectAll(st, listSS));
-
                 }
                 for (HumanAge ha : listHA) {
                   ha.setListSymptomAges(HumanAgeSymptomController.INSTANCE.selectAll(ha, listS));

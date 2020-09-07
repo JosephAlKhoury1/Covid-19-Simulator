@@ -9,23 +9,21 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.location1.*;
+import models.model.HumanAge;
 import models.model.HumanStat;
-import models.model.SymptomType;
 
 /**
  *
  * @author Joseph
  */
 public class Human extends Member {
-
+    
     private String firstName;
     private String lastName;
     private ReligionType religionType;
-    private SexeType sexeType;
+    //private SexeType sexeType;
     private HumanStat humanStat;
-    private SymptomType symptomType;
-    Color color = Color.GREEN;
-
+    
     public Human(int x, int y, House ownHouse, City city) {
         super(x, y, ownHouse, city);
         this.listDeleted = new ArrayList();
@@ -42,11 +40,17 @@ public class Human extends Member {
         }
         this.age = MonteCarlo.getHumanAge(humanAgeType);
         
+        for (HumanAge ha : city.getModel().getListHumanAge()) {
+            if (this.age >= ha.getMinAge() && this.age <= ha.getMaxAge()) {
+                this.symptomType = ha.monteCarlo();
+                break;
+            }
+        }
         this.sexeType = MonteCarlo.getSexeType();
         boolean goWork = false;
         boolean goUniversity = false;
         boolean goSchool = false;
-
+        
         if (this.humanAgeType != null) {
             goWork = MonteCarlo.checkProb(this.humanAgeType.getWorkPercentage());
             if (goWork) {
@@ -104,7 +108,7 @@ public class Human extends Member {
                         }
                     }
                 }
-
+                
             }
         }
         int o = this.numberLocationToGo;
@@ -118,34 +122,39 @@ public class Human extends Member {
         }
         getLocationToGo();
     }
-
+    
     int xs = 10, ys = 10;
-
+    
     @Override
     public void draw(Graphics g) {
-        g.setColor(color);
+        if (!isInfected()) {
+            g.setColor(Color.green);
+        } else {
+            g.setColor(color);
+        }
         g.fillOval(x, y, xs, ys);
         if (currentLocationToGo != null) {
             g.drawString("x=" + currentLocationToGo.getX() + " y=" + currentLocationToGo.getY(), x, y);
         }
+        
     }
-
+    
     public String getFirstName() {
         return firstName;
     }
-
+    
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
-
+    
     public String getLastName() {
         return lastName;
     }
-
+    
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
+    
     public void initHuman(City city) {
         /* if (this.school == null) {
             if (goSchool) {
@@ -189,19 +198,19 @@ public class Human extends Member {
             }
         }*/
     }
-
+    
     public ReligionType getReligionType() {
         return religionType;
     }
-
+    
     public void setReligionType(ReligionType religionType) {
         this.religionType = religionType;
     }
-
+    
     public HumanStat getHumanStat() {
         return humanStat;
     }
-
+    
     public void setHumanStat(HumanStat humanStat) {
         this.humanStat = humanStat;
     }

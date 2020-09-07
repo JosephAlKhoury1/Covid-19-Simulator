@@ -15,9 +15,9 @@ public class SymptomStageNameController {
 
     public static final SymptomStageNameController INSTANCE = new SymptomStageNameController();
 
-    private String insert = "insert into symptomstagename(name)"
-            + " values(?)";
-    private String selectAll = "select id , name"
+    private String insert = "insert into symptomstagename(name, inHospital)"
+            + " values(?, ?)";
+    private String selectAll = "select id , name , inHospital"
             + " from symptomstagename ";
     private String delete = "delete "
             + " from symptomstagename "
@@ -41,6 +41,7 @@ public class SymptomStageNameController {
         int id = -1;
         try {
             this.insertStatement.setString(1, sn.getName());
+            this.insertStatement.setInt(2, sn.getInHospital());
             this.insertStatement.executeUpdate();
             ResultSet set = this.insertStatement.getGeneratedKeys();
             if (set.next()) {
@@ -59,7 +60,7 @@ public class SymptomStageNameController {
 
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
-                SymptomStageName sn = new SymptomStageName(set.getInt(1), set.getString(2));
+                SymptomStageName sn = new SymptomStageName(set.getInt(1), set.getString(2), set.getInt(3));
                 list.add(sn);
             }
         } catch (SQLException ex) {

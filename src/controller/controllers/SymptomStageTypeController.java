@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import models.model.HumanAge;
+import models.model.SymptomAge;
 import models.model.SymptomStage;
 import models.model.SymptomStageType;
 import models.model.SymptomType;
@@ -91,7 +93,7 @@ public class SymptomStageTypeController {
                         break;
                     }
                 }
-                list.add(new SymptomStageType(set.getInt(1), symptom, st, set.getInt(3), set.getInt(4)));
+                list.add(new SymptomStageType(set.getInt(1), symptom, st, set.getInt(3), set.getInt(4), symptom.getModel()));
             }
             set.close();
             return list;
@@ -99,5 +101,30 @@ public class SymptomStageTypeController {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    public boolean update(SymptomStageType age) {
+        try {
+            this.updateStatement.setInt(1, age.getDay());
+            this.updateStatement.setDouble(2, age.getPercentage());
+            this.updateStatement.setInt(3, age.getId());
+            int affectedRows = this.updateStatement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating symptom failed, no rows affected.");
+            }
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public void delete(int id) {
+        try {
+            this.deleteStatement.setInt(1, id);
+            this.deleteStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(HumanAgeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

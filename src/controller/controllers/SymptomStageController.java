@@ -32,11 +32,11 @@ public class SymptomStageController {
             + " from symptomstages "
             + " where id = ? ";
 
-    private final String insertModel = "insert into symptomStagesModel(name, deathPercentage, immunePercentage, col,  modelId)"
-            + "values(?, ?, ?, ?, ?)";
+    private final String insertModel = "insert into symptomStagesModel(name, deathPercentage, immunePercentage, col, inHospital, modelId)"
+            + "values(?, ?, ?, ?, ?, ?)";
     private final String updateModel = "update symptomStagesModel set name = ?, deathPercentage = ?, immunePercentage = ?, col = ?"
             + " where id = ?";
-    private final String selectAllModel = "select id, name, immunePercentage,deathPercentage,  col "
+    private final String selectAllModel = "select id, name, immunePercentage,deathPercentage, col,  inHospital "
             + " from symptomStagesModel "
             + " where modelId = ? ";
     private final String deleteModel = "delete "
@@ -100,7 +100,8 @@ public class SymptomStageController {
             this.insertModelStatement.setDouble(2, ss.getDeathPercentage());
             this.insertModelStatement.setDouble(3, ss.getImmunePercentage());
             this.insertModelStatement.setInt(4, ss.getIndex());
-            this.insertModelStatement.setInt(5, ss.getModel().getModelId());
+            this.insertModelStatement.setInt(5, ss.getInHospital());
+            this.insertModelStatement.setInt(6, ss.getModel().getModelId());
             int id = -1;
             int affectedRows = this.insertModelStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -179,7 +180,7 @@ public class SymptomStageController {
             ResultSet set = this.selectAllModelStatement.executeQuery();
             while (set.next()) {
                 HumanStat humanState = HumanStateController.INSTANCE.select(set.getInt(1));
-                list.add(new SymptomStage(set.getInt(1), set.getString(2), set.getDouble(3), set.getDouble(4), set.getInt(5)));
+                list.add(new SymptomStage(set.getInt(1), set.getString(2), set.getDouble(3), set.getDouble(4), set.getInt(5),set.getInt(6)));
             }
             set.close();
             return list;

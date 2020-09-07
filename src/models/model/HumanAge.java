@@ -1,8 +1,11 @@
 package models.model;
 
 import controller.controllers.HumanAgeController;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,6 +22,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import models.client1.MonteCarlo;
 import views1.MainFrame;
 
 public class HumanAge {
@@ -34,14 +39,33 @@ public class HumanAge {
 
     private boolean isNew, saved, deleted;
 
-    private JTextFieldDoubleListener doubleListener;
     private JTextFieldMinIntegerListener minListener;
     private JTextFieldMaxIntegerListener maxListener;
 
     private JPanel panel;
     private Component cPanel;
 
+    private JButton removeButton;
+
     private List<SymptomAge> listSymptomAges;
+
+    public void setEnable() {
+        this.minAgeTxt.setEnabled(true);
+        this.maxAgeTxt.setEnabled(true);
+        this.removeButton.setEnabled(true);
+        for (SymptomAge as : this.listSymptomAges) {
+            as.setEnable();
+        }
+    }
+
+    public void setDisable() {
+        this.minAgeTxt.setEnabled(false);
+        this.maxAgeTxt.setEnabled(false);
+        this.removeButton.setEnabled(false);
+        for (SymptomAge as : this.listSymptomAges) {
+            as.setDisable();
+        }
+    }
 
     public List<SymptomAge> getListSymptomAges() {
         return listSymptomAges;
@@ -50,12 +74,12 @@ public class HumanAge {
     public void setListSymptomAges(List<SymptomAge> listSymptomAges) {
         this.listSymptomAges = listSymptomAges;
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(listSymptomAges.size() * 120, 35));
-        this.panel.setMinimumSize(new Dimension(listSymptomAges.size() * 120, 35));
+        this.panel.setBackground(Color.red);
+        this.panel.setPreferredSize(new Dimension(listSymptomAges.size() * 120 + 460, 35));
+        this.panel.setMinimumSize(new Dimension(listSymptomAges.size() * 120 + 460, 35));
         this.panel.setMaximumSize(new Dimension(listSymptomAges.size() * 1200, 35));
         this.panel.setBorder(BorderFactory.createEtchedBorder());
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
-
         this.cPanel = Box.createVerticalStrut(3);
         this.panel.add(this.nameLabel);
         for (SymptomAge sta : listSymptomAges) {
@@ -63,6 +87,7 @@ public class HumanAge {
         }
         this.panel.add(this.minAgeTxt);
         this.panel.add(this.maxAgeTxt);
+        this.panel.add(removeButton);
     }
 
     public HumanAge(int id, String name, int minAge, int maxAge) {
@@ -113,10 +138,22 @@ public class HumanAge {
         this.maxListener = new JTextFieldMaxIntegerListener(this.maxAgeTxt, this);
         this.maxAgeTxt.addFocusListener(this.maxListener);
         this.maxAgeTxt.getDocument().addDocumentListener(this.maxListener);
+
+        removeButton = new JButton("-");
+        removeButton.setPreferredSize(new Dimension(40, 35));
+        removeButton.setMinimumSize(new Dimension(40, 35));
+        removeButton.setMaximumSize(new Dimension(40, 35));
+
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeActionPerformed();
+            }
+        });
     }
 
     public HumanAge(String name, int minAge, int maxAge, List<SymptomType> listSymptom, Model model) {
-        this.name = name;
+        this.name = "between " + minAge + " and " + maxAge;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.model = model;
@@ -175,12 +212,25 @@ public class HumanAge {
         this.panel.add(this.nameLabel);
         this.listSymptomAges = new ArrayList();
         for (SymptomType stn : model.getListSymptomType()) {
-            SymptomAge sa = new SymptomAge(this, stn, 0);
+            SymptomAge sa = new SymptomAge(this, stn, 0, model);
             this.listSymptomAges.add(sa);
             this.panel.add(sa.getPercentageTxt());
         }
+
+        removeButton = new JButton("-");
+        removeButton.setPreferredSize(new Dimension(40, 35));
+        removeButton.setMinimumSize(new Dimension(40, 35));
+        removeButton.setMaximumSize(new Dimension(40, 35));
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeActionPerformed();
+            }
+        });
+
         this.panel.add(this.minAgeTxt);
         this.panel.add(this.maxAgeTxt);
+        this.panel.add(removeButton);
     }
 
     public Component getcPanel() {
@@ -189,6 +239,19 @@ public class HumanAge {
 
     public void setcPanel(Component cPanel) {
         this.cPanel = cPanel;
+    }
+
+    public void removeActionPerformed() {
+        this.setDeleted(true);
+        setSaved(true);
+        model.getMainFrame().setModelSavedButtonEnable();
+        model.setSaved(false);
+        for (SymptomAge sa : this.listSymptomAges) {
+            sa.setDeleted(true);
+        }
+        model.getListHumanAge().remove(this);
+        model.getListHumanAgeDeleted().add(this);
+        model.getModelPanel().reinitAgePanel();
     }
 
     public JPanel getPanel() {
@@ -261,10 +324,9 @@ public class HumanAge {
 
     public void setModel(Model model) {
         this.model = model;
-        if (this.doubleListener != null) {
-            this.doubleListener.setMainFrame(model.getMainFrame());
+        for (SymptomAge as : this.listSymptomAges) {
+            as.setModel(model);
         }
-
     }
 
     public JTextField getMinAgeTxt() {
@@ -323,7 +385,9 @@ public class HumanAge {
     }
 
     public void save() {
+        System.out.println(" before delete human age min = " + minAge + " max = " + maxAge);
         if (this.isDeleted()) {
+            System.out.println("delete human age min = " + minAge + " max = " + maxAge);
             HumanAgeController.INSTANCE.delete(this.id);
             return;
         }
@@ -336,10 +400,8 @@ public class HumanAge {
                 HumanAgeController.INSTANCE.update(this);
                 this.setSaved(true);
             } else {
-
             }
         }
-
         for (SymptomAge as : this.listSymptomAges) {
             as.save();
             as.setIsNew(false);
@@ -347,21 +409,15 @@ public class HumanAge {
         }
     }
 
-    public void save1() {
-        if (this.isDeleted()) {
-            HumanAgeController.INSTANCE.deleteModel(this.id);
-            return;
-        }
-        if (this.isIsNew()) {
-            //this.id = HumanAgeController.INSTANCE.insertModel(this);
-            this.setIsNew(false);
-            this.setSaved(true);
-        } else {
-            if (!this.isSaved()) {
-                // HumanAgeController.INSTANCE.updateModel(this);
-                this.setSaved(true);
-            } else {
-
+    public SymptomType monteCarlo() {
+        while (true) {
+            int index = MonteCarlo.uniformFixedSeed.nextInt(this.listSymptomAges.size());
+            System.out.println("index");
+            SymptomAge sage = (SymptomAge) this.listSymptomAges.get(index);
+            Double prob = sage.getPercentage() / 100d;
+            double newRandom = MonteCarlo.uniformFixedSeed.nextDouble();
+            if (newRandom <= prob) {
+                return sage.getSymptomType();
             }
         }
     }
@@ -583,6 +639,8 @@ public class HumanAge {
                 insertZero(minAge + "");
             } else {
                 minAge = d;
+                name = "between " + minAge + " and " + maxAge;
+                nameLabel.setText(name);
                 this.humanAge.setSaved(false);
             }
         }
@@ -678,6 +736,8 @@ public class HumanAge {
                 insertZero(maxAge + "");
             } else {
                 maxAge = d;
+                name = "between " + minAge + " and " + maxAge;
+                nameLabel.setText(name);
                 this.humanAge.setSaved(false);
             }
 

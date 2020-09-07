@@ -2,13 +2,19 @@ package models.model;
 
 import controller.controllers.HumanStateController;
 import controller.controllers.SymptomStageController;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -18,6 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import models.member1.Member;
 import views1.MainFrame;
 
 public class SymptomStage extends JPanel {
@@ -25,6 +32,7 @@ public class SymptomStage extends JPanel {
     private int id;
     private String name;
     private Model model;
+    private int inHospital;
 
     private int dayNum;
     private double percentageToBeInThisStage;
@@ -52,15 +60,33 @@ public class SymptomStage extends JPanel {
     private JPanel panel;
 
     private JTextField deathPercentageTxt, immunePercentageTxt, indexTxt;
+    private JButton removeButton;
     private JTextFieldDoubleDeathListener dList = null;
     private JTextFieldDoubleImmuneListener iList = null;
+    private JTextFieldIndexListener indexListener;
 
-    public SymptomStage(int id, String name, double immune, double death, int index) {
+    private JLabel statistiqueNameLabel, statistiqueValueNameLabel;
+    private JPanel statistiquePanel;
+
+    private Color color;
+
+    private List<Member> listMember;
+
+    private final Color[] colors = {Color.ORANGE, Color.YELLOW, Color.cyan, Color.PINK, Color.MAGENTA, Color.GRAY, Color.darkGray, Color.blue};
+
+    public SymptomStage(int id, String name, double immune, double death, int index, int inHospital) {
         this.name = name;
         this.id = id;
+        this.inHospital = inHospital;
         this.deathPercentage = death;
         this.immunePercentage = immune;
+        this.listMember = new ArrayList();
         this.index = index;
+        if (this.index - 1 > colors.length) {
+            this.color = colors[this.index - colors.length];
+        } else {
+            this.color = colors[this.index - 1];
+        }
         nameLabel1 = new JLabel(this.name + "");
         nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel1.setToolTipText("");
@@ -103,6 +129,22 @@ public class SymptomStage extends JPanel {
         indexTxt.setMinimumSize(new Dimension(140, 31));
         indexTxt.setPreferredSize(new Dimension(140, 31));
 
+        this.indexListener = new JTextFieldIndexListener(indexTxt, this);
+        indexTxt.addFocusListener(indexListener);
+        indexTxt.getDocument().addDocumentListener(indexListener);
+
+        removeButton = new JButton("-");
+        removeButton.setPreferredSize(new Dimension(40, 35));
+        removeButton.setMinimumSize(new Dimension(40, 35));
+        removeButton.setMaximumSize(new Dimension(40, 35));
+
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeActionPerformed();
+            }
+        });
+
         this.iList = new JTextFieldDoubleImmuneListener(this.immunePercentageTxt, this.immunePercentage + "", this);
         this.dList = new JTextFieldDoubleDeathListener(this.deathPercentageTxt, this.deathPercentage + "", this);
         immunePercentageTxt.addFocusListener(iList);
@@ -111,9 +153,9 @@ public class SymptomStage extends JPanel {
         deathPercentageTxt.getDocument().addDocumentListener(dList);
 
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(581, 35));
-        this.panel.setMinimumSize(new Dimension(581, 35));
-        this.panel.setMaximumSize(new Dimension(581, 35));
+        this.panel.setPreferredSize(new Dimension(622, 35));
+        this.panel.setMinimumSize(new Dimension(622, 35));
+        this.panel.setMaximumSize(new Dimension(622, 35));
         this.panel.setBorder(BorderFactory.createEtchedBorder());
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
         this.panel.add(this.nameLabel1);
@@ -127,18 +169,60 @@ public class SymptomStage extends JPanel {
 
         this.panel.add(this.indexTxt);
 
-        this.isNew = true;
-        this.saved = false;
+        panel.add(removeButton);
+
+        this.isNew = false;
+        this.saved = true;
         this.deleted = false;
+
+        statistiqueNameLabel = new JLabel();
+        statistiqueNameLabel.setText(name);
+        statistiqueNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        statistiqueNameLabel.setToolTipText("");
+        statistiqueNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statistiqueNameLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        statistiqueNameLabel.setMaximumSize(new java.awt.Dimension(245, 25));
+        statistiqueNameLabel.setMinimumSize(new java.awt.Dimension(245, 25));
+        statistiqueNameLabel.setPreferredSize(new java.awt.Dimension(245, 25));
+        statistiqueNameLabel.setForeground(color);
+
+        statistiqueValueNameLabel = new JLabel();
+        statistiqueValueNameLabel.setText("0");
+        statistiqueValueNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        statistiqueValueNameLabel.setToolTipText("");
+        statistiqueValueNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statistiqueValueNameLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        statistiqueValueNameLabel.setMaximumSize(new java.awt.Dimension(40, 25));
+        statistiqueValueNameLabel.setMinimumSize(new java.awt.Dimension(40, 25));
+        statistiqueValueNameLabel.setPreferredSize(new java.awt.Dimension(40, 25));
+        statistiqueValueNameLabel.setForeground(color);
+
+        this.statistiquePanel = new JPanel();
+        this.statistiquePanel.setPreferredSize(new Dimension(294, 27));
+        this.statistiquePanel.setMinimumSize(new Dimension(294, 27));
+        this.statistiquePanel.setMaximumSize(new Dimension(294, 27));
+        this.statistiquePanel.setBorder(BorderFactory.createEtchedBorder());
+        this.statistiquePanel.setLayout(new BoxLayout(this.statistiquePanel, BoxLayout.X_AXIS));
+
+        this.statistiquePanel.add(statistiqueNameLabel);
+        this.statistiquePanel.add(statistiqueValueNameLabel);
 
     }
 
-    public SymptomStage(String name, double deathPercentage, double immunePercentage, int index, Model model) {
+    public SymptomStage(String name, double deathPercentage, double immunePercentage, int index, int inHospital, Model model) {
         this.name = name;
         this.model = model;
+        this.inHospital = inHospital;
         this.index = index;
         this.deathPercentage = deathPercentage;
         this.immunePercentage = immunePercentage;
+        this.listMember = new ArrayList();
+
+        if (this.index - 1 > colors.length) {
+            this.color = colors[this.index - colors.length];
+        } else {
+            this.color = colors[this.index - 1];
+        }
         nameLabel1 = new JLabel(this.name + "");
         nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel1.setToolTipText("");
@@ -181,6 +265,22 @@ public class SymptomStage extends JPanel {
         indexTxt.setMinimumSize(new Dimension(140, 31));
         indexTxt.setPreferredSize(new Dimension(140, 31));
 
+        this.indexListener = new JTextFieldIndexListener(indexTxt, this);
+        indexTxt.addFocusListener(indexListener);
+        indexTxt.getDocument().addDocumentListener(indexListener);
+
+        removeButton = new JButton("-");
+        removeButton.setPreferredSize(new Dimension(40, 35));
+        removeButton.setMinimumSize(new Dimension(40, 35));
+        removeButton.setMaximumSize(new Dimension(40, 35));
+
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeActionPerformed();
+            }
+        });
+
         this.iList = new JTextFieldDoubleImmuneListener(this.immunePercentageTxt, this.immunePercentage + "", this);
         this.dList = new JTextFieldDoubleDeathListener(this.deathPercentageTxt, this.deathPercentage + "", this);
         immunePercentageTxt.addFocusListener(iList);
@@ -189,9 +289,9 @@ public class SymptomStage extends JPanel {
         deathPercentageTxt.getDocument().addDocumentListener(dList);
 
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(581, 35));
-        this.panel.setMinimumSize(new Dimension(581, 35));
-        this.panel.setMaximumSize(new Dimension(581, 35));
+        this.panel.setPreferredSize(new Dimension(622, 35));
+        this.panel.setMinimumSize(new Dimension(622, 35));
+        this.panel.setMaximumSize(new Dimension(622, 35));
         this.panel.setBorder(BorderFactory.createEtchedBorder());
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
         this.panel.add(this.nameLabel1);
@@ -205,63 +305,144 @@ public class SymptomStage extends JPanel {
 
         this.panel.add(this.indexTxt);
 
+        panel.add(removeButton);
+
         this.isNew = true;
         this.saved = false;
         this.deleted = false;
+
+        statistiqueNameLabel = new JLabel();
+        statistiqueNameLabel.setText(name);
+        statistiqueNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        statistiqueNameLabel.setToolTipText("");
+        statistiqueNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statistiqueNameLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        statistiqueNameLabel.setMaximumSize(new java.awt.Dimension(245, 25));
+        statistiqueNameLabel.setMinimumSize(new java.awt.Dimension(245, 25));
+        statistiqueNameLabel.setPreferredSize(new java.awt.Dimension(245, 25));
+        statistiqueNameLabel.setForeground(color);
+
+        statistiqueValueNameLabel = new JLabel();
+        statistiqueValueNameLabel.setText("0");
+        statistiqueValueNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        statistiqueValueNameLabel.setToolTipText("");
+        statistiqueValueNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statistiqueValueNameLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        statistiqueValueNameLabel.setMaximumSize(new java.awt.Dimension(40, 25));
+        statistiqueValueNameLabel.setMinimumSize(new java.awt.Dimension(40, 25));
+        statistiqueValueNameLabel.setPreferredSize(new java.awt.Dimension(40, 25));
+        statistiqueValueNameLabel.setForeground(color);
+
+        this.statistiquePanel = new JPanel();
+        this.statistiquePanel.setPreferredSize(new Dimension(294, 27));
+        this.statistiquePanel.setMinimumSize(new Dimension(294, 27));
+        this.statistiquePanel.setMaximumSize(new Dimension(294, 27));
+        this.statistiquePanel.setBorder(BorderFactory.createEtchedBorder());
+        this.statistiquePanel.setLayout(new BoxLayout(this.statistiquePanel, BoxLayout.X_AXIS));
+
+        this.statistiquePanel.add(statistiqueNameLabel);
+        this.statistiquePanel.add(statistiqueValueNameLabel);
+    }
+
+    public void removeActionPerformed() {
+        this.setDeleted(true);
+        if (this.inHospital == 0) {
+            this.model.getListSymptomStage1sNonHospital().remove(this);
+            this.model.getListSympStageNonHosDeleted().add(this);
+        } else {
+            this.model.getListSymptomStage1sHospital().remove(this);
+            this.model.getListSymptomStagesHosDeleted().add(this);
+        }
+        for (SymptomStage ss : this.model.getListSymptomStage1sNonHospital()) {
+            if (ss.getIndex() > this.index) {
+                ss.setIndex((ss.getIndex() - 1));
+                ss.setSaved(false);
+            }
+        }
+        for (SymptomStage ss : this.model.getListSymptomStage1sHospital()) {
+            if (ss.getIndex() > this.index) {
+                ss.setIndex((ss.getIndex() - 1));
+                ss.setSaved(false);
+            }
+        }
+        for (SymptomType st : this.model.getListSymptomType()) {
+            SymptomStageType tmp = null;
+            for (SymptomStageType sst : st.getListSage()) {
+                if (sst.getSymptomStage() == this) {
+                    sst.setDeleted(true);
+                    tmp = sst;
+                    break;
+                }
+            }
+            st.getListStageDeleted().add(tmp);
+            st.getListSage().remove(tmp);
+            st.reintSymptomStagePanel();
+        }
+        this.model.getModelPanel().reinitSymptomPanel();
+        this.model.getModelPanel().reinitPanel();
+        this.model.getMainFrame().setModelSavedButtonEnable();
+    }
+
+    public void setEnable() {
+        this.deathPercentageTxt.setEnabled(true);
+        this.immunePercentageTxt.setEnabled(true);
+        this.indexTxt.setEnabled(true);
+        this.removeButton.setEnabled(true);
+    }
+
+    public void setDisable() {
+        this.deathPercentageTxt.setEnabled(false);
+        this.immunePercentageTxt.setEnabled(false);
+        this.indexTxt.setEnabled(false);
+        this.removeButton.setEnabled(false);
     }
 
     public JLabel getNameLabel2() {
         return nameLabel2;
     }
 
-    public SymptomStage(String name, int dayNum, double percentage, double deathPercentage, double immunePercentage, int index, Model model) {
-        this.name = name;
-        this.model = model;
-        this.dayNum = dayNum;
-        this.index = index;
-        this.deathPercentage = deathPercentage;
-        this.immunePercentage = immunePercentage;
-        this.percentageToBeInThisStage = percentage;
+    public Color getColor() {
+        return color;
+    }
 
-        dayTxt = new JTextField(this.dayNum + "");
-        dayTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        dayTxt.setToolTipText("");
-        dayTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        dayTxt.setMaximumSize(new Dimension(55, 31));
-        dayTxt.setMinimumSize(new Dimension(55, 31));
-        dayTxt.setPreferredSize(new Dimension(55, 31));
-
-        percentageTxt = new JTextField(this.percentageToBeInThisStage + "");
-        percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        percentageTxt.setToolTipText("");
-        percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        percentageTxt.setMaximumSize(new Dimension(55, 31));
-        percentageTxt.setMinimumSize(new Dimension(55, 31));
-        percentageTxt.setPreferredSize(new Dimension(55, 31));
-
-        this.component = Box.createHorizontalStrut(3);
-
-        this.component = Box.createHorizontalStrut(3);
-        this.listener = new JTextFieldIntegerListener(this.dayTxt, model.getMainFrame(), this);
-        this.dayTxt.addFocusListener(listener);
-        this.dayTxt.getDocument().addDocumentListener(listener);
-        this.isNew = true;
-        this.saved = false;
-        this.deleted = false;
-
-        this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(120, 35));
-        this.panel.setMinimumSize(new Dimension(120, 35));
-        this.panel.setMaximumSize(new Dimension(120, 35));
-        this.panel.setBorder(BorderFactory.createEtchedBorder());
-        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
-
-        this.panel.add(this.dayTxt);
-        this.panel.add(this.percentageTxt);
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public JPanel getPanel() {
         return panel;
+    }
+
+    public JLabel getStatistiqueNameLabel() {
+        return statistiqueNameLabel;
+    }
+
+    public List<Member> getListMember() {
+        return listMember;
+    }
+
+    public void setListMember(List<Member> listMember) {
+        this.listMember = listMember;
+    }
+
+    public void setStatistiqueNameLabel(JLabel statistiqueNameLabel) {
+        this.statistiqueNameLabel = statistiqueNameLabel;
+    }
+
+    public JLabel getStatistiqueValueNameLabel() {
+        return statistiqueValueNameLabel;
+    }
+
+    public void setStatistiqueValueNameLabel(JLabel statistiqueValueNameLabel) {
+        this.statistiqueValueNameLabel = statistiqueValueNameLabel;
+    }
+
+    public JPanel getStatistiquePanel() {
+        return statistiquePanel;
+    }
+
+    public void setStatistiquePanel(JPanel statistiquePanel) {
+        this.statistiquePanel = statistiquePanel;
     }
 
     public void setPanel(JPanel panel) {
@@ -284,69 +465,6 @@ public class SymptomStage extends JPanel {
         this.immunePercentageTxt = immunePercentageTxt;
     }
 
-    ///////
-    /* public SymptomStage(String name, double d, double i, int index, Model model) {
-        this.name = name;
-        this.model = model;
-        this.deathPercentage = d;
-        this.immunePercentage = i;
-        this.index = index;
-
-        this.isNew = true;
-        this.saved = false;
-        this.deleted = false;
-
-        nameLabel1 = new JLabel(this.name + "");
-        nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-        nameLabel1.setToolTipText("");
-        nameLabel1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        nameLabel1.setMaximumSize(new Dimension(120, 18));
-        nameLabel1.setMinimumSize(new Dimension(120, 18));
-        nameLabel1.setPreferredSize(new Dimension(120, 18));
-
-        deathPercentageTxt = new JTextField(this.deathPercentage + "");
-        deathPercentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        deathPercentageTxt.setToolTipText("");
-        deathPercentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        deathPercentageTxt.setMaximumSize(new Dimension(120, 31));
-        deathPercentageTxt.setMinimumSize(new Dimension(120, 31));
-        deathPercentageTxt.setPreferredSize(new Dimension(120, 31));
-
-        dComponent = Box.createHorizontalStrut(3);
-
-        immunePercentageTxt = new JTextField(this.immunePercentage + "");
-        immunePercentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        immunePercentageTxt.setToolTipText("");
-        immunePercentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        immunePercentageTxt.setMaximumSize(new Dimension(120, 31));
-        immunePercentageTxt.setMinimumSize(new Dimension(120, 31));
-        immunePercentageTxt.setPreferredSize(new Dimension(120, 31));
-
-        this.iList = new JTextFieldDoubleImmuneListener(this.immunePercentageTxt, model.getMainFrame(), this.immunePercentage + "", this);
-        this.dList = new JTextFieldDoubleDeathListener(this.deathPercentageTxt, model.getMainFrame(), this.deathPercentage + "", this);
-        immunePercentageTxt.addFocusListener(iList);
-        immunePercentageTxt.getDocument().addDocumentListener(iList);
-        deathPercentageTxt.addFocusListener(dList);
-        deathPercentageTxt.getDocument().addDocumentListener(dList);
-
-        iComponent = Box.createHorizontalStrut(3);
-
-        this.humanState = new HumanStat(model.getMainFrame().getListHumanStatName().get(0).getName(), model.getMainFrame().getListHumanStatName().get(0).getColorName(), this);
-        humanStatBox = new JComboBox();
-        for (String s : model.getMainFrame().getHumanStatTab()) {
-            humanStatBox.addItem(s);
-        }
-        humanStatBox.setPreferredSize(new Dimension(120, 31));
-        humanStatBox.setMinimumSize(new Dimension(120, 31));
-        humanStatBox.setMaximumSize(new Dimension(120, 31));
-        humanStatBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jComboActionEvent();
-            }
-        });
-        this.cHumanStateBox = Box.createHorizontalStrut(3);
-    }*/
     public HumanStat getHumanState() {
         return humanState;
     }
@@ -389,6 +507,14 @@ public class SymptomStage extends JPanel {
         return nameLabel1;
     }
 
+    public int getInHospital() {
+        return inHospital;
+    }
+
+    public void setInHospital(int inHospital) {
+        this.inHospital = inHospital;
+    }
+
     public void setNameLabel1(JLabel nameLabel1) {
         this.nameLabel1 = nameLabel1;
     }
@@ -403,6 +529,7 @@ public class SymptomStage extends JPanel {
 
     public void setIndex(int index) {
         this.index = index;
+        this.indexTxt.setText(index + "");
     }
 
     public void setcName1(Component cName1) {
@@ -433,21 +560,6 @@ public class SymptomStage extends JPanel {
         this.listener = listener;
     }
 
-    /* public JTextField getDeathPercentageTxt() {
-        return deathPercentageTxt;
-    }
-
-    public void setDeathPercentageTxt(JTextField deathPercentageTxt) {
-        this.deathPercentageTxt = deathPercentageTxt;
-    }
-
-    public JTextField getImmunePercentageTxt() {
-        return immunePercentageTxt;
-    }
-
-    public void setImmunePercentageTxt(JTextField immunePercentageTxt) {
-        this.immunePercentageTxt = immunePercentageTxt;
-    }*/
     public JTextField getDayTxt() {
         return dayTxt;
     }
@@ -546,6 +658,8 @@ public class SymptomStage extends JPanel {
     public void save() {
         if (this.isDeleted()) {
             SymptomStageController.INSTANCE.delete(this.id);
+            this.setSaved(true);
+            this.setIsNew(false);
             return;
         }
         if (this.isNew) {
@@ -564,8 +678,10 @@ public class SymptomStage extends JPanel {
 
     public void save1() {
         if (this.isDeleted()) {
-            HumanStateController.INSTANCE.delete(this.humanState.getId());
+            //HumanStateController.INSTANCE.delete(this.humanState.getId());
             SymptomStageController.INSTANCE.deleteModel(this.id);
+            this.setSaved(true);
+            this.setIsNew(false);
             return;
         }
         if (this.isNew) {
@@ -581,6 +697,10 @@ public class SymptomStage extends JPanel {
             }
         }
         //this.humanState.save();
+    }
+
+    public void updateStatistique() {
+        this.statistiqueValueNameLabel.setText(this.listMember.size() + "");
     }
 
     private class JTextFieldIntegerListener implements DocumentListener, FocusListener {
@@ -741,7 +861,7 @@ public class SymptomStage extends JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -751,13 +871,13 @@ public class SymptomStage extends JPanel {
                 if (!insert) {
                     this.currentString = numTxt;
                     this.symStage.setDeathPercentage(Double.parseDouble(numTxt));
-                    mainFrame.setModelSavedButtonEnable();
+                    this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
                     this.symStage.getModel().setSaved(false);
                     this.symStage.setSaved(false);
                 }
                 if (d > 100) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.mainFrame, this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
@@ -766,7 +886,7 @@ public class SymptomStage extends JPanel {
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -785,7 +905,7 @@ public class SymptomStage extends JPanel {
             }
             this.currentString = s;
             this.symStage.setDeathPercentage(Double.parseDouble(s));
-            mainFrame.setModelSavedButtonEnable();
+            this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
             this.symStage.getModel().setSaved(false);
             this.symStage.setSaved(false);
 
@@ -865,7 +985,7 @@ public class SymptomStage extends JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -875,13 +995,13 @@ public class SymptomStage extends JPanel {
                 if (!insert) {
                     this.currentString = numTxt;
                     this.symStage.setImmunePercentage(Double.parseDouble(numTxt));
-                    mainFrame.setModelSavedButtonEnable();
+                    this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
                     this.symStage.getModel().setSaved(false);
                     this.symStage.setSaved(false);
                 }
                 if (d > 100) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.mainFrame, this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
@@ -890,7 +1010,7 @@ public class SymptomStage extends JPanel {
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -909,7 +1029,7 @@ public class SymptomStage extends JPanel {
             }
             this.currentString = s;
             this.symStage.setImmunePercentage(Double.parseDouble(s));
-            mainFrame.setModelSavedButtonEnable();
+            this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
             this.symStage.getModel().setSaved(false);
             this.symStage.setSaved(false);
 
@@ -940,6 +1060,146 @@ public class SymptomStage extends JPanel {
             } else {
                 insert = false;
             }
+        }
+
+    }
+
+    private class JTextFieldIndexListener implements DocumentListener, FocusListener {
+
+        private JTextField jtextField;
+        private final String numberFormat = "Parameter have to be a number!";
+        private final String badNumberValueTitle = "Bad Parameter";
+        private boolean insert = true;
+        private final String numberLower = "Max age can't be lower or equal to min age!";
+        private SymptomStage stage;
+
+        public JTextFieldIndexListener(JTextField textField, SymptomStage stage) {
+            this.jtextField = textField;
+            this.stage = stage;
+        }
+
+        private void insertZero(String s) {
+            Runnable doHighlight = new Runnable() {
+                @Override
+                public void run() {
+                    jtextField.setText(s);
+                }
+            };
+            SwingUtilities.invokeLater(doHighlight);
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            String numTxt = this.jtextField.getText();
+            if (numTxt.contains("f") || numTxt.contains("d")) {
+                this.insert = true;
+                Runnable doHighlight = () -> {
+                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                };
+                SwingUtilities.invokeLater(doHighlight);
+                insertZero(stage.getIndex() + "");
+                return;
+            }
+            try {
+                int d = Integer.parseInt(numTxt);
+                if (!insert) {
+                    model.getMainFrame().setModelSavedButtonEnable();
+                }
+
+            } catch (NumberFormatException ex) {
+                insert = true;
+                Runnable doHighlight = () -> {
+                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                };
+                SwingUtilities.invokeLater(doHighlight);
+                insertZero(stage.getIndex() + "");
+            }
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            String numTxt = this.jtextField.getText();
+            if (numTxt.length() <= 0 || numTxt.equals("")) {
+                return;
+            }
+            model.getMainFrame().setModelSavedButtonEnable();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            insert = false;
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            String numTxt = this.jtextField.getText();
+            if (numTxt.equals("")) {
+                insert = true;
+                insertZero(stage.getIndex() + "");
+                return;
+            } else {
+                insert = true;
+            }
+            int d = Integer.parseInt(numTxt);
+            if (d == 0) {
+                Runnable doHighlight = () -> {
+                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                };
+                SwingUtilities.invokeLater(doHighlight);
+                insertZero(stage.getIndex() + "");
+            } else if (stage.getInHospital() == 0) {
+                if (d > model.getListSymptomStage1sNonHospital().size()) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(stage.getIndex() + "");
+                } else {
+                    int tmp = stage.getIndex();
+                    for (SymptomStage ss : model.getListSymptomStage1sNonHospital()) {
+                        if (ss.getIndex() == d) {
+                            ss.setIndex(tmp);
+                            ss.setSaved(false);
+                            break;
+                        }
+                    }
+                    stage.setIndex(d);
+                    stage.setSaved(false);
+                    for (SymptomType st : model.getListSymptomType()) {
+                        st.reintSymptomStagePanel();
+                    }
+                    model.getModelPanel().reinitPanel();
+                }
+            } else {
+                if (d > model.getListSymptomStage1sHospital().size() + model.getListSymptomStage1sNonHospital().size()
+                        || d <= model.getListSymptomStage1sNonHospital().size()) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(stage.getIndex() + "");
+                } else {
+                    int tmp = stage.getIndex();
+                    for (SymptomStage ss : model.getListSymptomStage1sHospital()) {
+                        if (ss.getIndex() == d) {
+                            ss.setIndex(tmp);
+                            ss.setSaved(false);
+                            break;
+                        }
+                    }
+                    stage.setIndex(d);
+                    stage.setSaved(false);
+                    for (SymptomType st : model.getListSymptomType()) {
+                        st.reintSymptomStagePanel();
+                    }
+                    model.getModelPanel().reinitPanel();
+                }
+            }
+
         }
 
     }
