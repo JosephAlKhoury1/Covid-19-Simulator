@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller.controllers;
 
 import controller.datasource.DataSource;
@@ -14,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.model.HumanAge;
-import models.model.SymptomAge;
 import models.model.SymptomStage;
 import models.model.SymptomStageType;
 import models.model.SymptomType;
@@ -27,12 +20,12 @@ import models.model.SymptomType;
 public class SymptomStageTypeController {
 
     public static final SymptomStageTypeController INSTANCE = new SymptomStageTypeController();
-    private final String insert = "insert into symptomstagetype(idSymptom, idSymptomStage, days, percentage)"
-            + " values(?, ?, ?, ?)";
+    private final String insert = "insert into symptomstagetype(idSymptom, idSymptomStage, days)"
+            + " values(?, ?, ?)";
     private final String update = "update symptomstagetype"
-            + " set days = ?, percentage = ?"
+            + " set days = ?"
             + " where id = ?";
-    private final String selectAll = "select id , idSymptomStage, days, percentage"
+    private final String selectAll = "select id , idSymptomStage, days"
             + " from symptomstagetype "
             + " where idSymptom = ?";
     private final String delete = " delete"
@@ -61,7 +54,6 @@ public class SymptomStageTypeController {
             this.insertStatement.setInt(1, stt.getSymptomType().getId());
             this.insertStatement.setInt(2, stt.getSymptomStage().getId());
             this.insertStatement.setInt(3, stt.getDay());
-            this.insertStatement.setDouble(4, stt.getPercentage());
 
             int id = -1;
             int affectedRows = this.insertStatement.executeUpdate();
@@ -93,10 +85,19 @@ public class SymptomStageTypeController {
                         break;
                     }
                 }
-                list.add(new SymptomStageType(set.getInt(1), symptom, st, set.getInt(3), set.getInt(4), symptom.getModel()));
+                list.add(new SymptomStageType(set.getInt(1), symptom, st, set.getInt(3), symptom.getModel()));
             }
             set.close();
+            SymptomStageType[] tab = new SymptomStageType[list.size()];
+            for (SymptomStageType stt : list) {
+                tab[stt.getSymptomStage().getIndex() - 1] = stt;
+            }
+            list.clear();
+            for (SymptomStageType stt : tab) {
+                list.add(stt);
+            }
             return list;
+
         } catch (SQLException ex) {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -106,8 +107,7 @@ public class SymptomStageTypeController {
     public boolean update(SymptomStageType age) {
         try {
             this.updateStatement.setInt(1, age.getDay());
-            this.updateStatement.setDouble(2, age.getPercentage());
-            this.updateStatement.setInt(3, age.getId());
+            this.updateStatement.setInt(2, age.getId());
             int affectedRows = this.updateStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating symptom failed, no rows affected.");

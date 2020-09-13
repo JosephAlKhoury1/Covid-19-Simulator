@@ -11,27 +11,30 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import resources.icon.Colors;
+import resources.icon.Icons;
+import resources.icon.Messages;
 
 /**
  *
  * @author Joseph
  */
 public class SymptomAge {
-    
+
     private int id;
     private HumanAge humanAge;
     private SymptomType symptomType;
     private double percentage;
     private JTextField percentageTxt;
     private boolean deleted, isNew, saved;
-    
+
     private Model model;
     private JTextFieldDoubleListener percentageListener;
-    
+
     public void setEnable() {
         this.percentageTxt.setEnabled(true);
     }
-    
+
     public void setDisable() {
         this.percentageTxt.setEnabled(false);
     }
@@ -51,12 +54,12 @@ public class SymptomAge {
         this.percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.percentageTxt.setToolTipText("");
         this.percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         this.percentageListener = new JTextFieldDoubleListener(percentageTxt, this);
         this.percentageTxt.getDocument().addDocumentListener(percentageListener);
         this.percentageTxt.addFocusListener(percentageListener);
     }
-    
+
     public SymptomAge(int id, HumanAge humanAge, SymptomType st, double percentage) {
         this.symptomType = st;
         this.id = id;
@@ -72,86 +75,89 @@ public class SymptomAge {
         this.percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.percentageTxt.setToolTipText("");
         this.percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
+
         this.percentageListener = new JTextFieldDoubleListener(percentageTxt, this);
         this.percentageTxt.getDocument().addDocumentListener(percentageListener);
         this.percentageTxt.addFocusListener(percentageListener);
     }
-    
+
     public SymptomType getSymptomType() {
         return symptomType;
     }
-    
+
     public void setSymptomType(SymptomType symptomType) {
         this.symptomType = symptomType;
     }
-    
+
     public double getPercentage() {
         return percentage;
     }
-    
+
     public void setPercentage(double percentage) {
         this.percentage = percentage;
     }
-    
+
     public JTextField getPercentageTxt() {
         return percentageTxt;
     }
-    
+
     public void setPercentageTxt(JTextField percentageTxt) {
         this.percentageTxt = percentageTxt;
     }
-    
+
     public int getId() {
         return id;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }
-    
+
     public HumanAge getHumanAge() {
         return humanAge;
     }
-    
+
     public Model getModel() {
         return model;
     }
-    
+
     public void setModel(Model model) {
         this.model = model;
     }
-    
+
     public void setHumanAge(HumanAge humanAge) {
         this.humanAge = humanAge;
     }
-    
+
     public boolean isDeleted() {
         return deleted;
     }
-    
+
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
-    
+
     public boolean isIsNew() {
         return isNew;
     }
-    
+
     public void setIsNew(boolean isNew) {
         this.isNew = isNew;
     }
-    
+
     public boolean isSaved() {
         return saved;
     }
-    
+
     public void setSaved(boolean saved) {
         this.saved = saved;
     }
-    
+
     public void save() {
         if (this.isDeleted()) {
+            if (this.isNew) {
+                return;
+            }
             HumanAgeSymptomController.INSTANCE.delete(this.id);
             return;
         }
@@ -164,13 +170,13 @@ public class SymptomAge {
                 HumanAgeSymptomController.INSTANCE.update(this);
                 this.setSaved(true);
             } else {
-                
+
             }
         }
     }
-    
+
     private class JTextFieldDoubleListener implements DocumentListener, FocusListener {
-        
+
         private final JTextField jtextField;
         private String currentString;
         private final String greaterMessage = "Number can't be greater 100!";
@@ -178,20 +184,20 @@ public class SymptomAge {
         private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
         private SymptomAge symage;
-        
+
         public JTextFieldDoubleListener(JTextField textField, SymptomAge stage) {
             this.jtextField = textField;
             this.currentString = stage.getPercentage() + "";
             this.symage = stage;
         }
-        
+
         private void insertZero(String s) {
             Runnable doHighlight = () -> {
                 jtextField.setText(s);
             };
             SwingUtilities.invokeLater(doHighlight);
         }
-        
+
         @Override
         public void insertUpdate(DocumentEvent e) {
             String numTxt = this.jtextField.getText();
@@ -205,13 +211,6 @@ public class SymptomAge {
             }
             try {
                 Double d = Double.parseDouble(numTxt);
-                if (!insert) {
-                    this.currentString = numTxt;
-                    this.symage.setPercentage(Double.parseDouble(numTxt));
-                    this.symage.getModel().getMainFrame().setModelSavedButtonEnable();
-                    this.symage.getModel().setSaved(false);
-                    this.symage.setSaved(false);
-                }
                 if (d > 100) {
                     Runnable doHighlight = () -> {
                         JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
@@ -219,7 +218,33 @@ public class SymptomAge {
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
                     this.insert = false;
+                } else if (!insert) {
+                    this.currentString = numTxt;
+                    this.symage.setPercentage(Double.parseDouble(numTxt));
+                    this.symage.getModel().getMainFrame().setModelSavedButtonEnable();
+                    this.symage.getModel().setSaved(false);
+                    this.symage.setSaved(false);
+                    double sum = 0;
+                    for (SymptomAge sa : humanAge.getListSymptomAges()) {
+                        sum += sa.getPercentage();
+                    }
+                    if (sum != 100) {
+                        humanAge.getNameLabel().setBackground(Colors.WARNINGCOLOR);
+                        humanAge.getNameLabel().setIcon(Icons.WARNINGICON);
+                        humanAge.getNameLabel().setToolTipText(Messages.AGEPERCENTAGEWARNING);
+                        for (SymptomAge sa : humanAge.getListSymptomAges()) {
+                            sa.getPercentageTxt().setBackground(Colors.WARNINGCOLOR);
+                        }
+                    } else {
+                        humanAge.getNameLabel().setBackground(Colors.WHITE);
+                        humanAge.getNameLabel().setIcon(null);
+                        humanAge.getNameLabel().setToolTipText(null);
+                        for (SymptomAge sa : humanAge.getListSymptomAges()) {
+                            sa.getPercentageTxt().setBackground(Colors.WHITE);
+                        }
+                    }
                 }
+
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
@@ -230,7 +255,7 @@ public class SymptomAge {
             }
             this.insert = false;
         }
-        
+
         @Override
         public void removeUpdate(DocumentEvent e) {
             if (insert) {
@@ -245,18 +270,37 @@ public class SymptomAge {
             this.symage.getModel().getMainFrame().setModelSavedButtonEnable();
             this.symage.getModel().setSaved(false);
             this.symage.setSaved(false);
-            
+            double sum = 0;
+            for (SymptomAge sa : humanAge.getListSymptomAges()) {
+                sum += sa.getPercentage();
+            }
+            if (sum != 100) {
+                humanAge.getNameLabel().setBackground(Colors.WARNINGCOLOR);
+                humanAge.getNameLabel().setIcon(Icons.WARNINGICON);
+                humanAge.getNameLabel().setToolTipText(Messages.AGEPERCENTAGEWARNING);
+                for (SymptomAge sa : humanAge.getListSymptomAges()) {
+                    sa.getPercentageTxt().setBackground(Colors.WARNINGCOLOR);
+                }
+            } else {
+                humanAge.getNameLabel().setBackground(Colors.WHITE);
+                humanAge.getNameLabel().setIcon(null);
+                humanAge.getNameLabel().setToolTipText(null);
+                for (SymptomAge sa : humanAge.getListSymptomAges()) {
+                    sa.getPercentageTxt().setBackground(Colors.WHITE);
+                }
+            }
+
         }
-        
+
         @Override
         public void changedUpdate(DocumentEvent e) {
         }
-        
+
         @Override
         public void focusGained(FocusEvent e) {
             insert = false;
         }
-        
+
         @Override
         public void focusLost(FocusEvent e) {
             String numTxt = this.jtextField.getText();
@@ -274,6 +318,6 @@ public class SymptomAge {
                 insert = false;
             }
         }
-        
+
     }
 }

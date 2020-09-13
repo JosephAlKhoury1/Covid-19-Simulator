@@ -28,27 +28,33 @@ public class Model {
     private List<HumanAge> listHumanAgeDeleted;
 
     private List<SymptomType> listSymptomType;
+    private List<SymptomType> listSymptomTypeDeleted;
 
     private List<SymptomStage> listSymptomStage1sNonHospital, listSymptomStage1sHospital;
     private List<SymptomStage> listSympStageNonHosDeleted, listSymptomStagesHosDeleted;
     private List<SymptomStage> listSymptomStagesNonHosAdded, listSymptomStagesHosAdded;
 
     private City city;
-    private JMenuItem mapMenu, runMenu, pauseMenu, populationMenu;
+    private JMenuItem mapMenu, populationMenu;
+    private JMenuItem runMenu, pauseMenu, stopMenu;
 
-    private boolean run = false, pause = false, stop = false;
+    private boolean run = false, pause = false, stop = false, firstTimeRun = true;
+
+    private List<ResultOfDay> listResult;
 
     public Model(int modelId, String modelName, List<SymptomType> list, List<SymptomStage> listSS, List<HumanAge> listHA) {
         this.modelId = modelId;
         this.modelName = modelName;
         this.listSymptomStage1sHospital = new ArrayList();
         this.listSymptomStage1sNonHospital = new ArrayList();
+
+        this.listResult = new ArrayList();
+        this.listSymptomTypeDeleted = new ArrayList();
         this.listHumanAge = listHA;
         this.listSympStageNonHosDeleted = new ArrayList();
         this.listSymptomStagesHosDeleted = new ArrayList();
         this.listSymptomStagesHosAdded = new ArrayList();
         this.listSymptomStagesNonHosAdded = new ArrayList();
-        //this.listSymptomStage1s = listSS;
         for (SymptomStage ss : listSS) {
             if (ss.getInHospital() == 0) {
                 this.listSymptomStage1sNonHospital.add(ss);
@@ -83,14 +89,11 @@ public class Model {
         this.runMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                city.start();
-                setRun(true);
-                setPause(false);
-                mainFrame.getRunButton().setEnabled(false);
-                mainFrame.getPauseButton().setEnabled(true);
-                modelPanel.setDisable();
-                runMenu.setEnabled(false);
-                pauseMenu.setEnabled(true);
+                if (!isFirstTimeRun()) {
+                    city.resume();
+                } else {
+                    city.start();
+                }
             }
         });
 
@@ -99,12 +102,14 @@ public class Model {
             @Override
             public void actionPerformed(ActionEvent e) {
                 city.pause();
-                setPause(true);
-                setRun(false);
-                mainFrame.getRunButton().setEnabled(true);
-                mainFrame.getPauseButton().setEnabled(false);
-                runMenu.setEnabled(true);
-                pauseMenu.setEnabled(false);
+            }
+        });
+
+        this.stopMenu = new JMenuItem("Stop " + this.modelName);
+        this.stopMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.stop();
             }
         });
         this.newModel = false;
@@ -126,12 +131,16 @@ public class Model {
         this.modelName = name;
         this.mainFrame = frame;
         this.isMain = 1;
+
+        this.listResult = new ArrayList();
+
         this.listSymptomStage1sHospital = new ArrayList();
         this.listSymptomStage1sNonHospital = new ArrayList();
         this.listSympStageNonHosDeleted = new ArrayList();
         this.listSymptomStagesHosDeleted = new ArrayList();
         this.listSymptomStagesHosAdded = new ArrayList();
         this.listSymptomStagesNonHosAdded = new ArrayList();
+        this.listSymptomTypeDeleted = new ArrayList();
         this.city = c;
         if (this.city != null) {
             this.city.setModel(this);
@@ -162,14 +171,11 @@ public class Model {
         this.runMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                city.start();
-                setRun(true);
-                setPause(false);
-                mainFrame.getRunButton().setEnabled(false);
-                mainFrame.getPauseButton().setEnabled(true);
-                modelPanel.setDisable();
-                runMenu.setEnabled(false);
-                pauseMenu.setEnabled(true);
+                if (!isFirstTimeRun()) {
+                    city.resume();
+                } else {
+                    city.start();
+                }
             }
         });
 
@@ -178,12 +184,14 @@ public class Model {
             @Override
             public void actionPerformed(ActionEvent e) {
                 city.pause();
-                setPause(true);
-                setRun(false);
-                mainFrame.getRunButton().setEnabled(true);
-                mainFrame.getPauseButton().setEnabled(false);
-                runMenu.setEnabled(true);
-                pauseMenu.setEnabled(false);
+            }
+        });
+
+        this.stopMenu = new JMenuItem("Stop " + this.modelName);
+        this.stopMenu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                city.stop();
             }
         });
 
@@ -205,7 +213,7 @@ public class Model {
             i++;
         }
         for (SymptomName sn : this.mainFrame.getListSymptomName()) {
-            SymptomType st1 = new SymptomType(sn.getName(), 0, this.mainFrame.getListSymptomStageNames(), this.listSymptomStage1sHospital, this.listSymptomStage1sNonHospital, this);
+            SymptomType st1 = new SymptomType(sn.getName(), 0, this.listSymptomStage1sHospital, this.listSymptomStage1sNonHospital, this);
             this.listSymptomType.add(st1);
         }
         for (HumanAgeName hu : this.mainFrame.getListHumanAgeName()) {
@@ -215,8 +223,36 @@ public class Model {
 
     }
 
+    public List<ResultOfDay> getListResult() {
+        return listResult;
+    }
+
+    public void setListResult(List<ResultOfDay> listResult) {
+        this.listResult = listResult;
+    }
+
+    public boolean isFirstTimeRun() {
+        return firstTimeRun;
+    }
+
+    public void setFirstTimeRun(boolean firstTimeRun) {
+        this.firstTimeRun = firstTimeRun;
+    }
+
     public void generateMapLocation() {
         this.city.generateMapLocation();
+    }
+
+    public JMenuItem getStopMenu() {
+        return stopMenu;
+    }
+
+    public List<SymptomType> getListSymptomTypeDeleted() {
+        return listSymptomTypeDeleted;
+    }
+
+    public void setListSymptomTypeDeleted(List<SymptomType> listSymptomTypeDeleted) {
+        this.listSymptomTypeDeleted = listSymptomTypeDeleted;
     }
 
     public List<SymptomStage> getListSymptomStage1sNonHospital() {
@@ -492,6 +528,12 @@ public class Model {
             st.setModel(this);
             st.save();
         }
+
+        for (SymptomType st : this.listSymptomTypeDeleted) {
+            st.setModel(this);
+            st.save();
+        }
+
         for (HumanAge ha : this.listHumanAge) {
             ha.setModel(this);
             ha.save();
@@ -504,6 +546,10 @@ public class Model {
 
         this.listHumanAgeDeleted.clear();
         this.listHumanAgeAdd.clear();
+    }
+
+    public void refresh() {
+        this.city.refresh();
     }
 
     /* public void removeSymptomStage(List<SymptomStage> list) {
@@ -562,12 +608,23 @@ public class Model {
         }
 
         for (SymptomType st : this.listSymptomType) {
-            st.getListSage().add(new SymptomStageType(st, ss, 0, 0.0, this));
+            st.addSymptomStage(new SymptomStageType(st, ss, 0, this));
             st.reintSymptomStagePanel();
         }
 
         this.modelPanel.reinitPanel();
         this.modelPanel.reinitSymptomPanel();
+        this.mainFrame.setModelSavedButtonEnable();
+    }
+
+    public void addNewSymptom(String name) {
+        SymptomType st = new SymptomType(name, 0, listSymptomStage1sHospital, listSymptomStage1sNonHospital, this);
+        this.listSymptomType.add(st);
+        for (HumanAge ha : this.listHumanAge) {
+            ha.addSymptomType(st);
+        }
+        this.modelPanel.reinitPanel();
+        this.modelPanel.reinitAgePanel();
         this.mainFrame.setModelSavedButtonEnable();
     }
 

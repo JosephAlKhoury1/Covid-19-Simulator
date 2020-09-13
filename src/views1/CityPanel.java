@@ -1,5 +1,6 @@
 package views1;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -9,10 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +24,9 @@ import models.client1.HumanCityAgeType;
 import models.client1.LocationToGo;
 import models.client1.ReligionType;
 import models.client1.SexeType;
+import resources.icon.Colors;
+import resources.icon.Icons;
+import resources.icon.Messages;
 import views1.city.dialog.ManageLocationToGoDistributionDialog;
 import views1.city.dialog.ManageReligionGoDistributionDialog;
 
@@ -73,15 +75,36 @@ public class CityPanel extends javax.swing.JPanel {
             rl.setCity(city);
         });
 
+        double totalHumanAgePercentage = 0;
         this.currentCity.getListHumanAgeType().stream().map((hu) -> {
             Component c = Box.createVerticalStrut(3);
             hu.setComp(c);
+
             this.agePanel.add(hu.getPanel());
             this.agePanel.add(c);
             return hu;
         }).forEachOrdered((hu) -> {
             hu.setCity(city);
         });
+
+        for (HumanCityAgeType ha : this.currentCity.getListHumanAgeType()) {
+            totalHumanAgePercentage += ha.getHumanPercentage();
+        }
+        if (totalHumanAgePercentage != 100) {
+            for (HumanCityAgeType ha : this.currentCity.getListHumanAgeType()) {
+                ha.getPercentageJtxt().setBackground(Colors.WARNINGCOLOR);
+            }
+            this.percentageOfHumanLabel.setIcon(Icons.WARNINGICON);
+            this.percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGEWITHWARNING);
+            this.percentageOfHumanLabel.setBackground(Colors.WARNINGCOLOR);
+        } else {
+            for (HumanCityAgeType ha : this.currentCity.getListHumanAgeType()) {
+                ha.getPercentageJtxt().setBackground(Colors.NOWARNINGCOLOR);
+            }
+            this.percentageOfHumanLabel.setIcon(null);
+            this.percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGE);
+            this.percentageOfHumanLabel.setBackground(Colors.NOWARNINGCOLOR);
+        }
 
         this.currentCity.getListHousePopulations().stream().map((hp) -> {
             Component c = Box.createVerticalStrut(3);
@@ -145,8 +168,27 @@ public class CityPanel extends javax.swing.JPanel {
             this.housePopulationPanel.add(c);
             return hu;
         }).forEachOrdered((hu) -> {
-            //hu.setCity(this.currentCity);
+            hu.setCity(this.currentCity);
         });
+        double totalHumanAgePercentage = 0;
+        for (HumanCityAgeType ha : this.currentCity.getListHumanAgeType()) {
+            totalHumanAgePercentage += ha.getHumanPercentage();
+        }
+        if (totalHumanAgePercentage != 100) {
+            for (HumanCityAgeType ha : this.currentCity.getListHumanAgeType()) {
+                ha.getPercentageJtxt().setBackground(Colors.WARNINGCOLOR);
+            }
+            this.percentageOfHumanLabel.setIcon(Icons.WARNINGICON);
+            this.percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGEWITHWARNING);
+            this.percentageOfHumanLabel.setBackground(Colors.WARNINGCOLOR);
+        } else {
+            for (HumanCityAgeType ha : this.currentCity.getListHumanAgeType()) {
+                ha.getPercentageJtxt().setBackground(Colors.NOWARNINGCOLOR);
+            }
+            this.percentageOfHumanLabel.setIcon(null);
+            this.percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGE);
+            this.percentageOfHumanLabel.setBackground(Colors.NOWARNINGCOLOR);
+        }
 
         this.currentCity.getListHousePopulations().stream().map((hp) -> {
             Component c = Box.createVerticalStrut(3);
@@ -281,7 +323,7 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel30 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
+        percentageOfHumanLabel = new javax.swing.JLabel();
         jPanel16 = new javax.swing.JPanel();
         jLabel22 = new javax.swing.JLabel();
         locationToGoPanel = new javax.swing.JPanel();
@@ -374,20 +416,22 @@ public class CityPanel extends javax.swing.JPanel {
 
         jPanel30.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        jLabel1.setBackground(new Color(255,204,51));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Min");
         jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jLabel1.setPreferredSize(new java.awt.Dimension(20, 35));
 
+        jLabel2.setBackground(new Color(255,204,51));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Max");
         jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jLabel2.setPreferredSize(new java.awt.Dimension(24, 35));
 
-        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel14.setText("% of human");
-        jLabel14.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jLabel14.setPreferredSize(new java.awt.Dimension(63, 35));
+        percentageOfHumanLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        percentageOfHumanLabel.setText("% of human");
+        percentageOfHumanLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        percentageOfHumanLabel.setPreferredSize(new java.awt.Dimension(63, 35));
 
         jPanel16.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel16.setPreferredSize(new java.awt.Dimension(124, 35));
@@ -444,7 +488,7 @@ public class CityPanel extends javax.swing.JPanel {
                 .addGap(0, 0, 0)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(percentageOfHumanLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
@@ -456,7 +500,7 @@ public class CityPanel extends javax.swing.JPanel {
             jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel30Layout.createSequentialGroup()
                 .addGroup(jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(percentageOfHumanLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1098,7 +1142,6 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
@@ -1140,6 +1183,7 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JPanel locationToGoPanel;
+    public javax.swing.JLabel percentageOfHumanLabel;
     private javax.swing.JLabel populationLabel;
     private javax.swing.JPanel religionPanel;
     private javax.swing.JPanel sexePanel;

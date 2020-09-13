@@ -2,6 +2,7 @@ package models.client1;
 
 import java.util.ArrayList;
 import java.util.List;
+import models.model.ResultOfDay;
 
 public class Week {
 
@@ -65,12 +66,19 @@ public class Week {
                 this.hour = 0;
                 int i = currentDay.getIndex();
                 this.city.setDayChanged(true);
+
+                ResultOfDay result = new ResultOfDay(city.getListHealth().size(), city.getListImmune().size(),
+                        city.getListDeath().size(), city.getModel().getListSymptomStage1sHospital(),
+                        city.getModel().getListSymptomStage1sNonHospital(), weekNumber, currentDay.getDay().getName());
+
+                System.out.println("new result day = " + result.getDayName() + " week = " + result.getWeek());
+                System.out.println("currentDay day = " + currentDay.getDay().getName() + " week " + weekNumber);
+                city.getModel().getListResult().add(result);
                 i++;
                 if (i > 6) {
                     currentDay = listDay.get(0);
                     weekNumber++;
                 } else {
-                    //System.out.println("i = " + (i));
                     currentDay = listDay.get(i);
                 }
                 this.city.changeDay(this.currentDay);

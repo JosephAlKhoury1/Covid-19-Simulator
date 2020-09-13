@@ -2,12 +2,16 @@ package models.model;
 
 import controller.controllers.SymptomsController;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -15,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import resources.icon.Messages;
 import views1.MainFrame;
 
 public class SymptomType extends javax.swing.JPanel {
@@ -26,7 +31,6 @@ public class SymptomType extends javax.swing.JPanel {
     private List<SymptomStage> listDeleted;
     private List<SymptomStage> listAdd;
     private int contagiousDay;
-
 
     private boolean saved, inNew, deleted;
 
@@ -40,24 +44,9 @@ public class SymptomType extends javax.swing.JPanel {
     private List<SymptomStageType> listSage;
     private List<SymptomStageType> listStageDeleted;
 
-    public List<SymptomStageType> getListSage() {
-        return listSage;
-    }
+    private JButton removeButton;
 
-    public void setListSage(List<SymptomStageType> listSage) {
-        this.listSage = listSage;
-        int index = 1;
-        while (index < listSage.size() + 1) {
-            for (SymptomStageType stt : listSage) {
-                if (stt.getSymptomStage().getIndex() == index) {
-                    this.symptomeStagePanel.add(stt.getPanel());
-                    index++;
-                }
-            }
-        }
-    }
-
-    public SymptomType(String name, int contagiousDay, List<SymptomStageName> list, List<SymptomStage> listSymptomStageHospital, List<SymptomStage> listNonHospital, Model m) {
+    public SymptomType(String name, int contagiousDay, List<SymptomStage> listSymptomStageHospital, List<SymptomStage> listNonHospital, Model m) {
         initComponents();
         this.name = name;
         this.model = m;
@@ -110,21 +99,34 @@ public class SymptomType extends javax.swing.JPanel {
         this.dayTxt.addFocusListener(listener);
         this.dayTxt.getDocument().addDocumentListener(listener);
 
-        //int index = 0;
+        removeButton = new JButton("-");
+        removeButton.setPreferredSize(new Dimension(40, 35));
+        removeButton.setMinimumSize(new Dimension(40, 35));
+        removeButton.setMaximumSize(new Dimension(40, 35));
+
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeActionPerformed();
+            }
+        });
+
         this.symptomeStagePanel.setLayout(new BoxLayout(this.symptomeStagePanel, BoxLayout.X_AXIS));
 
         this.listSage = new ArrayList();
         for (SymptomStage stg : listNonHospital) {
-            SymptomStageType stt = new SymptomStageType(this, stg, 0, 0.0, model);
+            SymptomStageType stt = new SymptomStageType(this, stg, 0, model);
             this.listSage.add(stt);
             this.symptomeStagePanel.add(stt.getPanel());
+
         }
         for (SymptomStage stg : listSymptomStageHospital) {
-            SymptomStageType stt = new SymptomStageType(this, stg, 0, 0.0, model);
+            SymptomStageType stt = new SymptomStageType(this, stg, 0, model);
             this.listSage.add(stt);
             this.symptomeStagePanel.add(stt.getPanel());
         }
 
+        this.symptomeStagePanel.add(removeButton);
     }
 
     public SymptomType(int id, String name, int contagiousDay) {
@@ -170,6 +172,18 @@ public class SymptomType extends javax.swing.JPanel {
         dayTxt.setMinimumSize(new java.awt.Dimension(130, 35));
         dayTxt.setPreferredSize(new java.awt.Dimension(130, 35));
 
+        removeButton = new JButton("-");
+        removeButton.setPreferredSize(new Dimension(40, 35));
+        removeButton.setMinimumSize(new Dimension(40, 35));
+        removeButton.setMaximumSize(new Dimension(40, 35));
+
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeActionPerformed();
+            }
+        });
+
         this.saved = true;
         this.inNew = false;
         this.deleted = false;
@@ -184,6 +198,7 @@ public class SymptomType extends javax.swing.JPanel {
     }
 
     public void reintSymptomStagePanel() {
+        this.symptomeStagePanel.remove(this.removeButton);
         int index = 1;
         this.symptomeStagePanel.removeAll();
         while (index < listSage.size() + 1) {
@@ -194,10 +209,49 @@ public class SymptomType extends javax.swing.JPanel {
                 }
             }
         }
+        this.symptomeStagePanel.add(this.removeButton);
+    }
+
+    public void removeActionPerformed() {
+        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETESYMPTOMTYPE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+
+        if (index == JOptionPane.NO_OPTION) {
+            return;
+        }
+        this.setDeleted(true);
+        this.model.getListSymptomType().remove(this);
+        this.model.getListSymptomTypeDeleted().add(this);
+        for (HumanAge ha : this.model.getListHumanAge()) {
+            ha.removeSymptomType(this);
+        }
+        for (SymptomStageType sst : this.listSage) {
+            sst.setDeleted(true);
+        }
+        this.model.getModelPanel().reinitPanel();
+        this.model.getModelPanel().reinitAgePanel();
+        this.model.getMainFrame().setModelSavedButtonEnable();
     }
 
     public List<SymptomStageType> getListStageDeleted() {
         return listStageDeleted;
+    }
+
+    public List<SymptomStageType> getListSage() {
+        return listSage;
+    }
+
+    public void setListSage(List<SymptomStageType> listSage) {
+        this.listSage = listSage;
+        int index = 1;
+        while (index < listSage.size() + 1) {
+            for (SymptomStageType stt : listSage) {
+                if (stt.getSymptomStage().getIndex() == index) {
+                    this.symptomeStagePanel.add(stt.getPanel());
+                    index++;
+                }
+            }
+        }
+        this.symptomeStagePanel.add(removeButton);
     }
 
     public void setListStageDeleted(List<SymptomStageType> listStageDeleted) {
@@ -207,8 +261,6 @@ public class SymptomType extends javax.swing.JPanel {
     public int getId() {
         return id;
     }
-
-  
 
     public JPanel getSymptomeStagePanel() {
         return symptomeStagePanel;
@@ -318,6 +370,9 @@ public class SymptomType extends javax.swing.JPanel {
 
     public void save() {
         if (this.isDeleted()) {
+            if (this.isInNew()) {
+                return;
+            }
             SymptomsController.INSTANCE.delete(this.id);
             return;
         }
@@ -469,66 +524,34 @@ public class SymptomType extends javax.swing.JPanel {
         this.updateSymptomStageList(list);
         this.updateSymptomStagePanel();;
     }
-    
-    public void setEnable(){
-     this.dayTxt.setEnabled(true);
-     for(SymptomStageType ss:this.listSage){
-      ss.setEnable();
-     }
-    }
-    
-    public void setDisable(){
-     this.dayTxt.setEnabled(false);
-     for(SymptomStageType ss:this.listSage){
-      ss.setDisable();
-     }
+
+    public void setEnable() {
+        this.dayTxt.setEnabled(true);
+        for (SymptomStageType ss : this.listSage) {
+            ss.setEnable();
+        }
     }
 
-//    private void updateHumanAgeList(List<HumanAge> list) {
-//        for (HumanAge ha : list) {
-//            if (ha.isIsNew()) {
-//                if (!ha.isDeleted()) {
-//                    HumanAge han = new HumanAge(ha.getName(), 0.0, ha.getMinAge(), ha.getMaxAge(), this, ha.getModel());
-//                    this.listHumanAge.add(han);
-//                    this.listHumanAgeAdd.add(han);
-//                } else {
-//
-//                }
-//            } else {
-//                if (ha.isDeleted()) {
-//                    HumanAge tmp = null;
-//                    for (HumanAge hat : this.listHumanAge) {
-//                        if (hat.getName().equals(ha.getName())) {
-//                            hat.setDeleted(true);
-//                            tmp = hat;
-//                            break;
-//                        }
-//                    }
-//                    if (this.listHumanAgeAdd.contains(tmp)) {
-//                        this.listHumanAgeAdd.remove(tmp);
-//                    }
-//                    this.listHumanAge.remove(tmp);
-//                    this.listHumanAgeDeleted.add(tmp);
-//                } else {
-//
-//                }
-//            }
-//        }
-//    }
-//    private void updateHumanAgePanel() {
-//        this.agePanel.removeAll();
-//        this.agePanel.setPreferredSize(new Dimension(this.listHumanAge.size() * 120, 35));
-//        for (HumanAge ha : this.listHumanAge) {
-//            ha.setSymptomeType(this);
-//            this.agePanel.add(ha.getPercentageTxt());
-//            this.agePanel.add(ha.getcPercentage());
-//        }
-//        this.agePanel.revalidate();
-//    }
-//    public void updateHumanAge(List<HumanAge> list) {
-//        this.updateHumanAgeList(list);
-//        this.updateHumanAgePanel();
-//    }
+    public void setDisable() {
+        this.dayTxt.setEnabled(false);
+        for (SymptomStageType ss : this.listSage) {
+            ss.setDisable();
+        }
+    }
+
+    public void addSymptomStage(SymptomStageType st) {
+
+        listSage.add(st);
+        SymptomStageType[] tab = new SymptomStageType[listSage.size()];
+        for (SymptomStageType stt : listSage) {
+            tab[stt.getSymptomStage().getIndex() - 1] = stt;
+        }
+        listSage.clear();
+        for (SymptomStageType stt : tab) {
+            listSage.add(stt);
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel symptomeStagePanel;
     // End of variables declaration//GEN-END:variables

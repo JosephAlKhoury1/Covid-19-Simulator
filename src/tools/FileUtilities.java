@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tools;
 
 import java.io.FileWriter;
@@ -23,8 +18,6 @@ import models.member1.Member;
  * @author Joseph
  */
 public class FileUtilities {
-
-    static String path = "‪‪C:\\Users\\Joseph\\Desktop";
 
     public static void saveStat(Map<Integer, Member> list) {
         try {
@@ -51,6 +44,12 @@ public class FileUtilities {
                 if (e.getValue().getCurrentLocationToGo() != null) {
                     pr.print("current location x =" + e.getValue().getCurrentLocationToGo().getX() + " y = " + e.getValue().getCurrentLocationToGo().getY());
                 }
+                pr.println();
+                
+                pr.print("age = "+e.getValue().getAge());
+                pr.println();
+                
+                pr.print("symptom type = "+e.getValue().getSymptomType().getName());
                 pr.println();
             }
             pr.close();

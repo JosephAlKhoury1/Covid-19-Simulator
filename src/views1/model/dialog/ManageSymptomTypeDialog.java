@@ -4,8 +4,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import models.model.Model;
 import views1.MainFrame;
-import views1.model.panel.ManageSymptomTypePanel;
+import views1.model.panel.ManageSymptomsTypePanel;
 
 /**
  *
@@ -15,12 +16,12 @@ public class ManageSymptomTypeDialog extends JDialog {
 
     MainFrame frame;
 
-    public ManageSymptomTypeDialog(MainFrame rf) {
+    public ManageSymptomTypeDialog(MainFrame rf, Model model) {
         super(new JFrame(), "New symptom");
         this.frame = rf;
         this.setAlwaysOnTop(true);
         this.setLocation(500, 200);
-        this.setSize(300, 400);
+        this.setSize(400, 300);
         this.setResizable(false);
         addWindowListener(new WindowAdapter() {
 
@@ -29,7 +30,7 @@ public class ManageSymptomTypeDialog extends JDialog {
                 frame.setEnabled(true);
             }
         });
-        this.add(new ManageSymptomTypePanel(frame, this));
+        this.add(new ManageSymptomsTypePanel(frame, this, model));
 
     }
 

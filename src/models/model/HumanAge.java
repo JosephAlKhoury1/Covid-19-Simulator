@@ -23,6 +23,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import models.client1.MonteCarlo;
+import resources.icon.Colors;
+import resources.icon.Icons;
+import resources.icon.Messages;
 import views1.MainFrame;
 
 public class HumanAge {
@@ -48,47 +51,7 @@ public class HumanAge {
     private JButton removeButton;
 
     private List<SymptomAge> listSymptomAges;
-
-    public void setEnable() {
-        this.minAgeTxt.setEnabled(true);
-        this.maxAgeTxt.setEnabled(true);
-        this.removeButton.setEnabled(true);
-        for (SymptomAge as : this.listSymptomAges) {
-            as.setEnable();
-        }
-    }
-
-    public void setDisable() {
-        this.minAgeTxt.setEnabled(false);
-        this.maxAgeTxt.setEnabled(false);
-        this.removeButton.setEnabled(false);
-        for (SymptomAge as : this.listSymptomAges) {
-            as.setDisable();
-        }
-    }
-
-    public List<SymptomAge> getListSymptomAges() {
-        return listSymptomAges;
-    }
-
-    public void setListSymptomAges(List<SymptomAge> listSymptomAges) {
-        this.listSymptomAges = listSymptomAges;
-        this.panel = new JPanel();
-        this.panel.setBackground(Color.red);
-        this.panel.setPreferredSize(new Dimension(listSymptomAges.size() * 120 + 460, 35));
-        this.panel.setMinimumSize(new Dimension(listSymptomAges.size() * 120 + 460, 35));
-        this.panel.setMaximumSize(new Dimension(listSymptomAges.size() * 1200, 35));
-        this.panel.setBorder(BorderFactory.createEtchedBorder());
-        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
-        this.cPanel = Box.createVerticalStrut(3);
-        this.panel.add(this.nameLabel);
-        for (SymptomAge sta : listSymptomAges) {
-            this.panel.add(sta.getPercentageTxt());
-        }
-        this.panel.add(this.minAgeTxt);
-        this.panel.add(this.maxAgeTxt);
-        this.panel.add(removeButton);
-    }
+    private List<SymptomAge> listSymptomAgesDeleted;
 
     public HumanAge(int id, String name, int minAge, int maxAge) {
         this.id = id;
@@ -99,6 +62,8 @@ public class HumanAge {
         this.isNew = false;
         this.saved = true;
         this.deleted = false;
+
+        this.listSymptomAgesDeleted = new ArrayList();
 
         this.nameLabel = new JLabel(name);
         this.nameLabel.setPreferredSize(new Dimension(130, 31));
@@ -118,6 +83,7 @@ public class HumanAge {
         this.minAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.minAgeTxt.setToolTipText("");
         this.minAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.minAgeTxt.setBackground(new Color(255, 204, 51));
 
         this.cMinAge = Box.createHorizontalStrut(3);
 
@@ -128,6 +94,7 @@ public class HumanAge {
         this.maxAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.maxAgeTxt.setToolTipText("");
         this.maxAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.maxAgeTxt.setBackground(new Color(255, 204, 51));
 
         this.cMaxAge = Box.createHorizontalStrut(3);
 
@@ -161,6 +128,8 @@ public class HumanAge {
         this.saved = false;
         this.deleted = false;
 
+        this.listSymptomAgesDeleted = new ArrayList();
+
         this.nameLabel = new JLabel(name);
         this.nameLabel.setPreferredSize(new Dimension(130, 31));
         this.nameLabel.setMaximumSize(new Dimension(130, 31));
@@ -179,6 +148,7 @@ public class HumanAge {
         this.minAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.minAgeTxt.setToolTipText("");
         this.minAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.minAgeTxt.setBackground(new Color(255, 204, 51));
 
         this.cMinAge = Box.createHorizontalStrut(3);
 
@@ -189,6 +159,7 @@ public class HumanAge {
         this.maxAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.maxAgeTxt.setToolTipText("");
         this.maxAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.maxAgeTxt.setBackground(new Color(255, 204, 51));
 
         this.cMaxAge = Box.createHorizontalStrut(3);
 
@@ -202,21 +173,41 @@ public class HumanAge {
 
         this.panel = new JPanel();
         this.panel.setPreferredSize(new Dimension(listSymptom.size() * 120, 35));
-        this.panel.setMinimumSize(new Dimension(listSymptom.size() * 120, 35));
-        this.panel.setMaximumSize(new Dimension(listSymptom.size() * 1200, 35));
+//        this.panel.setMinimumSize(new Dimension(listSymptom.size() * 120, 35));
+//        this.panel.setMaximumSize(new Dimension(listSymptom.size() * 1200, 35));
         this.panel.setBorder(BorderFactory.createEtchedBorder());
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
 
         this.cPanel = Box.createVerticalStrut(3);
 
         this.panel.add(this.nameLabel);
+        this.panel.add(this.minAgeTxt);
+        this.panel.add(this.maxAgeTxt);
+
         this.listSymptomAges = new ArrayList();
+        double sum = 0;
         for (SymptomType stn : model.getListSymptomType()) {
             SymptomAge sa = new SymptomAge(this, stn, 0, model);
             this.listSymptomAges.add(sa);
             this.panel.add(sa.getPercentageTxt());
+            sum += sa.getPercentage();
         }
 
+        if (sum != 100) {
+            this.nameLabel.setBackground(Colors.WARNINGCOLOR);
+            this.nameLabel.setIcon(Icons.WARNINGICON);
+            this.nameLabel.setToolTipText(Messages.AGEPERCENTAGEWARNING);
+            for (SymptomAge sa : this.listSymptomAges) {
+                sa.getPercentageTxt().setBackground(Colors.WARNINGCOLOR);
+            }
+        } else {
+            this.nameLabel.setBackground(Colors.WHITE);
+            this.nameLabel.setIcon(null);
+            this.nameLabel.setToolTipText(null);
+            for (SymptomAge sa : this.listSymptomAges) {
+                sa.getPercentageTxt().setBackground(Colors.WHITE);
+            }
+        }
         removeButton = new JButton("-");
         removeButton.setPreferredSize(new Dimension(40, 35));
         removeButton.setMinimumSize(new Dimension(40, 35));
@@ -227,9 +218,6 @@ public class HumanAge {
                 removeActionPerformed();
             }
         });
-
-        this.panel.add(this.minAgeTxt);
-        this.panel.add(this.maxAgeTxt);
         this.panel.add(removeButton);
     }
 
@@ -237,11 +225,75 @@ public class HumanAge {
         return cPanel;
     }
 
+    public void setEnable() {
+        this.minAgeTxt.setEnabled(true);
+        this.maxAgeTxt.setEnabled(true);
+        this.removeButton.setEnabled(true);
+        for (SymptomAge as : this.listSymptomAges) {
+            as.setEnable();
+        }
+    }
+
+    public void setDisable() {
+        this.minAgeTxt.setEnabled(false);
+        this.maxAgeTxt.setEnabled(false);
+        this.removeButton.setEnabled(false);
+        for (SymptomAge as : this.listSymptomAges) {
+            as.setDisable();
+        }
+    }
+
+    public List<SymptomAge> getListSymptomAges() {
+        return listSymptomAges;
+    }
+
+    public void setListSymptomAges(List<SymptomAge> listSymptomAges) {
+        this.listSymptomAges = listSymptomAges;
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(listSymptomAges.size() * 120 + 460, 35));
+        this.panel.setMinimumSize(new Dimension(listSymptomAges.size() * 120 + 460, 35));
+        this.panel.setMaximumSize(new Dimension(listSymptomAges.size() * 1200, 35));
+        this.panel.setBorder(BorderFactory.createEtchedBorder());
+        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
+        this.cPanel = Box.createVerticalStrut(3);
+        this.panel.add(this.nameLabel);
+        this.panel.add(this.minAgeTxt);
+        this.panel.add(this.maxAgeTxt);
+
+        double sum = 0;
+        for (SymptomAge sta : listSymptomAges) {
+            this.panel.add(sta.getPercentageTxt());
+            sum += sta.getPercentage();
+        }
+        if (sum != 100) {
+            this.nameLabel.setBackground(Colors.WARNINGCOLOR);
+            this.nameLabel.setIcon(Icons.WARNINGICON);
+            this.nameLabel.setToolTipText(Messages.AGEPERCENTAGEWARNING);
+            for (SymptomAge sa : this.listSymptomAges) {
+                sa.getPercentageTxt().setBackground(Colors.WARNINGCOLOR);
+            }
+        } else {
+            this.nameLabel.setBackground(Colors.WHITE);
+            this.nameLabel.setIcon(null);
+            this.nameLabel.setToolTipText(null);
+            for (SymptomAge sa : this.listSymptomAges) {
+                sa.getPercentageTxt().setBackground(Colors.WHITE);
+            }
+        }
+        this.panel.add(removeButton);
+    }
+
     public void setcPanel(Component cPanel) {
         this.cPanel = cPanel;
     }
 
     public void removeActionPerformed() {
+
+        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETEHUMANAGE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+
+        if (index == JOptionPane.NO_OPTION) {
+            return;
+        }
         this.setDeleted(true);
         setSaved(true);
         model.getMainFrame().setModelSavedButtonEnable();
@@ -345,13 +397,6 @@ public class HumanAge {
         this.maxAgeTxt = maxAgeTxt;
     }
 
-    /* public JTextField getPercentageTxt() {
-        return percentageTxt;
-    }
-
-    public void setPercentageTxt(JTextField percentageTxt) {
-        this.percentageTxt = percentageTxt;
-    }*/
     public JLabel getNameLabel() {
         return nameLabel;
     }
@@ -385,9 +430,10 @@ public class HumanAge {
     }
 
     public void save() {
-        System.out.println(" before delete human age min = " + minAge + " max = " + maxAge);
         if (this.isDeleted()) {
-            System.out.println("delete human age min = " + minAge + " max = " + maxAge);
+            if (this.isNew) {
+                return;
+            }
             HumanAgeController.INSTANCE.delete(this.id);
             return;
         }
@@ -407,6 +453,10 @@ public class HumanAge {
             as.setIsNew(false);
             as.setSaved(true);
         }
+
+        for (SymptomAge sa : this.listSymptomAgesDeleted) {
+            sa.save();
+        }
     }
 
     public SymptomType monteCarlo() {
@@ -420,6 +470,33 @@ public class HumanAge {
                 return sage.getSymptomType();
             }
         }
+    }
+
+    public void addSymptomType(SymptomType st) {
+        this.panel.setPreferredSize(new Dimension(listSymptomAges.size() * 120 + 500, 35));
+        this.panel.setMinimumSize(new Dimension(listSymptomAges.size() * 120 + 500, 35));
+        this.panel.setMaximumSize(new Dimension(listSymptomAges.size() * 1200, 35));
+        this.panel.remove(this.removeButton);
+        SymptomAge sa = new SymptomAge(this, st, 0.0, model);
+        this.listSymptomAges.add(sa);
+        this.panel.add(sa.getPercentageTxt());
+        this.panel.add(this.removeButton);
+        this.panel.repaint();
+    }
+
+    public void removeSymptomType(SymptomType st) {
+        SymptomAge tmp = null;
+        for (SymptomAge sa : this.listSymptomAges) {
+            if (sa.getSymptomType() == st) {
+                tmp = sa;
+                break;
+            }
+        }
+        tmp.setDeleted(true);
+        this.listSymptomAgesDeleted.add(tmp);
+        this.listSymptomAges.remove(tmp);
+        this.panel.remove(tmp.getPercentageTxt());
+        this.panel.repaint();
     }
 
     private class JTextFieldDoubleListener implements DocumentListener, FocusListener {
@@ -638,10 +715,25 @@ public class HumanAge {
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(minAge + "");
             } else {
-                minAge = d;
-                name = "between " + minAge + " and " + maxAge;
-                nameLabel.setText(name);
-                this.humanAge.setSaved(false);
+                boolean isOk = true;
+                for (HumanAge ha : model.getListHumanAge()) {
+                    if (ha.getMinAge() <= d && ha.getMaxAge() >= d && this.humanAge != ha) {
+                        isOk = false;
+                        break;
+                    }
+                }
+                if (isOk) {
+                    minAge = d;
+                    name = "between " + minAge + " and " + maxAge;
+                    nameLabel.setText(name);
+                    this.humanAge.setSaved(false);
+                } else {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberHigher, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(minAge + "");
+                }
             }
         }
 
@@ -735,10 +827,25 @@ public class HumanAge {
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(maxAge + "");
             } else {
-                maxAge = d;
-                name = "between " + minAge + " and " + maxAge;
-                nameLabel.setText(name);
-                this.humanAge.setSaved(false);
+                boolean isOk = true;
+                for (HumanAge ha : model.getListHumanAge()) {
+                    if (ha.getMinAge() <= d && ha.getMaxAge() >= d && this.humanAge != ha) {
+                        isOk = false;
+                        break;
+                    }
+                }
+                if (isOk) {
+                    maxAge = d;
+                    name = "between " + minAge + " and " + maxAge;
+                    nameLabel.setText(name);
+                    this.humanAge.setSaved(false);
+                } else {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(maxAge + "");
+                }
             }
 
         }

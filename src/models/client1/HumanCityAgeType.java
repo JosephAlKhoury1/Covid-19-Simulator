@@ -1,6 +1,7 @@
 package models.client1;
 
 import controller.controllers.HumanCityAgeContoller;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.FocusEvent;
@@ -10,6 +11,8 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,6 +20,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import resources.icon.*;
 
 public class HumanCityAgeType extends javax.swing.JPanel {
 
@@ -83,6 +87,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         this.minTxt.setMinimumSize(new Dimension(41, 31));
         this.minTxt.setMaximumSize(new Dimension(41, 31));
         this.minTxt.setHorizontalAlignment(SwingUtilities.CENTER);
+        this.minTxt.setBackground(new Color(255, 204, 51));
         this.listMin = new JTextFieldMinIntegerListener(minTxt, this);
         this.minTxt.addFocusListener(this.listMin);
         this.minTxt.getDocument().addDocumentListener(this.listMin);
@@ -92,6 +97,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         this.maxTxt.setMinimumSize(new Dimension(41, 31));
         this.maxTxt.setMaximumSize(new Dimension(41, 31));
         this.maxTxt.setHorizontalAlignment(SwingUtilities.CENTER);
+        this.maxTxt.setBackground(new Color(255, 204, 51));
         this.listMax = new JTextFieldMaxIntegerListener(maxTxt, this);
         this.maxTxt.addFocusListener(this.listMax);
         this.maxTxt.getDocument().addDocumentListener(this.listMax);
@@ -181,6 +187,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         this.minTxt.setMinimumSize(new Dimension(40, 31));
         this.minTxt.setMaximumSize(new Dimension(40, 31));
         this.minTxt.setHorizontalAlignment(SwingUtilities.CENTER);
+        this.minTxt.setBackground(new Color(255, 204, 51));
         this.listMin = new JTextFieldMinIntegerListener(minTxt, this);
         this.minTxt.addFocusListener(this.listMin);
         this.minTxt.getDocument().addDocumentListener(this.listMin);
@@ -190,6 +197,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         this.maxTxt.setMinimumSize(new Dimension(40, 31));
         this.maxTxt.setMaximumSize(new Dimension(40, 31));
         this.maxTxt.setHorizontalAlignment(SwingUtilities.CENTER);
+        this.maxTxt.setBackground(new Color(255, 204, 51));
         this.listMax = new JTextFieldMaxIntegerListener(maxTxt, this);
         this.maxTxt.addFocusListener(this.listMax);
         this.maxTxt.getDocument().addDocumentListener(this.listMax);
@@ -265,6 +273,10 @@ public class HumanCityAgeType extends javax.swing.JPanel {
 
     public JPanel getPanel() {
         return panel;
+    }
+
+    public JTextField getPercentageJtxt() {
+        return percentageJtxt;
     }
 
     public int getPlaceNumber() {
@@ -535,8 +547,24 @@ public class HumanCityAgeType extends javax.swing.JPanel {
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(min + "");
             } else {
-                min = d;
-                this.humanAge.setSaved(false);
+                boolean isOk = true;
+                for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                    if (ha.getMin() <= d && ha.getMax() >= d && this.humanAge != ha) {
+                        isOk = false;
+                        break;
+                    }
+                }
+                if (isOk) {
+                    min = d;
+                    nameLabel.setText("between " + min + " and " + max);
+                    this.humanAge.setSaved(false);
+                } else {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(city.getMainFrame(), this.numberHigher, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(min + "");
+                }
             }
         }
 
@@ -630,8 +658,24 @@ public class HumanCityAgeType extends javax.swing.JPanel {
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(max + "");
             } else {
-                max = d;
-                this.humanAge.setSaved(false);
+                boolean isOk = true;
+                for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                    if (ha.getMin() <= d && ha.getMax() >= d && ha != this.humanAge) {
+                        isOk = false;
+                        break;
+                    }
+                }
+                if (isOk) {
+                    max = d;
+                    nameLabel.setText("between " + min + " and " + max);
+                    this.humanAge.setSaved(false);
+                } else {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(city.getMainFrame(), "hello", this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(max + "");
+                }
             }
 
         }
@@ -674,13 +718,6 @@ public class HumanCityAgeType extends javax.swing.JPanel {
             }
             try {
                 Double d = Double.parseDouble(numTxt);
-                if (!insert) {
-                    this.currentString = numTxt;
-                    this.loc.setHumanPercentage(Double.parseDouble(numTxt));
-                    this.loc.getCity().getMainFrame().setCitySavedButtonEnable();
-                    this.loc.getCity().setIsSaved(false);
-                    this.loc.setSaved(false);
-                }
                 if (d > 100) {
                     Runnable doHighlight = () -> {
                         JOptionPane.showOptionDialog(this.loc.getCity().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
@@ -688,7 +725,33 @@ public class HumanCityAgeType extends javax.swing.JPanel {
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
                     this.insert = false;
+                } else if (!insert) {
+                    double totalPer = 0;
+                    this.currentString = numTxt;
+                    this.loc.setHumanPercentage(Double.parseDouble(numTxt));
+                    this.loc.getCity().getMainFrame().setCitySavedButtonEnable();
+                    this.loc.getCity().setIsSaved(false);
+                    this.loc.setSaved(false);
+                    for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                        totalPer += ha.getHumanPercentage();
+                    }
+                    if (totalPer != 100) {
+                        for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                            ha.getPercentageJtxt().setBackground(Colors.WARNINGCOLOR);
+                        }
+                        city.getCityPanel().percentageOfHumanLabel.setIcon(Icons.WARNINGICON);
+                        city.getCityPanel().percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGEWITHWARNING);
+                        city.getCityPanel().percentageOfHumanLabel.setBackground(Colors.WARNINGCOLOR);
+                    } else {
+                        for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                            ha.getPercentageJtxt().setBackground(Colors.NOWARNINGCOLOR);
+                        }
+                        city.getCityPanel().percentageOfHumanLabel.setIcon(null);
+                        city.getCityPanel().percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGE);
+                        city.getCityPanel().percentageOfHumanLabel.setBackground(Colors.NOWARNINGCOLOR);
+                    }
                 }
+
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
@@ -714,6 +777,25 @@ public class HumanCityAgeType extends javax.swing.JPanel {
             this.loc.getCity().getMainFrame().setCitySavedButtonEnable();
             this.loc.setSaved(false);
             this.loc.getCity().setIsSaved(false);
+            double totalPer = 0;
+            for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                totalPer += ha.getHumanPercentage();
+            }
+            if (totalPer != 100) {
+                for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                    ha.getPercentageJtxt().setBackground(Colors.WARNINGCOLOR);
+                }
+                city.getCityPanel().percentageOfHumanLabel.setIcon(Icons.WARNINGICON);
+                city.getCityPanel().percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGEWITHWARNING);
+                city.getCityPanel().percentageOfHumanLabel.setBackground(Colors.WARNINGCOLOR);
+            } else {
+                for (HumanCityAgeType ha : city.getListHumanAgeType()) {
+                    ha.getPercentageJtxt().setBackground(Colors.NOWARNINGCOLOR);
+                }
+                city.getCityPanel().percentageOfHumanLabel.setIcon(null);
+                city.getCityPanel().percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGE);
+                city.getCityPanel().percentageOfHumanLabel.setBackground(Colors.NOWARNINGCOLOR);
+            }
 
         }
 

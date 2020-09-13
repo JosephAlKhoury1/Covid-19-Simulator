@@ -14,6 +14,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import resources.icon.Colors;
 
 public class SymptomStageType {
 
@@ -21,19 +22,17 @@ public class SymptomStageType {
     private SymptomType symptomType;
     private SymptomStage symptomStage;
     private int day;
-    private double percentage;
 
     private Model model;
 
-    private JTextField dayTxt, percentageTxt;
+    private JTextField dayTxt;
     private JPanel panel;
 
     private boolean deleted, isNew, saved;
 
     private JTextFieldIntegerListener dayListener;
-    private JTextFieldDoubleListener percentageListener;
 
-    public SymptomStageType(SymptomType type, SymptomStage symptomStage, int day, double percentage, Model model) {
+    public SymptomStageType(SymptomType type, SymptomStage symptomStage, int day, Model model) {
         this.symptomStage = symptomStage;
         this.symptomType = type;
         this.day = day;
@@ -41,26 +40,20 @@ public class SymptomStageType {
         this.deleted = false;
         this.isNew = true;
         this.saved = false;
-        this.percentage = percentage;
-        this.percentageTxt = new JTextField(this.percentage + "");
-        this.percentageTxt.setPreferredSize(new Dimension(55, 31));
-        this.percentageTxt.setMaximumSize(new Dimension(55, 31));
-        this.percentageTxt.setMinimumSize(new Dimension(55, 31));
-        this.percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        this.percentageTxt.setToolTipText("");
-        this.percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        this.percentageListener = new JTextFieldDoubleListener(percentageTxt, this);
-        this.percentageTxt.getDocument().addDocumentListener(percentageListener);
-        this.percentageTxt.addFocusListener(percentageListener);
 
         this.dayTxt = new JTextField(this.day + "");
-        this.dayTxt.setPreferredSize(new Dimension(55, 31));
-        this.dayTxt.setMaximumSize(new Dimension(55, 31));
-        this.dayTxt.setMinimumSize(new Dimension(55, 31));
+        this.dayTxt.setPreferredSize(new Dimension(118, 31));
+        this.dayTxt.setMaximumSize(new Dimension(118, 31));
+        this.dayTxt.setMinimumSize(new Dimension(118, 31));
         this.dayTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.dayTxt.setToolTipText("");
         this.dayTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        if (this.day == 0) {
+            this.dayTxt.setBackground(Colors.LIGHTGRAY);
+        } else {
+            this.dayTxt.setBackground(Colors.WHITE);
+        }
 
         this.dayListener = new JTextFieldIntegerListener(dayTxt, this);
         this.dayTxt.getDocument().addDocumentListener(dayListener);
@@ -74,11 +67,10 @@ public class SymptomStageType {
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
 
         this.panel.add(this.dayTxt);
-        this.panel.add(this.percentageTxt);
 
     }
 
-    public SymptomStageType(int id, SymptomType symptom, SymptomStage stage, int day, double percentage, Model model) {
+    public SymptomStageType(int id, SymptomType symptom, SymptomStage stage, int day, Model model) {
         this.symptomType = symptom;
         this.symptomStage = stage;
         this.day = day;
@@ -87,26 +79,20 @@ public class SymptomStageType {
         this.deleted = false;
         this.isNew = false;
         this.saved = true;
-        this.percentage = percentage;
-        this.percentageTxt = new JTextField(this.percentage + "");
-        this.percentageTxt.setPreferredSize(new Dimension(55, 31));
-        this.percentageTxt.setMaximumSize(new Dimension(55, 31));
-        this.percentageTxt.setMinimumSize(new Dimension(55, 31));
-        this.percentageTxt.setHorizontalAlignment(SwingConstants.CENTER);
-        this.percentageTxt.setToolTipText("");
-        this.percentageTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        this.percentageListener = new JTextFieldDoubleListener(percentageTxt, this);
-        this.percentageTxt.getDocument().addDocumentListener(percentageListener);
-        this.percentageTxt.addFocusListener(percentageListener);
 
         this.dayTxt = new JTextField(this.day + "");
-        this.dayTxt.setPreferredSize(new Dimension(55, 31));
-        this.dayTxt.setMaximumSize(new Dimension(55, 31));
-        this.dayTxt.setMinimumSize(new Dimension(55, 31));
+        this.dayTxt.setPreferredSize(new Dimension(118, 31));
+        this.dayTxt.setMaximumSize(new Dimension(118, 31));
+        this.dayTxt.setMinimumSize(new Dimension(118, 31));
         this.dayTxt.setHorizontalAlignment(SwingConstants.CENTER);
         this.dayTxt.setToolTipText("");
         this.dayTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        if (this.day == 0) {
+            this.dayTxt.setBackground(Colors.LIGHTGRAY);
+        } else {
+            this.dayTxt.setBackground(Colors.WHITE);
+        }
 
         this.dayListener = new JTextFieldIntegerListener(dayTxt, this);
         this.dayTxt.getDocument().addDocumentListener(dayListener);
@@ -120,17 +106,14 @@ public class SymptomStageType {
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
 
         this.panel.add(this.dayTxt);
-        this.panel.add(this.percentageTxt);
     }
 
     public void setEnable() {
         this.dayTxt.setEnabled(true);
-        this.percentageTxt.setEnabled(true);
     }
 
     public void setDisable() {
         this.dayTxt.setEnabled(false);
-        this.percentageTxt.setEnabled(false);
     }
 
     public SymptomStage getSymptomStage() {
@@ -193,14 +176,6 @@ public class SymptomStageType {
         this.dayTxt = dayTxt;
     }
 
-    public JTextField getPercentageTxt() {
-        return percentageTxt;
-    }
-
-    public void setPercentageTxt(JTextField percentageTxt) {
-        this.percentageTxt = percentageTxt;
-    }
-
     public void setSymptomStage(SymptomStage symptomStage) {
         this.symptomStage = symptomStage;
     }
@@ -213,14 +188,6 @@ public class SymptomStageType {
         this.day = day;
     }
 
-    public double getPercentage() {
-        return percentage;
-    }
-
-    public void setPercentage(double percentage) {
-        this.percentage = percentage;
-    }
-
     public Model getModel() {
         return model;
     }
@@ -231,6 +198,9 @@ public class SymptomStageType {
 
     public void save() {
         if (this.isDeleted()) {
+            if (this.isNew) {
+                return;
+            }
             SymptomStageTypeController.INSTANCE.delete(this.id);
             return;
         }
@@ -255,12 +225,12 @@ public class SymptomStageType {
         private final String numberFormat = "Parameter have to be a number!";
         private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
-        private final SymptomStageType symptomType;
+        private final SymptomStageType symptomstageType;
 
         public JTextFieldIntegerListener(JTextField textField, SymptomStageType s) {
             this.jtextField = textField;
             this.currentString = s.getDay() + "";
-            this.symptomType = s;
+            this.symptomstageType = s;
         }
 
         private void insertZero(String s) {
@@ -278,11 +248,11 @@ public class SymptomStageType {
             String numTxt = this.jtextField.getText();
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
-                if (this.symptomType.getModel() == null) {
+                if (this.symptomstageType.getModel() == null) {
                     System.out.println("say null");
                 }
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symptomType.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symptomstageType.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -291,9 +261,9 @@ public class SymptomStageType {
             try {
                 int d = Integer.parseInt(numTxt);
                 if (!insert) {
-                    this.symptomType.setDay(d);
-                    this.symptomType.setSaved(false);
-                    this.symptomType.getModel().setSaved(false);
+                    this.symptomstageType.setDay(d);
+                    this.symptomstageType.setSaved(false);
+                    this.symptomstageType.getModel().setSaved(false);
                     symptomType.getModel().getMainFrame().setModelSavedButtonEnable();
                     this.currentString = numTxt;
                 }
@@ -301,7 +271,7 @@ public class SymptomStageType {
             } catch (NumberFormatException ex) {
                 insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symptomType.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symptomstageType.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -319,11 +289,11 @@ public class SymptomStageType {
                 return;
             }
 
-            this.symptomType.setDay(Integer.parseInt(numTxt));
-            this.symptomType.setSaved(false);
-            this.symptomType.getModel().setSaved(false);
+            this.symptomstageType.setDay(Integer.parseInt(numTxt));
+            this.symptomstageType.setSaved(false);
+            this.symptomstageType.getModel().setSaved(false);
             this.currentString = numTxt;
-            this.symptomType.getModel().getMainFrame().setModelSavedButtonEnable();
+            this.symptomstageType.getModel().getMainFrame().setModelSavedButtonEnable();
 
         }
 
@@ -344,113 +314,11 @@ public class SymptomStageType {
             } else {
                 insert = false;
             }
-        }
-
-    }
-
-    private class JTextFieldDoubleListener implements DocumentListener, FocusListener {
-
-        private final JTextField jtextField;
-        private String currentString;
-        private final String greaterMessage = "Number can't be greater 100!";
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
-        private boolean insert = false;
-        private SymptomStageType symStage;
-
-        public JTextFieldDoubleListener(JTextField textField, SymptomStageType stage) {
-            this.jtextField = textField;
-            this.currentString = stage.getPercentage() + "";
-            this.symStage = stage;
-        }
-
-        private void insertZero(String s) {
-            Runnable doHighlight = () -> {
-                jtextField.setText(s);
-            };
-            SwingUtilities.invokeLater(doHighlight);
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (numTxt.contains("f") || numTxt.contains("d")) {
-                this.insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-            }
-            try {
-                Double d = Double.parseDouble(numTxt);
-                if (!insert) {
-                    this.currentString = numTxt;
-                    this.symStage.setPercentage(Double.parseDouble(numTxt));
-                    this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
-                    this.symStage.getModel().setSaved(false);
-                    this.symStage.setSaved(false);
-                }
-                if (d > 100) {
-                    Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                    };
-                    SwingUtilities.invokeLater(doHighlight);
-                    insertZero(this.currentString);
-                    this.insert = false;
-                }
-            } catch (NumberFormatException ex) {
-                this.insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-            }
-            this.insert = false;
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            if (insert) {
-                return;
-            }
-            String s = this.jtextField.getText();
-            if (s.length() <= 0 || s.equals("")) {
-                return;
-            }
-            this.currentString = s;
-            this.symStage.setPercentage(Double.parseDouble(s));
-            this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
-            this.symStage.getModel().setSaved(false);
-            this.symStage.setSaved(false);
-
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-        }
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            insert = false;
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (numTxt.equals("")) {
-                insert = true;
-                insertZero(this.currentString);
-            } else if (numTxt.startsWith(".")) {
-                this.currentString = "0" + this.currentString;
-                insert = true;
-                insertZero(this.currentString);
-            } else if (numTxt.endsWith(".")) {
-                this.currentString = this.currentString + "0";
-                insertZero(this.currentString);
+            int d = Integer.parseInt(this.jtextField.getText());
+            if (d == 0) {
+                this.jtextField.setBackground(Colors.LIGHTGRAY);
             } else {
-                insert = false;
+                this.jtextField.setBackground(Colors.WHITE);
             }
         }
 

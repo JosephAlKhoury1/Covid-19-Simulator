@@ -1,6 +1,5 @@
 package models.model;
 
-import controller.controllers.HumanStateController;
 import controller.controllers.SymptomStageController;
 import java.awt.Color;
 import java.awt.Component;
@@ -25,6 +24,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import models.member1.Member;
+import resources.icon.Colors;
+import resources.icon.Icons;
+import resources.icon.Messages;
 import views1.MainFrame;
 
 public class SymptomStage extends JPanel {
@@ -35,7 +37,6 @@ public class SymptomStage extends JPanel {
     private int inHospital;
 
     private int dayNum;
-    private double percentageToBeInThisStage;
 
     private SymptomType symptomType;
     private double deathPercentage;
@@ -72,8 +73,6 @@ public class SymptomStage extends JPanel {
 
     private List<Member> listMember;
 
-    private final Color[] colors = {Color.ORANGE, Color.YELLOW, Color.cyan, Color.PINK, Color.MAGENTA, Color.GRAY, Color.darkGray, Color.blue};
-
     public SymptomStage(int id, String name, double immune, double death, int index, int inHospital) {
         this.name = name;
         this.id = id;
@@ -82,11 +81,9 @@ public class SymptomStage extends JPanel {
         this.immunePercentage = immune;
         this.listMember = new ArrayList();
         this.index = index;
-        if (this.index - 1 > colors.length) {
-            this.color = colors[this.index - colors.length];
-        } else {
-            this.color = colors[this.index - 1];
-        }
+
+        this.color = Colors.SYMPTOMSTAGECOLORS[index - 1];
+
         nameLabel1 = new JLabel(this.name + "");
         nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel1.setToolTipText("");
@@ -175,6 +172,21 @@ public class SymptomStage extends JPanel {
         this.saved = true;
         this.deleted = false;
 
+        double sum = this.immunePercentage + this.deathPercentage;
+        if (sum != 100) {
+            this.immunePercentageTxt.setBackground(Colors.WARNINGCOLOR);
+            this.deathPercentageTxt.setBackground(Colors.WARNINGCOLOR);
+            this.nameLabel1.setBackground(Colors.WARNINGCOLOR);
+            this.nameLabel1.setToolTipText(Messages.IMMUNEDEATHWARNINGMESSAGE);
+            this.nameLabel1.setIcon(Icons.WARNINGICON);
+        } else {
+            this.immunePercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+            this.deathPercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+            this.nameLabel1.setBackground(Colors.NOWARNINGCOLOR);
+            this.nameLabel1.setToolTipText(null);
+            this.nameLabel1.setIcon(null);
+        }
+
         statistiqueNameLabel = new JLabel();
         statistiqueNameLabel.setText(name);
         statistiqueNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -218,11 +230,7 @@ public class SymptomStage extends JPanel {
         this.immunePercentage = immunePercentage;
         this.listMember = new ArrayList();
 
-        if (this.index - 1 > colors.length) {
-            this.color = colors[this.index - colors.length];
-        } else {
-            this.color = colors[this.index - 1];
-        }
+        this.color = Colors.SYMPTOMSTAGECOLORS[index - 1];
         nameLabel1 = new JLabel(this.name + "");
         nameLabel1.setHorizontalAlignment(SwingConstants.CENTER);
         nameLabel1.setToolTipText("");
@@ -311,6 +319,21 @@ public class SymptomStage extends JPanel {
         this.saved = false;
         this.deleted = false;
 
+        double sum = this.immunePercentage + this.deathPercentage;
+        if (sum != 100) {
+            this.immunePercentageTxt.setBackground(Colors.WARNINGCOLOR);
+            this.deathPercentageTxt.setBackground(Colors.WARNINGCOLOR);
+            this.nameLabel1.setBackground(Colors.WARNINGCOLOR);
+            this.nameLabel1.setToolTipText(Messages.IMMUNEDEATHWARNINGMESSAGE);
+            this.nameLabel1.setIcon(Icons.WARNINGICON);
+        } else {
+            this.immunePercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+            this.deathPercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+            this.nameLabel1.setBackground(Colors.NOWARNINGCOLOR);
+            this.nameLabel1.setToolTipText(null);
+            this.nameLabel1.setIcon(null);
+        }
+
         statistiqueNameLabel = new JLabel();
         statistiqueNameLabel.setText(name);
         statistiqueNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -345,6 +368,12 @@ public class SymptomStage extends JPanel {
     }
 
     public void removeActionPerformed() {
+        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETESYMPTOMSTAGE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+
+        if (index == JOptionPane.NO_OPTION) {
+            return;
+        }
+        
         this.setDeleted(true);
         if (this.inHospital == 0) {
             this.model.getListSymptomStage1sNonHospital().remove(this);
@@ -657,6 +686,9 @@ public class SymptomStage extends JPanel {
 
     public void save() {
         if (this.isDeleted()) {
+            if (this.isNew) {
+                return;
+            }
             SymptomStageController.INSTANCE.delete(this.id);
             this.setSaved(true);
             this.setIsNew(false);
@@ -678,7 +710,9 @@ public class SymptomStage extends JPanel {
 
     public void save1() {
         if (this.isDeleted()) {
-            //HumanStateController.INSTANCE.delete(this.humanState.getId());
+            if (this.isNew) {
+                return;
+            }
             SymptomStageController.INSTANCE.deleteModel(this.id);
             this.setSaved(true);
             this.setIsNew(false);
@@ -874,6 +908,20 @@ public class SymptomStage extends JPanel {
                     this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
                     this.symStage.getModel().setSaved(false);
                     this.symStage.setSaved(false);
+                    double sum = immunePercentage + deathPercentage;
+                    if (sum != 100) {
+                        immunePercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                        deathPercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                        nameLabel1.setBackground(Colors.WARNINGCOLOR);
+                        nameLabel1.setToolTipText(Messages.IMMUNEDEATHWARNINGMESSAGE);
+                        nameLabel1.setIcon(Icons.WARNINGICON);
+                    } else {
+                        immunePercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                        deathPercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                        nameLabel1.setBackground(Colors.NOWARNINGCOLOR);
+                        nameLabel1.setToolTipText(null);
+                        nameLabel1.setIcon(null);
+                    }
                 }
                 if (d > 100) {
                     Runnable doHighlight = () -> {
@@ -908,7 +956,20 @@ public class SymptomStage extends JPanel {
             this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
             this.symStage.getModel().setSaved(false);
             this.symStage.setSaved(false);
-
+            double sum = immunePercentage + deathPercentage;
+            if (sum != 100) {
+                immunePercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                deathPercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                nameLabel1.setBackground(Colors.WARNINGCOLOR);
+                nameLabel1.setToolTipText(Messages.IMMUNEDEATHWARNINGMESSAGE);
+                nameLabel1.setIcon(Icons.WARNINGICON);
+            } else {
+                immunePercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                deathPercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                nameLabel1.setBackground(Colors.NOWARNINGCOLOR);
+                nameLabel1.setToolTipText(null);
+                nameLabel1.setIcon(null);
+            }
         }
 
         @Override
@@ -998,6 +1059,20 @@ public class SymptomStage extends JPanel {
                     this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
                     this.symStage.getModel().setSaved(false);
                     this.symStage.setSaved(false);
+                    double sum = immunePercentage + deathPercentage;
+                    if (sum != 100) {
+                        immunePercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                        deathPercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                        nameLabel1.setBackground(Colors.WARNINGCOLOR);
+                        nameLabel1.setToolTipText(Messages.IMMUNEDEATHWARNINGMESSAGE);
+                        nameLabel1.setIcon(Icons.WARNINGICON);
+                    } else {
+                        immunePercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                        deathPercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                        nameLabel1.setBackground(Colors.NOWARNINGCOLOR);
+                        nameLabel1.setToolTipText(null);
+                        nameLabel1.setIcon(null);
+                    }
                 }
                 if (d > 100) {
                     Runnable doHighlight = () -> {
@@ -1032,6 +1107,20 @@ public class SymptomStage extends JPanel {
             this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
             this.symStage.getModel().setSaved(false);
             this.symStage.setSaved(false);
+            double sum = immunePercentage + deathPercentage;
+            if (sum != 100) {
+                immunePercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                deathPercentageTxt.setBackground(Colors.WARNINGCOLOR);
+                nameLabel1.setBackground(Colors.WARNINGCOLOR);
+                nameLabel1.setToolTipText(Messages.IMMUNEDEATHWARNINGMESSAGE);
+                nameLabel1.setIcon(Icons.WARNINGICON);
+            } else {
+                immunePercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                deathPercentageTxt.setBackground(Colors.NOWARNINGCOLOR);
+                nameLabel1.setBackground(Colors.NOWARNINGCOLOR);
+                nameLabel1.setToolTipText(null);
+                nameLabel1.setIcon(null);
+            }
 
         }
 

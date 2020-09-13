@@ -4,6 +4,9 @@ import controller.controllers.LocationToGoController;
 import controller.locationController.CityController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import static java.awt.image.ImageObserver.HEIGHT;
+import static java.awt.image.ImageObserver.WIDTH;
+import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -13,7 +16,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -23,12 +28,15 @@ import models.model.HumanAgeName;
 import models.model.Model;
 import models.model.ReligionName;
 import models.transportation1.Transportation;
+import resources.icon.Messages;
+import tools.Excel;
 import tools.FileUtilities;
 import views.tile.Tile;
 import views.tile.TileType;
 import views1.CityPanel;
 import views1.MainFrame;
 import views1.Maps;
+import views1.model.panel.FileChooser;
 import views1.model.panel.StatistiquePanel;
 
 public class City extends UnicastRemoteObject implements ICity, Runnable, Cloneable {
@@ -82,18 +90,23 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     private Week week;
     private Day currentDay;
     private Thread thread;
-    private JMenuItem mapMenu, runMenu, pauseMenu, populationMenu;
-    private JSeparator separator, runSeparator, pauseSeparator, separatorPopulation;
+    private JMenuItem mapMenu, populationMenu;
+    // private JMenuItem runMenu, pauseMenu;
+    private JSeparator separator, separatorPopulation;
+    //private JSeparator runSeparator, pauseSeparator;
 
     private int speed = 5;
 
     private StatistiquePanel statistiquePanel;
     private List<Member> listHealth;
-    private List<Member> listSick;
     private List<Member> listDeath;
     private List<Member> listImmune;
 
     private Model model;
+
+    public CityPanel getCityPanel() {
+        return cityPanel;
+    }
 
     public City(int id, String name, int nbPopulation, int width, int height, int isMain,
             int countryId, List<HumanCityAgeType> list, List<ReligionType> listR, List<HousePopulation> listHp, List<SexeType> listSt) throws RemoteException {
@@ -131,25 +144,28 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         });
         this.separatorPopulation = new JSeparator(SwingConstants.HORIZONTAL);
 
-        this.runMenu = new JMenuItem("Run " + this.name);
-        this.runMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                start();
-            }
-        });
-
-        this.pauseMenu = new JMenuItem("Pause " + this.name);
-        this.pauseMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pause();
-            }
-        });
-
-        this.runSeparator = new JSeparator(SwingConstants.HORIZONTAL);
-        this.pauseSeparator = new JSeparator(SwingConstants.HORIZONTAL);
-
+//        this.runMenu = new JMenuItem("Run " + this.name);
+//        this.runMenu.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                if (model.isPause()) {
+//                    resume();
+//                } else {
+//                    start();
+//                }
+//            }
+//        });
+//
+//        this.pauseMenu = new JMenuItem("Pause " + this.name);
+//        this.pauseMenu.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                pause();
+//            }
+//        });
+//
+//        this.runSeparator = new JSeparator(SwingConstants.HORIZONTAL);
+//        this.pauseSeparator = new JSeparator(SwingConstants.HORIZONTAL);
         this.listHumanAgeType = list;
         this.listHumanAgeTypeDeleted = new ArrayList();
 
@@ -196,7 +212,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
         this.listHealth = new ArrayList();
         this.listDeath = new ArrayList();
-        this.listSick = new ArrayList();
         this.listImmune = new ArrayList();
 
         if (this.model != null) {
@@ -257,25 +272,29 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         });
         this.separatorPopulation = new JSeparator(SwingConstants.HORIZONTAL);
 
-        this.runMenu = new JMenuItem("Run " + this.name);
-        this.runMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                run();
-            }
-        });
-
-        this.pauseMenu = new JMenuItem("Pause " + this.name);
-        this.pauseMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                pause();
-            }
-        });
-
-        this.runSeparator = new JSeparator(SwingConstants.HORIZONTAL);
-        this.pauseSeparator = new JSeparator(SwingConstants.HORIZONTAL);
-
+//        this.runMenu = new JMenuItem("Run " + this.name);
+//        this.runMenu.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                if (model.isPause()) {
+//                    resume();
+//                } else {
+//                    start();
+//                }
+//
+//            }
+//        });
+//
+//        this.pauseMenu = new JMenuItem("Pause " + this.name);
+//        this.pauseMenu.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                pause();
+//            }
+//        });
+//
+//        this.runSeparator = new JSeparator(SwingConstants.HORIZONTAL);
+//        this.pauseSeparator = new JSeparator(SwingConstants.HORIZONTAL);
         for (ReligionName rn : this.mainFrame.getListReligionName()) {
             this.listrelReligionTypes.add(new ReligionType(rn.getName(), 100 / this.mainFrame.getListReligionName().size(), rn.getPrayLocation(), this));
         }
@@ -312,7 +331,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
         this.listHealth = new ArrayList();
         this.listDeath = new ArrayList();
-        this.listSick = new ArrayList();
         this.listImmune = new ArrayList();
 
     }
@@ -360,22 +378,24 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.mapMenu = mapMenu;
     }
 
-    public JSeparator getRunSeparator() {
-        return runSeparator;
-    }
-
+//    public JSeparator getRunSeparator() {
+//        return runSeparator;
+//    }
     public Day getCurrentDay() {
         return currentDay;
+    }
+
+    public void setCityPanel(CityPanel cityPanel) {
+        this.cityPanel = cityPanel;
     }
 
     public void setCurrentDay(Day currentDay) {
         this.currentDay = currentDay;
     }
 
-    public JSeparator getPauseSeparator() {
-        return pauseSeparator;
-    }
-
+//    public JSeparator getPauseSeparator() {
+//        return pauseSeparator;
+//    }
     public void setWidth(int width) {
         this.width = width;
     }
@@ -430,10 +450,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
     public List<Member> getListHealth() {
         return listHealth;
-    }
-
-    public List<Member> getListSick() {
-        return listSick;
     }
 
     public List<Member> getListDeath() {
@@ -714,37 +730,115 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     }
 
     public void start() {
+        this.model.setRun(true);
+        this.model.setPause(false);
+        this.model.setStop(false);
+        this.model.setFirstTimeRun(false);
         this.thread.start();
+        if (this.mainFrame.getCurrentModel() == this.model) {
+            this.mainFrame.getRunButton().setEnabled(false);
+            this.mainFrame.getPauseButton().setEnabled(true);
+            this.mainFrame.getStopButton().setEnabled(true);
+        }
+        this.model.getRunMenu().setEnabled(false);
+        this.model.getPauseMenu().setEnabled(true);
+        this.model.getStopMenu().setEnabled(true);
     }
 
     public void pause() {
+        this.model.setRun(false);
+        this.model.setPause(true);
+        this.model.setStop(false);
         this.thread.suspend();
+        if (this.mainFrame.getCurrentModel() == this.model) {
+            this.mainFrame.getRunButton().setEnabled(true);
+            this.mainFrame.getPauseButton().setEnabled(false);
+        }
+        this.model.getRunMenu().setEnabled(true);
+        this.model.getPauseMenu().setEnabled(false);
     }
 
     public void resume() {
+        this.model.setRun(true);
+        this.model.setPause(false);
+        this.model.setStop(false);
         this.thread.resume();
+        if (this.mainFrame.getCurrentModel() == this.model) {
+            this.mainFrame.getRunButton().setEnabled(false);
+            this.mainFrame.getPauseButton().setEnabled(true);
+        }
+        this.model.getRunMenu().setEnabled(false);
+        this.model.getPauseMenu().setEnabled(true);
+    }
+
+    public void stop() {
+        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.STOPRUNNING, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+        if (index == JOptionPane.NO_OPTION) {
+            return;
+        }
+        this.thread.stop();
+        this.model.setStop(true);
+        if (this.mainFrame.getCurrentModel() == this.model) {
+            this.mainFrame.getRunButton().setEnabled(false);
+            this.mainFrame.getPauseButton().setEnabled(false);
+            this.mainFrame.getStopButton().setEnabled(false);
+        }
+        this.model.getRunMenu().setEnabled(false);
+        this.model.getPauseMenu().setEnabled(false);
+        this.model.getStopMenu().setEnabled(false);
+        JFrame f = new JFrame();
+        f.setSize(700, 500);
+        f.setLocation(300, 200);
+        FileChooser cf = new FileChooser();
+        cf.setSize(700, 500);
+        int r = cf.j.showSaveDialog(cf.j);
+        f.add(cf);
+        //f.setVisible(true);
+        String ff = null;
+        if (r == cf.j.APPROVE_OPTION) {
+            ff = cf.j.getSelectedFile().getAbsolutePath();
+            ff = ff + "\\";
+            f.setVisible(false);
+            File file = null;
+
+            int o = 0;
+            while (true) {
+                if (o == 0) {
+                    file = new File(ff + this.name + " " + this.model.getModelName() + ".xls");
+                    if (!file.exists()) {
+                        break;
+                    } else {
+                        o++;
+                    }
+                } else {
+                    file = new File(ff + name + " " + this.model.getModelName() + o + ".xls");
+                    if (!file.exists()) {
+                        break;
+                    } else {
+                        o++;
+                    }
+                }
+            }
+            Excel.writeResult(file, model);
+        }
     }
 
     public Tile[][] getMap() {
         return map;
     }
 
-    public JMenuItem getRunMenu() {
-        return runMenu;
-    }
-
-    public void setRunMenu(JMenuItem runMenu) {
-        this.runMenu = runMenu;
-    }
-
-    public JMenuItem getPauseMenu() {
-        return pauseMenu;
-    }
-
-    public void setPauseMenu(JMenuItem pauseMenu) {
-        this.pauseMenu = pauseMenu;
-    }
-
+//    public JMenuItem getRunMenu() {
+//        return runMenu;
+//    }
+//    public void setRunMenu(JMenuItem runMenu) {
+//        this.runMenu = runMenu;
+//    }
+//    public JMenuItem getPauseMenu() {
+//        return pauseMenu;
+//    }
+//    public void setPauseMenu(JMenuItem pauseMenu) {
+//        this.pauseMenu = pauseMenu;
+//    }
     public List<HousePopulation> getListHousePopulations() {
         return listHousePopulations;
     }
@@ -812,7 +906,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
             try {
                 this.thread.sleep(speed);
                 week.changeTime();
-                //mainFrame.updateTime(week);
                 if (statistiquePanel != null) {
                     statistiquePanel.updateState();
                     statistiquePanel.updateTime(week);
@@ -829,8 +922,10 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
                     this.currentMap.repaint();
                 }
                 this.mainFrame.setVisible(true);
+
             } catch (InterruptedException ex) {
-                Logger.getLogger(City.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(City.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -1024,6 +1119,17 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
             this.listHealth.remove(y);
             m.setInfected(true);
         }
+        this.statistiquePanel.updateState();
+    }
+
+    public void refresh() {
+        this.listHealth.clear();
+        for (Entry<Integer, Member> e : this.listMember.entrySet()) {
+            e.getValue().refresh();
+            this.listHealth.add(e.getValue());
+        }
+        this.listDeath.clear();
+        this.listImmune.clear();
         this.statistiquePanel.updateState();
     }
 }
