@@ -1,6 +1,5 @@
 package views1.model.panel;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -30,7 +29,6 @@ import models.model.SymptomStage;
 import models.model.SymptomType;
 import resources.icon.Colors;
 import views1.MainFrame;
-import views1.model.dialog.ManageHumanAgeDistributionDialog;
 import views1.model.dialog.ManageSymptomStagesDialog;
 import views1.model.dialog.ManageSymptomTypeDialog;
 
@@ -356,7 +354,7 @@ public class ModelPanel extends javax.swing.JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //mainframe.closeModel(this.mp.getModel());
+            mainframe.closeModel(this.mp.getModel());
             int i = pane.indexOfComponent(mp);
             pane.removeTabAt(i);
             mainframe.removeGenerateLocationMenu(currentModel.getMapMenu());

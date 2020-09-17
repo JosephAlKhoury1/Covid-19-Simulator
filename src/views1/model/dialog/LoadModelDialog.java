@@ -1,26 +1,22 @@
-package views.dialog1;
+package views1.model.dialog;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import views1.LoadCityPanel;
 import views1.MainFrame;
+import views1.model.panel.LoadModelPanel;
 
-/**
- *
- * @author Joseph
- */
-public class LoadCityDialog extends JDialog {
+public class LoadModelDialog extends JDialog {
 
     MainFrame frame;
 
-    public LoadCityDialog(MainFrame rf) {
-        super(new JFrame(), "Load city");
+    public LoadModelDialog(MainFrame rf) {
+        super(new JFrame(), "Load model");
         this.frame = rf;
         this.setAlwaysOnTop(true);
         this.setLocation(370, 150);
-        this.setSize(427, 335);
+        this.setSize(470, 300);
         this.setResizable(false);
         addWindowListener(new WindowAdapter() {
 
@@ -29,8 +25,6 @@ public class LoadCityDialog extends JDialog {
                 frame.setEnabled(true);
             }
         });
-        this.add(new LoadCityPanel(frame, this));
-
+        this.add(new LoadModelPanel(frame, this));
     }
-
 }

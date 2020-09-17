@@ -20,7 +20,7 @@ public class NewCityDialog extends JDialog {
         this.frame = rf;
         this.setAlwaysOnTop(true);
         this.setLocation(370, 150);
-        this.setSize(460, 200);
+        this.setSize(405, 345);
         this.setResizable(false);
         addWindowListener(new WindowAdapter() {
 

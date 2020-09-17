@@ -373,7 +373,7 @@ public class SymptomStage extends JPanel {
         if (index == JOptionPane.NO_OPTION) {
             return;
         }
-        
+
         this.setDeleted(true);
         if (this.inHospital == 0) {
             this.model.getListSymptomStage1sNonHospital().remove(this);
@@ -902,7 +902,14 @@ public class SymptomStage extends JPanel {
             }
             try {
                 Double d = Double.parseDouble(numTxt);
-                if (!insert) {
+                if (d > 100) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(this.currentString);
+                    this.insert = false;
+                } else if (!insert) {
                     this.currentString = numTxt;
                     this.symStage.setDeathPercentage(Double.parseDouble(numTxt));
                     this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
@@ -923,14 +930,7 @@ public class SymptomStage extends JPanel {
                         nameLabel1.setIcon(null);
                     }
                 }
-                if (d > 100) {
-                    Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                    };
-                    SwingUtilities.invokeLater(doHighlight);
-                    insertZero(this.currentString);
-                    this.insert = false;
-                }
+
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
@@ -1053,7 +1053,14 @@ public class SymptomStage extends JPanel {
             }
             try {
                 Double d = Double.parseDouble(numTxt);
-                if (!insert) {
+                if (d > 100) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(this.currentString);
+                    this.insert = false;
+                } else if (!insert) {
                     this.currentString = numTxt;
                     this.symStage.setImmunePercentage(Double.parseDouble(numTxt));
                     this.symStage.getModel().getMainFrame().setModelSavedButtonEnable();
@@ -1074,14 +1081,7 @@ public class SymptomStage extends JPanel {
                         nameLabel1.setIcon(null);
                     }
                 }
-                if (d > 100) {
-                    Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                    };
-                    SwingUtilities.invokeLater(doHighlight);
-                    insertZero(this.currentString);
-                    this.insert = false;
-                }
+
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {

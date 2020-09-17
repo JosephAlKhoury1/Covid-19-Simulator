@@ -4,8 +4,6 @@ import controller.controllers.LocationToGoController;
 import controller.locationController.CityController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import static java.awt.image.ImageObserver.HEIGHT;
-import static java.awt.image.ImageObserver.WIDTH;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

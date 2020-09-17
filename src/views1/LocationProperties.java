@@ -17,7 +17,6 @@ public class LocationProperties extends javax.swing.JPanel {
         this.nameLabel1.setText(lc.getName());
         this.kindLabel1.setText(lc.getKind());
         this.quantityLabel1.setText(lc.getQuantity() + "");
-        this.percentageLabel1.setText(lc.getPercentageToBeSick() + "");
 
         String[] tab = lc.getDays().split(" ");
         for (String s : tab) {
@@ -59,11 +58,6 @@ public class LocationProperties extends javax.swing.JPanel {
                 this.closeTimeBox.setSelectedIndex(i);
             }
         }
-        if (lc.getFixedLocation() == 1) {
-            this.fixedJComboBox.setSelected(true);
-        } else {
-            this.fixedJComboBox.setSelected(false);
-        }
         first = false;
     }
 
@@ -79,9 +73,6 @@ public class LocationProperties extends javax.swing.JPanel {
         kindLabel1 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         quantityLabel1 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        percentageLabel1 = new javax.swing.JLabel();
-        fixedJComboBox = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         mondayBox = new javax.swing.JCheckBox();
         tuesdayBox = new javax.swing.JCheckBox();
@@ -118,51 +109,26 @@ public class LocationProperties extends javax.swing.JPanel {
         quantityLabel1.setText("0");
         quantityLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel9.setText("Percentage to sick:");
-
-        percentageLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        percentageLabel1.setText("50");
-        percentageLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        fixedJComboBox.setText("Fixed location");
-        fixedJComboBox.setToolTipText("");
-        fixedJComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fixedJComboBoxActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(quantityLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(percentageLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
-                                .addGap(102, 102, 102))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(kindLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
-                                    .addComponent(nameLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jLabel8)
+                        .addGap(18, 18, 18)
+                        .addComponent(quantityLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(fixedJComboBox)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(nameLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(kindLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -179,13 +145,7 @@ public class LocationProperties extends javax.swing.JPanel {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(quantityLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(percentageLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fixedJComboBox)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(67, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -252,21 +212,20 @@ public class LocationProperties extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(sundayBox)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(thursdayBox)
-                            .addComponent(mondayBox))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tuesdayBox)
-                            .addComponent(fridayBox))
-                        .addGap(10, 10, 10)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(saturdayBox)
-                            .addComponent(wednesdayBox))))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addComponent(mondayBox)
+                .addGap(10, 10, 10)
+                .addComponent(tuesdayBox)
+                .addGap(10, 10, 10)
+                .addComponent(wednesdayBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(thursdayBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(fridayBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(saturdayBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(sundayBox)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -275,14 +234,12 @@ public class LocationProperties extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(mondayBox)
                     .addComponent(tuesdayBox)
-                    .addComponent(wednesdayBox))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(wednesdayBox)
                     .addComponent(thursdayBox)
                     .addComponent(fridayBox)
-                    .addComponent(saturdayBox))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sundayBox))
+                    .addComponent(saturdayBox)
+                    .addComponent(sundayBox))
+                .addGap(46, 46, 46))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -330,7 +287,7 @@ public class LocationProperties extends javax.swing.JPanel {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(2, 2, 2)
                         .addComponent(closeTimeBox)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -350,10 +307,10 @@ public class LocationProperties extends javax.swing.JPanel {
                 .addComponent(jLabel7)
                 .addGap(0, 0, 0)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -435,19 +392,9 @@ public class LocationProperties extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_closeTimeBoxActionPerformed
 
-    private void fixedJComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedJComboBoxActionPerformed
-        if (this.fixedJComboBox.isSelected()) {
-            this.locationCategory.setFixedLocation(1);
-        } else {
-            this.locationCategory.setFixedLocation(0);
-        }
-
-    }//GEN-LAST:event_fixedJComboBoxActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> closeTimeBox;
-    private javax.swing.JCheckBox fixedJComboBox;
     private javax.swing.JCheckBox fridayBox;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -455,7 +402,6 @@ public class LocationProperties extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel5;
@@ -463,7 +409,6 @@ public class LocationProperties extends javax.swing.JPanel {
     private javax.swing.JCheckBox mondayBox;
     private javax.swing.JLabel nameLabel1;
     private javax.swing.JComboBox<String> openTimeBox;
-    private javax.swing.JLabel percentageLabel1;
     private javax.swing.JLabel quantityLabel1;
     private javax.swing.JCheckBox saturdayBox;
     private javax.swing.JCheckBox sundayBox;

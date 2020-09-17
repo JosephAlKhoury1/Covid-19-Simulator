@@ -1,5 +1,6 @@
 package views1;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -52,10 +53,16 @@ public class CityPanel extends javax.swing.JPanel {
         this.currentCity = city;
         this.currentCity.setMainFrame(mainFrame);
         this.button = new ButtonTilte(this);
-        this.currentLocationListPanel = new LocationListPanel(this.mainFrame, this);
 
         this.listMaps = new ArrayList();
         this.initComponents();
+        this.locationPanel.setLayout(new BorderLayout());
+        this.locationPropertiesPanel.setLayout(new BorderLayout());
+
+        this.currentLocationListPanel = new LocationListPanel(this.mainFrame, this);
+        this.locationPanel.removeAll();
+        this.currentLocationListPanel.setSize(this.locationPanel.getSize());
+        this.locationPanel.add(this.currentLocationListPanel);
 
         this.sexePanel.setLayout(new BoxLayout(this.sexePanel, BoxLayout.Y_AXIS));
         this.religionPanel.setLayout(new BoxLayout(this.religionPanel, BoxLayout.Y_AXIS));
@@ -137,9 +144,17 @@ public class CityPanel extends javax.swing.JPanel {
             Logger.getLogger(CityPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.button = new ButtonTilte(this);
-        this.currentLocationListPanel = new LocationListPanel(this.mainFrame, this);
         this.listMaps = new ArrayList();
         this.initComponents();
+        this.currentLocationListPanel = new LocationListPanel(this.mainFrame, this);
+
+        this.locationPanel.setLayout(new BorderLayout());
+
+        this.locationPanel.removeAll();
+        this.currentLocationListPanel.setSize(this.locationPanel.getSize());
+        this.locationPanel.add(this.currentLocationListPanel);
+
+        this.locationPropertiesPanel.setLayout(new BorderLayout());
 
         this.sexePanel.setLayout(new BoxLayout(this.sexePanel, BoxLayout.Y_AXIS));
         this.religionPanel.setLayout(new BoxLayout(this.religionPanel, BoxLayout.Y_AXIS));
@@ -231,6 +246,10 @@ public class CityPanel extends javax.swing.JPanel {
         return button;
     }
 
+    public JPanel getLocationPropertiesPanel() {
+        return locationPropertiesPanel;
+    }
+
     public LocationListPanel getCurrentLocationListPanel() {
         return currentLocationListPanel;
     }
@@ -312,6 +331,7 @@ public class CityPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane5 = new javax.swing.JScrollPane();
         jPanel5 = new javax.swing.JPanel();
         jPanel47 = new javax.swing.JPanel();
@@ -374,6 +394,9 @@ public class CityPanel extends javax.swing.JPanel {
         stayHomePerTxt = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         populationLabel = new javax.swing.JLabel();
+        jPanel17 = new javax.swing.JPanel();
+        locationPanel = new javax.swing.JPanel();
+        locationPropertiesPanel = new javax.swing.JPanel();
 
         jPanel5.setBackground(new java.awt.Color(255, 255, 51));
         jPanel5.setPreferredSize(new java.awt.Dimension(900, 1000));
@@ -628,7 +651,7 @@ public class CityPanel extends javax.swing.JPanel {
         );
         housePopulationPanelLayout.setVerticalGroup(
             housePopulationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 168, Short.MAX_VALUE)
+            .addGap(0, 185, Short.MAX_VALUE)
         );
 
         jScrollPane3.setViewportView(housePopulationPanel);
@@ -707,7 +730,7 @@ public class CityPanel extends javax.swing.JPanel {
         );
         sexePanelLayout.setVerticalGroup(
             sexePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 149, Short.MAX_VALUE)
+            .addGap(0, 159, Short.MAX_VALUE)
         );
 
         jScrollPane2.setViewportView(sexePanel);
@@ -811,7 +834,7 @@ public class CityPanel extends javax.swing.JPanel {
         );
         religionPanelLayout.setVerticalGroup(
             religionPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 166, Short.MAX_VALUE)
+            .addGap(0, 183, Short.MAX_VALUE)
         );
 
         jScrollPane6.setViewportView(religionPanel);
@@ -847,9 +870,9 @@ public class CityPanel extends javax.swing.JPanel {
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
-            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
+            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
         );
 
         jPanel7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -994,12 +1017,13 @@ public class CityPanel extends javax.swing.JPanel {
                         .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel47, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1007,20 +1031,63 @@ public class CityPanel extends javax.swing.JPanel {
                     .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 84, Short.MAX_VALUE))
-                .addContainerGap(192, Short.MAX_VALUE))
+                .addContainerGap(164, Short.MAX_VALUE))
         );
 
         jScrollPane5.setViewportView(jPanel5);
+
+        jTabbedPane1.addTab("Properties", null, jScrollPane5, "");
+
+        locationPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        javax.swing.GroupLayout locationPanelLayout = new javax.swing.GroupLayout(locationPanel);
+        locationPanel.setLayout(locationPanelLayout);
+        locationPanelLayout.setHorizontalGroup(
+            locationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 296, Short.MAX_VALUE)
+        );
+        locationPanelLayout.setVerticalGroup(
+            locationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 848, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout locationPropertiesPanelLayout = new javax.swing.GroupLayout(locationPropertiesPanel);
+        locationPropertiesPanel.setLayout(locationPropertiesPanelLayout);
+        locationPropertiesPanelLayout.setHorizontalGroup(
+            locationPropertiesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 759, Short.MAX_VALUE)
+        );
+        locationPropertiesPanelLayout.setVerticalGroup(
+            locationPropertiesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
+        jPanel17.setLayout(jPanel17Layout);
+        jPanel17Layout.setHorizontalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel17Layout.createSequentialGroup()
+                .addComponent(locationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(locationPropertiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel17Layout.setVerticalGroup(
+            jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(locationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(locationPropertiesPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Locations", null, jPanel17, "");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 1070, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 880, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 880, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1167,6 +1234,7 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
@@ -1182,6 +1250,9 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel locationPanel;
+    private javax.swing.JPanel locationPropertiesPanel;
     private javax.swing.JPanel locationToGoPanel;
     public javax.swing.JLabel percentageOfHumanLabel;
     private javax.swing.JLabel populationLabel;

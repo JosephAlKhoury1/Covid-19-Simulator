@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.model.HumanAge;
@@ -27,7 +29,7 @@ public class ModelController {
             + " where ismain = 1";
     private final String selectAll = "select id, name "
             + " from models ";
-    private final String select = "select name, ismain"
+    private final String select = "select name"
             + " from models "
             + " where id = ?";
     private final String setModelNonMain = "update models"
@@ -106,7 +108,7 @@ public class ModelController {
                     st.setListSage(SymptomStageTypeController.INSTANCE.selectAll(st, listSS));
                 }
                 for (HumanAge ha : listHA) {
-                  ha.setListSymptomAges(HumanAgeSymptomController.INSTANCE.selectAll(ha, listS));
+                    ha.setListSymptomAges(HumanAgeSymptomController.INSTANCE.selectAll(ha, listS));
                 }
                 list.add(new Model(set.getInt(1), set.getString(2), listS, listSS, listHA));
             }
@@ -134,5 +136,45 @@ public class ModelController {
         } catch (SQLException ex) {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public Map<Integer, String> selectAll() {
+        try {
+            Map<Integer, String> list = new HashMap();
+            ResultSet set = this.selectAllStatement.executeQuery();
+            while (set.next()) {
+                list.put(set.getInt(1), set.getString(2));
+            }
+            set.close();
+            return list;
+        } catch (SQLException ex) {
+            Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public Model select(int id) {
+        try {
+            this.selectStatement.setInt(1, id);
+            ResultSet set = this.selectStatement.executeQuery();
+            Model m = null;
+            while (set.next()) {
+                List<SymptomStage> listSS = SymptomStageController.INSTANCE.selectAllModel(id);
+                List<SymptomType> listS = SymptomsController.INSTANCE.selectAllSymptom(id);
+                List<HumanAge> listHA = HumanAgeController.INSTANCE.selectAll(id);
+                for (SymptomType st : listS) {
+                    st.setListSage(SymptomStageTypeController.INSTANCE.selectAll(st, listSS));
+                }
+                for (HumanAge ha : listHA) {
+                    ha.setListSymptomAges(HumanAgeSymptomController.INSTANCE.selectAll(ha, listS));
+                }
+                m = new Model(id, set.getString(1), listS, listSS, listHA);
+            }
+            setModelMain(id);
+            return m;
+        } catch (SQLException ex) {
+            Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }
