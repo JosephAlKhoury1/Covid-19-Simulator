@@ -271,13 +271,6 @@ public class LocationToGo {
             }
             try {
                 Double d = Double.parseDouble(numTxt);
-                if (!insert) {
-                    this.currentString = numTxt;
-                    this.loc.setPercentage(Double.parseDouble(numTxt));
-                    this.loc.getAgeType().getCity().getMainFrame().setCitySavedButtonEnable();
-                    this.loc.getAgeType().getCity().setIsSaved(false);
-                    this.loc.setSaved(false);
-                }
                 if (d > 100) {
                     Runnable doHighlight = () -> {
                         JOptionPane.showOptionDialog(this.loc.getAgeType().getCity().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
@@ -285,7 +278,14 @@ public class LocationToGo {
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
                     this.insert = false;
+                } else if (!insert) {
+                    this.currentString = numTxt;
+                    this.loc.setPercentage(Double.parseDouble(numTxt));
+                    this.loc.getAgeType().getCity().getMainFrame().setCitySavedButtonEnable();
+                    this.loc.getAgeType().getCity().setIsSaved(false);
+                    this.loc.setSaved(false);
                 }
+
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {

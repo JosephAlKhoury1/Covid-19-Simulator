@@ -21,12 +21,12 @@ public class HospitalController {
 
     public static final HospitalController INSTANCE = new HospitalController();
 
-    private final String insert = "insert into hospital(name, x, y, width, height, sickPercentage, fixed, openTime, closeTime, days, locationCategoryId)"
-            + " values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+    private final String insert = "insert into hospital(name, x, y, width, height, sickPercentage, locationCategoryId)"
+            + " values(?, ?, ?, ?, ?, ?, ?) ";
     private final String update = "update hospital"
-            + " set sickPercentage = ?, fixed = ?, set days= ?, set openTime = ?, set closeTime = ?"
+            + " set sickPercentage = ?"
             + " where id = ? ";
-    private final String selectAll = "select id, name, x, y, width, height, sickPercentage, fixed, openTime, closeTime, days, locationCategoryId"
+    private final String selectAll = "select id, name, x, y, width, height, sickPercentage"
             + " from hospital"
             + " where locationCategoryId = ? ";
 
@@ -59,11 +59,7 @@ public class HospitalController {
             this.insertStatement.setInt(4, c.getWidth());
             this.insertStatement.setInt(5, c.getHeight());
             this.insertStatement.setDouble(6, c.getAverage_sick());
-            this.insertStatement.setInt(7, c.getFixedLocation());
-            this.insertStatement.setInt(8, c.getOpenTime());
-            this.insertStatement.setInt(9, c.getCloseTime());
-            this.insertStatement.setString(10, c.getDays());
-            this.insertStatement.setInt(11, c.getLocationCategoryId());
+            this.insertStatement.setInt(7, c.getLocationCategoryId());
             this.insertStatement.executeUpdate();
             ResultSet generatedKeys = this.insertStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -79,11 +75,7 @@ public class HospitalController {
     public boolean update(Hospital c) {
         try {
             this.updateStatement.setDouble(1, c.getAverage_sick());
-            this.updateStatement.setInt(2, c.getFixedLocation());
-            this.updateStatement.setString(3, c.getDays());
-            this.updateStatement.setInt(4, c.getOpenTime());
-            this.updateStatement.setInt(5, c.getCloseTime());
-            this.updateStatement.setInt(6, c.getId());
+            this.updateStatement.setInt(2, c.getId());
             this.updateStatement.executeUpdate();
             return true;
         } catch (SQLException ex) {
@@ -99,7 +91,7 @@ public class HospitalController {
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
                 Hospital h = new Hospital(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4),
-                        set.getInt(5), set.getInt(6), set.getDouble(7), set.getInt(8), set.getInt(9), set.getInt(10), set.getString(11), set.getInt(12),c);
+                        set.getInt(5), set.getInt(6), set.getDouble(7),categoryId,c);
                 list.add(h);
             }
             set.close();

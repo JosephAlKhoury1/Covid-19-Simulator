@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.client1.City;
+import models.location1.DayRow;
 import models.location1.Location;
 import models.location1.LocationCategory;
 
@@ -19,12 +20,12 @@ public class LocationCategoryController {
 
     public static final LocationCategoryController INSTANCE = new LocationCategoryController();
 
-    private final String insert = "insert into locationcategories(name, kind, quantity, percentageToBeSick, days, openTime, closeTime, fixed, cityid)"
-            + " values(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private final String insert = "insert into locationcategories(name, kind, quantity, percentageToBeSick,  cityid)"
+            + " values(?, ?, ?, ?, ?)";
     private final String update = "update locationcategories "
-            + " set name = ? , kind = ?, quantity = ?, percentageToBeSick = ?, days= ?, openTime = ?, closeTime = ?, fixed = ? "
+            + " set name = ? , kind = ?, quantity = ?, percentageToBeSick = ?"
             + " where id = ?";
-    private final String selectAll = "select id, name, kind, quantity, percentageToBeSick, days, openTime, closeTime, fixed"
+    private final String selectAll = "select id, name, kind, quantity, percentageToBeSick"
             + " from locationcategories "
             + " where cityid = ? ";
 
@@ -54,11 +55,7 @@ public class LocationCategoryController {
             this.insertStatement.setString(2, lc.getKind());
             this.insertStatement.setInt(3, lc.getQuantity());
             this.insertStatement.setDouble(4, lc.getPercentageToBeSick());
-            this.insertStatement.setString(5, lc.getDays());
-            this.insertStatement.setInt(6, lc.getOpenTime());
-            this.insertStatement.setInt(7, lc.getCloseTime());
-            this.insertStatement.setInt(8, lc.getFixedLocation());
-            this.insertStatement.setInt(9, lc.getCityId());
+            this.insertStatement.setInt(5, lc.getCityId());
             this.insertStatement.executeUpdate();
             ResultSet generatedKeys = this.insertStatement.getGeneratedKeys();
             if (generatedKeys.next()) {
@@ -77,11 +74,7 @@ public class LocationCategoryController {
             this.updateStatement.setString(2, lc.getKind());
             this.updateStatement.setInt(3, lc.getQuantity());
             this.updateStatement.setDouble(4, lc.getPercentageToBeSick());
-            this.updateStatement.setString(5, lc.getDays());
-            this.updateStatement.setInt(6, lc.getOpenTime());
-            this.updateStatement.setInt(7, lc.getCloseTime());
-            this.updateStatement.setInt(8, lc.getFixedLocation());
-            this.updateStatement.setInt(9, lc.getId());
+            this.updateStatement.setInt(5, lc.getId());
             this.updateStatement.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(LocationCategoryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -140,8 +133,10 @@ public class LocationCategoryController {
                             break;
                     }
                 }
-                LocationCategory lc = new LocationCategory(set.getInt(1), set.getString(2), set.getString(3), set.getDouble(5), set.getString(6), set.getInt(4),
-                        set.getInt(7), set.getInt(8), set.getInt(9), city, listLoc);
+                LocationCategory lc = new LocationCategory(set.getInt(1), set.getString(2), set.getString(3), set.getDouble(5), set.getInt(4),
+                        city, listLoc);
+                List<DayRow> listDay = DayRowController.INSTANCE.selectAll(lc);
+                lc.setListDayRow(listDay);
                 list.put(set.getString(2), lc);
             }
             set.close();

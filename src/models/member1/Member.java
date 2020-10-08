@@ -19,6 +19,7 @@ import static models.client1.MonteCarlo.uniformFixedSeed;
 import models.client1.SexeType;
 import models.location1.House;
 import models.location1.Location;
+import models.location1.TimeRow;
 import models.model.SymptomStage;
 import models.model.SymptomStageType;
 import models.model.SymptomType;
@@ -36,24 +37,19 @@ public abstract class Member implements Serializable, Cloneable {
     protected Tile myTile;
     protected int age;
     protected SexeType sexeType;
-    protected Map<Location, Integer> listLocation;
-    protected List<Location> listLocDeleted;
     protected int locationIndex;
-    protected Location currentLocationToGo = null;
     protected Tile currentTile;
     protected Maps map;
     protected CityPanel cityPanel;
     protected List<Tile> listTileWaked = new ArrayList();
     protected HumanCityAgeType humanAgeType;
-    protected int numberLocationToGo;
     protected Day day;
     protected Location school = null;
     protected Location university = null;
-    protected Entry<Location, Integer> workPlace = null;
-    protected List<LocationToGo> listDeleted;
+    protected Location hospital = null;
+    protected Location work1;
     protected int hourInLocation = 0;
     protected int hour;
-    protected int[] hourIn = {1, 2, 3, 4};
 
     protected boolean infected = false;
     protected int dayInfected = 0;
@@ -64,18 +60,36 @@ public abstract class Member implements Serializable, Cloneable {
     protected Color color;
     protected boolean immune = false, death = false;
 
+    protected boolean goWork = false;
+    protected boolean goUniversity = false;
+    protected boolean goSchool = false;
+
+    protected SpecifiedLocation sch;
+    protected SpecifiedLocation univ;
+    protected SpecifiedLocation wor;
+
+    protected boolean worker = false;
+    protected Map<String, Boolean> mapIfGo;
+    protected LocationLinkedList listLocatioOfDay;
+    protected SpecifiedLocation currentLocationGo;
+
+    protected boolean canMove = true;
+
+    protected int step = 6;
+
     public Member(int id, int x, int y, House ownHouse, City city) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.city = city;
         this.ownHouse = ownHouse;
-        this.listLocation = new HashMap();
-        this.listLocDeleted = new ArrayList();
+
         this.currentTile = this.city.getTile(x, y);
         this.day = city.getWeek().getMONDAY();
         this.hour = city.getWeek().getHour();
         this.infected = false;
+        this.mapIfGo = new HashMap();
+        this.listLocatioOfDay = new LocationLinkedList(this.ownHouse);
     }
 
     public Member(int x, int y, House ownHouse, City city) {
@@ -84,12 +98,11 @@ public abstract class Member implements Serializable, Cloneable {
         this.ownHouse = ownHouse;
         this.city = city;
         this.myTile = city.getTile(x, y);
-        this.listLocDeleted = new ArrayList();
-        this.listLocation = new HashMap();
         this.day = city.getWeek().getMONDAY();
         this.hour = city.getWeek().getHour();
         this.infected = false;
-
+        this.mapIfGo = new HashMap();
+        this.listLocatioOfDay = new LocationLinkedList(this.ownHouse);
     }
 
     public Member() {
@@ -101,31 +114,23 @@ public abstract class Member implements Serializable, Cloneable {
 
     public void setDay(Day day) {
         this.day = day;
-        if (this.workPlace != null) {
-            this.workPlace.setValue(this.workPlace.getKey().getWorkTime());
-        }
-        this.listLocation.clear();
-        int o = this.numberLocationToGo;
-        while (o > 0) {
-            Location loc = city.getRandomLocation();
-            if (loc != null && this.workPlace != loc && !this.listLocation.containsKey(loc)) {
-                int index = MonteCarlo.getNextInt(this.hourIn.length);
-                this.listLocation.put(loc, this.hourIn[index]);
-                o--;
-            }
-        }
-        getLocationToGo();
+        initiateLocationToGo(day.getDay().getName());
     }
 
     public void refresh() {
         this.setInfected(false);
         this.dayInfected = 0;
+        this.infected = false;
         this.stageNum = 0;
         this.stage = null;
         if (this.symptomStageType != null) {
             this.symptomStageType.getSymptomStage().getListMember().remove(this);
         }
         this.symptomStageType = null;
+        this.x = this.ownHouse.getX();
+        this.y = this.ownHouse.getY();
+        this.currentLocationGo.getLocation().getListMember().remove(this);
+        this.ownHouse.getListMember().add(this);
         color = Color.green;
     }
 
@@ -137,12 +142,14 @@ public abstract class Member implements Serializable, Cloneable {
         if (this.isInfected()) {
             return;
         }
-        this.infected = infected;
-        this.symptomStageType = this.symptomType.getListSage().get(0);
-        this.stage = this.symptomStageType.getSymptomStage();
-        this.stage.getListMember().add(this);
-        this.city.getListHealth().remove(this);
-        this.color = this.stage.getColor();
+        if (this.symptomType != null && !this.immune && !this.death) {
+            this.infected = infected;
+            this.symptomStageType = this.symptomType.getListSage().get(0);
+            this.stage = this.symptomStageType.getSymptomStage();
+            this.stage.getListMember().add(this);
+            this.city.getModel().getListHealth().remove(this);
+            this.color = this.stage.getColor();
+        }
     }
 
     public int getId() {
@@ -246,7 +253,9 @@ public abstract class Member implements Serializable, Cloneable {
     public void setHour(int hour) {
         this.hour = hour;
         this.hourInLocation++;
-        checkChangeLocaion();
+        if (this.currentLocationGo != null) {
+            this.currentLocationGo.checkToGoNext(hour, this);
+        }
     }
 
     public void setX(int x) {
@@ -261,9 +270,27 @@ public abstract class Member implements Serializable, Cloneable {
         this.y = y;
     }
 
-    public void move(boolean dayChanged) {
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public void move(String day) {
         if (this.isInfected() && !this.immune && !this.death) {
             this.dayInfected++;
+            if (this.stage != null) {
+                if (this.stage.getInHospital() == 1) {
+                    this.canMove = false;
+                    if (this.hospital != null) {
+                        this.currentLocationGo = new SpecifiedLocation(this.hospital, "hospital");
+                    } else {
+                        this.currentLocationGo = new SpecifiedLocation(this.ownHouse, "house");
+                    }
+                }
+            }
             if (this.dayInfected > this.symptomStageType.getDay()) {
                 this.stageNum++;
                 this.dayInfected = 0;
@@ -296,13 +323,18 @@ public abstract class Member implements Serializable, Cloneable {
                             if (index == 0) {
                                 this.color = Color.CYAN;
                                 this.stage.getListMember().remove(this);
-                                this.city.getListImmune().add(this);
+                                this.city.getModel().getListImmune().add(this);
                                 this.setImmune(true);
+                                this.canMove = true;
+                                this.currentLocationGo.getLocation().getListMember().remove(this);
+                                this.initiateLocationToGo(this.day.getDay().getName());
                             } else {
                                 this.color = Colors.BLACK;
                                 this.stage.getListMember().remove(this);
-                                this.city.getListDeath().add(this);
+                                this.city.getModel().getListDeath().add(this);
                                 this.setDeath(true);
+                                this.currentLocationGo.getLocation().getListMember().remove(this);
+                                //this.city.getListMember().remove(this.getId());
                             }
                             break;
                         }
@@ -312,54 +344,43 @@ public abstract class Member implements Serializable, Cloneable {
             }
         }
 
-        if (this.currentLocationToGo == null) {
+        if (this.currentLocationGo == null) {
             return;
         }
-        if (this.listLocation.isEmpty()) {
+        if (this.listLocatioOfDay.isEmpty()) {
             return;
         }
         if (currentTile == null) {
             currentTile = this.city.getTile(this.x, this.y);
         }
-        final int step = 6;
-        boolean containX = currentLocationToGo.containX(this.x);
-        boolean containY = currentLocationToGo.containY(this.y);
+        boolean containX = currentLocationGo.getLocation().containX(this.x);
+        boolean containY = currentLocationGo.getLocation().containY(this.y);
 
         if (containX && containY) {
-            this.currentLocationToGo.getListMember().add(this);
-            /*boolean containSick = false;
-            for (Member m : this.currentLocationToGo.getListMember()) {
-                if (m.isInfected()) {
-                    containSick = true;
-                    break;
+            if (!this.currentLocationGo.getLocation().getListMember().contains(this)) {
+                this.currentLocationGo.getLocation().getListMember().add(this);
+            }
+            if (this.isInfected() && canMove) {
+                for (Member m : this.currentLocationGo.getLocation().getListMember()) {
+                    if (m != this) {
+                        boolean canInfect = MonteCarlo.checkProb(this.currentLocationGo.getLocation().getPercentageToBeSick());
+                        if (canInfect) {
+                            m.setInfected(true);
+                        }
+                    }
                 }
             }
-            if (containSick) {
-                boolean isSick = false;
-                isSick = MonteCarlo.checkProb(this.currentLocationToGo.getPercentageToBeSick());
-                if (isSick) {
-                    this.setInfected(true);
-                }
-            }*/
-            if (this.isInfected()) {
-                int listMemberSize = this.currentLocationToGo.getListMember().size();
-                int toInfect = (int) this.currentLocationToGo.getPercentageToBeSick() * listMemberSize / 100;
-                for (int i = 0; i < toInfect; i++) {
-                    int index = MonteCarlo.getNextInt(this.currentLocationToGo.getListMember().size());
-                    this.currentLocationToGo.getListMember().get(index).setInfected(true);
-                }
-            }
-            checkChangeLocaion();
+            this.currentLocationGo = this.currentLocationGo.checkToGoNext(this.city.getWeek().getCurrentDay().getHour(), this);
         }
 
-        if (this.currentLocationToGo.isHigherX(this.x)) {
+        if (this.currentLocationGo.getLocation().isHigherX(this.x)) {
             this.x -= step;
-        } else if (this.currentLocationToGo.isSmallerX(this.x)) {
+        } else if (this.currentLocationGo.getLocation().isSmallerX(this.x)) {
             this.x += step;
         } else {
-            if (this.currentLocationToGo.isHigherY(this.y)) {
+            if (this.currentLocationGo.getLocation().isHigherY(this.y)) {
                 this.y -= step;
-            } else if (this.currentLocationToGo.isSmallerY(this.y)) {
+            } else if (this.currentLocationGo.getLocation().isSmallerY(this.y)) {
                 this.y += step;
             } else {
 
@@ -369,6 +390,16 @@ public abstract class Member implements Serializable, Cloneable {
 
     public void move() {
         if (this.isInfected() && !this.immune && !this.death) {
+            if (this.stage != null) {
+                if (this.stage.getInHospital() == 1) {
+                    this.canMove = false;
+                    if (this.hospital != null) {
+                        this.currentLocationGo = new SpecifiedLocation(this.hospital, "hospital");
+                    } else {
+                        this.currentLocationGo = new SpecifiedLocation(this.ownHouse, "house");
+                    }
+                }
+            }
             if (this.dayInfected > this.symptomStageType.getDay()) {
                 this.stageNum++;
                 this.dayInfected = 0;
@@ -401,13 +432,18 @@ public abstract class Member implements Serializable, Cloneable {
                             if (index == 0) {
                                 this.color = Color.CYAN;
                                 this.stage.getListMember().remove(this);
-                                this.city.getListImmune().add(this);
+                                this.city.getModel().getListImmune().add(this);
                                 this.setImmune(true);
+                                this.canMove = true;
+                                this.currentLocationGo.getLocation().getListMember().remove(this);
+                                this.initiateLocationToGo(this.day.getDay().getName());
                             } else {
                                 this.color = Colors.BLACK;
                                 this.stage.getListMember().remove(this);
-                                this.city.getListDeath().add(this);
+                                this.city.getModel().getListDeath().add(this);
                                 this.setDeath(true);
+                                this.currentLocationGo.getLocation().getListMember().remove(this);
+                                this.city.getListMember().remove(this.getId());
                             }
                             break;
                         }
@@ -416,58 +452,46 @@ public abstract class Member implements Serializable, Cloneable {
 
             }
         }
-        if (this.currentLocationToGo
-                == null) {
+        if (this.currentLocationGo == null) {
             return;
         }
 
-        if (this.listLocation.isEmpty()) {
+        if (this.listLocatioOfDay.isEmpty()) {
             return;
         }
+
         if (currentTile == null) {
             currentTile = this.city.getTile(this.x, this.y);
         }
-        final int step = 6;
-        boolean containX = currentLocationToGo.containX(this.x);
-        boolean containY = currentLocationToGo.containY(this.y);
+
+        boolean containX = currentLocationGo.getLocation().containX(this.x);
+        boolean containY = currentLocationGo.getLocation().containY(this.y);
 
         if (containX && containY) {
-            this.currentLocationToGo.getListMember().add(this);
-            /*boolean containSick = false;
-            for (Member m : this.currentLocationToGo.getListMember()) {
-                if (m.isInfected()) {
-                    containSick = true;
-                    break;
+            if (!this.currentLocationGo.getLocation().getListMember().contains(this)) {
+                this.currentLocationGo.getLocation().getListMember().add(this);
+            }
+            if (this.isInfected() && canMove) {
+                for (Member m : this.currentLocationGo.getLocation().getListMember()) {
+                    if (m != this) {
+                        boolean canInfect = MonteCarlo.checkProb(this.currentLocationGo.getLocation().getPercentageToBeSick());
+                        if (canInfect) {
+                            m.setInfected(true);
+                        }
+                    }
                 }
             }
-            if (containSick) {
-                boolean isSick = false;
-                isSick = MonteCarlo.checkProb(this.currentLocationToGo.getPercentageToBeSick());
-                if (isSick) {
-                    this.setInfected(true);
-                }
-            }*/
-            if (this.isInfected()) {
-                int listMemberSize = this.currentLocationToGo.getListMember().size();
-                int toInfect = (int) this.currentLocationToGo.getPercentageToBeSick() * listMemberSize / 100;
-                for (int i = 0; i < toInfect; i++) {
-                    int index = MonteCarlo.getNextInt(this.currentLocationToGo.getListMember().size());
-                    this.currentLocationToGo.getListMember().get(index).setInfected(true);
-                }
-            }
-            checkChangeLocaion();
+            this.currentLocationGo = this.currentLocationGo.checkToGoNext(this.city.getWeek().getCurrentDay().getHour(), this);
         }
 
-        if (this.currentLocationToGo.isHigherX(
-                this.x)) {
+        if (this.currentLocationGo.getLocation().isHigherX(this.x)) {
             this.x -= step;
-        } else if (this.currentLocationToGo.isSmallerX(
-                this.x)) {
+        } else if (this.currentLocationGo.getLocation().isSmallerX(this.x)) {
             this.x += step;
         } else {
-            if (this.currentLocationToGo.isHigherY(this.y)) {
+            if (this.currentLocationGo.getLocation().isHigherY(this.y)) {
                 this.y -= step;
-            } else if (this.currentLocationToGo.isSmallerY(this.y)) {
+            } else if (this.currentLocationGo.getLocation().isSmallerY(this.y)) {
                 this.y += step;
             } else {
 
@@ -475,118 +499,16 @@ public abstract class Member implements Serializable, Cloneable {
         }
     }
 
-    public void checkChangeLocaion() {
-        if (this.currentLocationToGo != null) {
-            if (this.currentLocationToGo == this.school) {
-                if (this.currentLocationToGo.getCloseTime() == this.city.getWeek().getHour()) {
-                    getLocationToGo();
-                    this.currentLocationToGo.getListMember().remove(this);
-                } else {
-                    return;
-                }
-            }
-            if (this.currentLocationToGo == this.university) {
-                if (this.currentLocationToGo.getCloseTime() == this.city.getWeek().getHour()) {
-                    getLocationToGo();
-                    this.currentLocationToGo.getListMember().remove(this);
-                } else {
-                    return;
-                }
-            }
-            if (this.workPlace != null) {
-                if (this.currentLocationToGo == this.workPlace.getKey()) {
-                    if (this.workPlace.getValue() == 0 || this.currentLocationToGo.getCloseTime() <= this.city.getWeek().getHour()) {
-                        getLocationToGo();
-                        this.currentLocationToGo.getListMember().remove(this);
-                    } else {
-                        this.workPlace.setValue(this.workPlace.getValue() - 1);
-                        return;
-                    }
-                }
-            }
-            if (this.listLocation.containsKey(this.currentLocationToGo)) {
-                if (this.listLocation.get(this.currentLocationToGo) == 0 || this.currentLocationToGo.getCloseTimeToVisit() == this.city.getWeek().getHour()) {
-                    //this.listLocation.remove(this.currentLocationToGo);
-                    getLocationToGo();
-                    this.currentLocationToGo.getListMember().remove(this);
-                } else {
-                    this.listLocation.put(this.currentLocationToGo, (this.listLocation.get(this.currentLocationToGo) - 1));
-                    return;
-                }
-            }
-            if (this.currentLocationToGo == this.ownHouse) {
-                getLocationToGo();
-                this.currentLocationToGo.getListMember().remove(this);
-            }
-        } else {
-            getLocationToGo();
-        }
+    public SpecifiedLocation getCurrentLocationGo() {
+        return currentLocationGo;
     }
 
-    public void getLocationToGo() {
-        if (this.school != null) {
-            if (this.school.getListDay().contains(this.city.getWeek().getCurrentDay())) {
-                if (this.school.getOpenTime() == this.city.getWeek().getCurrentDay().getHour() + 1) {
-                    this.currentLocationToGo = this.school;
-                    this.hourInLocation = 0;
-                    return;
-                }
-            }
-        }
-        if (this.university != null) {
-            if (this.university.getListDay().contains(this.city.getWeek().getCurrentDay())) {
-                if (this.university.getOpenTime() == this.city.getWeek().getCurrentDay().getHour() + 1
-                        && this.university.getCloseTime() >= this.city.getWeek().getCurrentDay().getHour() + 5) {
-                    this.currentLocationToGo = this.university;
-                    this.hourInLocation = 0;
-                    return;
-                }
-            }
-        }
-        if (this.workPlace != null) {
-            if (this.workPlace.getKey().getListDay().contains(this.city.getWeek().getCurrentDay())) {
-                if (this.workPlace.getKey().getOpenTime() == this.city.getWeek().getCurrentDay().getHour() + 1
-                        && this.workPlace.getKey().getCloseTime() >= this.city.getWeek().getCurrentDay().getHour()
-                        && this.workPlace.getValue() > 0) {
-                    this.currentLocationToGo = this.workPlace.getKey();
-                    this.hourInLocation = 0;
-                    return;
-                }
-            }
-        }
-        if (this.listLocation.size() > 0) {
-            for (Entry<Location, Integer> e : this.listLocation.entrySet()) {
-                if (e.getKey().getOpenTimeToVisit() <= this.city.getWeek().getHour() + 1
-                        && e.getKey().getCloseTimeToVisit() >= this.city.getWeek().getHour() + e.getValue()
-                        && e.getValue() > 0) {
-                    this.currentLocationToGo = e.getKey();
-                    this.hourInLocation = 0;
-                    return;
-                } else {
-                    this.currentLocationToGo = this.ownHouse;
-                    this.hourInLocation = 0;
-                    return;
-                }
-                /*} else {
-                    i++;
-                }*/
-            }
-        } else {
-            this.currentLocationToGo = this.ownHouse;
-            this.hourInLocation = 0;
-        }
+    public void setCurrentLocationGo(SpecifiedLocation currentLocationGo) {
+        this.currentLocationGo = currentLocationGo;
     }
 
     public HumanCityAgeType getHumanAgeType() {
         return humanAgeType;
-    }
-
-    public Location getCurrentLocationToGo() {
-        return currentLocationToGo;
-    }
-
-    public void setCurrentLocationToGo(Location currentLocationToGo) {
-        this.currentLocationToGo = currentLocationToGo;
     }
 
     public void setHumanAgeType(HumanCityAgeType humanAgeType) {
@@ -605,30 +527,21 @@ public abstract class Member implements Serializable, Cloneable {
         return university;
     }
 
-    public Map<Location, Integer> getListLocation() {
-        return listLocation;
-    }
-
-    public void setListLocation(Map<Location, Integer> listLocation) {
-        this.listLocation = listLocation;
+    public LocationLinkedList getListLocatioOfDay() {
+        return listLocatioOfDay;
     }
 
     public void setUniversity(Location university) {
         this.university = university;
     }
 
-    public Location getWorkPlace() {
-        if (this.workPlace != null) {
-            return workPlace.getKey();
-        } else {
-            return null;
-        }
+    public Location getWork1() {
+        return work1;
     }
 
     @Override
     public Object clone() throws CloneNotSupportedException {
         Member m = (Member) super.clone();
-        m.listLocation = new HashMap();
         return m;
     }
 
@@ -644,5 +557,39 @@ public abstract class Member implements Serializable, Cloneable {
                     .getName()).log(Level.SEVERE, null, ex);
         }
         return m;
+    }
+
+    public void initiateLocationToGo(String day) {
+        this.listLocatioOfDay.clear();
+
+        SpecifiedLocation speScho = null;
+        SpecifiedLocation speUni = null;
+        SpecifiedLocation speWo = null;
+        List<SpecifiedLocation> list = new ArrayList();
+
+        if (this.school != null) {
+            speScho = new SpecifiedLocation(this.school, day, 1);
+        }
+        if (this.university != null) {
+            speUni = new SpecifiedLocation(this.university, day, 1);
+        }
+        if (this.work1 != null) {
+            speWo = new SpecifiedLocation(this.work1, day, 1);
+        }
+        for (Entry<String, Boolean> e : this.mapIfGo.entrySet()) {
+            if (e.getValue()) {
+                Location l = this.city.getLocationDay(e.getKey(), day);
+                if (l != null) {
+                    SpecifiedLocation spec = new SpecifiedLocation(l, day, 0);
+                    list.add(spec);
+
+                }
+            }
+        }
+        this.listLocatioOfDay.add1(list, speScho, speUni, speWo, this.currentLocationGo);
+
+        if (this.listLocatioOfDay.getFirst() != null) {
+            this.currentLocationGo = this.listLocatioOfDay.getFirst();
+        }
     }
 }

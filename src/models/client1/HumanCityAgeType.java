@@ -11,8 +11,6 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -29,7 +27,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
     private String name;
     private int min;
     private int max;
-    private int placeNumber;
+    //private int placeNumber;
     private double workPercentage;
 
     private double humanPercentage;
@@ -45,19 +43,19 @@ public class HumanCityAgeType extends javax.swing.JPanel {
 
     private JPanel panel;
     private JLabel nameLabel;
-    private JTextField minTxt, maxTxt, percentageJtxt, placeNumberTxt, workPercentageTxt;
+    private JTextField minTxt, maxTxt, percentageJtxt,  workPercentageTxt;//,placeNumberTxt;
     private JPanel locPanel;
     private JTextFieldMinIntegerListener listMin;
     private JTextFieldMaxIntegerListener listMax;
     private JTextFieldDoubleListener listPer;
     private JTextFieldDoubleListener1 workListener;
-    private JTextFieldIntegerListener placeListener;
+   // private JTextFieldIntegerListener placeListener;
 
-    public HumanCityAgeType(String name, int min, int max, double percentage, int place, double workPercentage, City city) {
+    public HumanCityAgeType(String name, int min, int max, double percentage,  double workPercentage, City city) {
         this.name = name;
         this.min = min;
         this.max = max;
-        this.placeNumber = place;
+        //this.placeNumber = place;
         this.workPercentage = workPercentage;
         this.isNew = true;
         this.saved = false;
@@ -111,14 +109,14 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         this.percentageJtxt.addFocusListener(this.listPer);
         this.percentageJtxt.getDocument().addDocumentListener(this.listPer);
 
-        this.placeNumberTxt = new JTextField(this.placeNumber + "");
-        this.placeNumberTxt.setPreferredSize(new Dimension(121, 31));
-        this.placeNumberTxt.setMinimumSize(new Dimension(121, 31));
-        this.placeNumberTxt.setMaximumSize(new Dimension(121, 31));
-        this.placeNumberTxt.setHorizontalAlignment(SwingUtilities.CENTER);
-        this.placeListener = new JTextFieldIntegerListener(this.placeNumberTxt, this);
-        this.placeNumberTxt.addFocusListener(this.placeListener);
-        this.placeNumberTxt.getDocument().addDocumentListener(this.placeListener);
+//        this.placeNumberTxt = new JTextField(this.placeNumber + "");
+//        this.placeNumberTxt.setPreferredSize(new Dimension(121, 31));
+//        this.placeNumberTxt.setMinimumSize(new Dimension(121, 31));
+//        this.placeNumberTxt.setMaximumSize(new Dimension(121, 31));
+//        this.placeNumberTxt.setHorizontalAlignment(SwingUtilities.CENTER);
+//        this.placeListener = new JTextFieldIntegerListener(this.placeNumberTxt, this);
+//        this.placeNumberTxt.addFocusListener(this.placeListener);
+//        this.placeNumberTxt.getDocument().addDocumentListener(this.placeListener);
 
         this.workPercentageTxt = new JTextField(this.workPercentage + "");
         this.workPercentageTxt.setPreferredSize(new Dimension(121, 31));
@@ -133,7 +131,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         panel.add(this.minTxt);
         panel.add(this.maxTxt);
         panel.add(this.percentageJtxt);
-        panel.add(this.placeNumberTxt);
+       // panel.add(this.placeNumberTxt);
         panel.add(this.workPercentageTxt);
         panel.add(Box.createHorizontalStrut(3));
 
@@ -144,28 +142,33 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         locPanel.setLayout(new BoxLayout(this.locPanel, BoxLayout.X_AXIS));
 
         for (String s : Data.tabLocation) {
-            this.listLocationToGoName.add(s);
-            LocationToGo lt = new LocationToGo(s, 0.0, this);
-            listLocationToGo.add(lt);
-            this.locPanel.add(lt.getPercentageTxt());
-            this.locPanel.add(lt.getcPercentage());
+            if (!s.equals("House")) {
+                this.listLocationToGoName.add(s);
+                LocationToGo lt = new LocationToGo(s, 0.0, this);
+                listLocationToGo.add(lt);
+                this.locPanel.add(lt.getPercentageTxt());
+                this.locPanel.add(lt.getcPercentage());
+            }
         }
         this.panel.add(this.locPanel);
     }
 
-    public HumanCityAgeType(int id, String name, int min, int max, double percentage, int place, double workPercentage, List<LocationToGo> list, List<String> listN) {
+    public HumanCityAgeType(int id, String name, int min, int max, double percentage, double workPercentage, List<LocationToGo> list, List<String> listN) {
         this.id = id;
         this.name = name;
         this.min = min;
         this.max = max;
-        this.placeNumber = place;
+       // this.placeNumber = place;
         this.workPercentage = workPercentage;
         this.isNew = false;
         this.saved = true;
         this.deleted = false;
         this.humanPercentage = percentage;
+        
         this.listLocationToGoName = listN;
         this.listLocationToGo = list;
+        
+        
         this.listLocationAdd = new ArrayList();
         this.listLocationDeleted = new ArrayList();
         panel = new JPanel();
@@ -211,14 +214,14 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         this.percentageJtxt.addFocusListener(this.listPer);
         this.percentageJtxt.getDocument().addDocumentListener(this.listPer);
 
-        this.placeNumberTxt = new JTextField(this.placeNumber + "");
-        this.placeNumberTxt.setPreferredSize(new Dimension(121, 31));
-        this.placeNumberTxt.setMinimumSize(new Dimension(121, 31));
-        this.placeNumberTxt.setMaximumSize(new Dimension(121, 31));
-        this.placeNumberTxt.setHorizontalAlignment(SwingUtilities.CENTER);
-        this.placeListener = new JTextFieldIntegerListener(this.placeNumberTxt, this);
-        this.placeNumberTxt.addFocusListener(this.placeListener);
-        this.placeNumberTxt.getDocument().addDocumentListener(this.placeListener);
+//        this.placeNumberTxt = new JTextField(this.placeNumber + "");
+//        this.placeNumberTxt.setPreferredSize(new Dimension(121, 31));
+//        this.placeNumberTxt.setMinimumSize(new Dimension(121, 31));
+//        this.placeNumberTxt.setMaximumSize(new Dimension(121, 31));
+//        this.placeNumberTxt.setHorizontalAlignment(SwingUtilities.CENTER);
+//        this.placeListener = new JTextFieldIntegerListener(this.placeNumberTxt, this);
+//        this.placeNumberTxt.addFocusListener(this.placeListener);
+//        this.placeNumberTxt.getDocument().addDocumentListener(this.placeListener);
 
         this.workPercentageTxt = new JTextField(this.workPercentage + "");
         this.workPercentageTxt.setPreferredSize(new Dimension(121, 31));
@@ -233,7 +236,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         panel.add(this.minTxt);
         panel.add(this.maxTxt);
         panel.add(this.percentageJtxt);
-        panel.add(this.placeNumberTxt);
+       // panel.add(this.placeNumberTxt);
         panel.add(this.workPercentageTxt);
         panel.add(Box.createHorizontalStrut(3));
 
@@ -279,13 +282,13 @@ public class HumanCityAgeType extends javax.swing.JPanel {
         return percentageJtxt;
     }
 
-    public int getPlaceNumber() {
-        return placeNumber;
-    }
-
-    public void setPlaceNumber(int placeNumber) {
-        this.placeNumber = placeNumber;
-    }
+//    public int getPlaceNumber() {
+//        return placeNumber;
+//    }
+//
+//    public void setPlaceNumber(int placeNumber) {
+//        this.placeNumber = placeNumber;
+//    }
 
     public double getWorkPercentage() {
         return workPercentage;
@@ -786,6 +789,7 @@ public class HumanCityAgeType extends javax.swing.JPanel {
                     ha.getPercentageJtxt().setBackground(Colors.WARNINGCOLOR);
                 }
                 city.getCityPanel().percentageOfHumanLabel.setIcon(Icons.WARNINGICON);
+                
                 city.getCityPanel().percentageOfHumanLabel.setToolTipText(Messages.PERCENTAGEOFHUMANHAVINTHISAGEWITHWARNING);
                 city.getCityPanel().percentageOfHumanLabel.setBackground(Colors.WARNINGCOLOR);
             } else {
@@ -936,100 +940,100 @@ public class HumanCityAgeType extends javax.swing.JPanel {
 
     }
 
-    private class JTextFieldIntegerListener implements DocumentListener, FocusListener {
-
-        private JTextField jtextField;
-        private String currentString;
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
-        private boolean insert = false;
-        private final HumanCityAgeType human;
-
-        public JTextFieldIntegerListener(JTextField textField, HumanCityAgeType s) {
-            this.jtextField = textField;
-            this.currentString = s.getPlaceNumber() + "";
-            this.human = s;
-        }
-
-        private void insertZero(String s) {
-            Runnable doHighlight = new Runnable() {
-                @Override
-                public void run() {
-                    jtextField.setText(s);
-                }
-            };
-            SwingUtilities.invokeLater(doHighlight);
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (numTxt.contains("f") || numTxt.contains("d")) {
-                this.insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.human.getCity().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-                return;
-            }
-            try {
-                int d = Integer.parseInt(numTxt);
-                if (!insert) {
-                    this.human.setPlaceNumber(d);
-                    this.human.setSaved(false);
-                    this.human.getCity().setIsSaved(false);
-                    this.human.getCity().getMainFrame().setCitySavedButtonEnable();
-                    this.currentString = numTxt;
-                }
-
-            } catch (NumberFormatException ex) {
-                insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.human.getCity().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-            }
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (insert) {
-                return;
-            }
-            String s = this.jtextField.getText();
-            if (s.length() <= 0 || s.equals("")) {
-                return;
-            }
-
-            this.human.setPlaceNumber(Integer.parseInt(numTxt));
-            this.human.setSaved(false);
-            this.human.getCity().setIsSaved(false);
-            this.human.getCity().getMainFrame().setCitySavedButtonEnable();
-            this.currentString = numTxt;
-
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-        }
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            insert = false;
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            if (this.jtextField.getText().equals("")) {
-                insert = true;
-                insertZero(this.currentString);
-            } else {
-                insert = false;
-            }
-        }
-
-    }
+//    private class JTextFieldIntegerListener implements DocumentListener, FocusListener {
+//
+//        private JTextField jtextField;
+//        private String currentString;
+//        private final String numberFormat = "Parameter have to be a number!";
+//        private final String badNumberValueTitle = "Bad Parameter";
+//        private boolean insert = false;
+//        private final HumanCityAgeType human;
+//
+//        public JTextFieldIntegerListener(JTextField textField, HumanCityAgeType s) {
+//            this.jtextField = textField;
+//            this.currentString = s.getPlaceNumber() + "";
+//            this.human = s;
+//        }
+//
+//        private void insertZero(String s) {
+//            Runnable doHighlight = new Runnable() {
+//                @Override
+//                public void run() {
+//                    jtextField.setText(s);
+//                }
+//            };
+//            SwingUtilities.invokeLater(doHighlight);
+//        }
+//
+//        @Override
+//        public void insertUpdate(DocumentEvent e) {
+//            String numTxt = this.jtextField.getText();
+//            if (numTxt.contains("f") || numTxt.contains("d")) {
+//                this.insert = true;
+//                Runnable doHighlight = () -> {
+//                    JOptionPane.showOptionDialog(this.human.getCity().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+//                };
+//                SwingUtilities.invokeLater(doHighlight);
+//                insertZero(this.currentString);
+//                return;
+//            }
+//            try {
+//                int d = Integer.parseInt(numTxt);
+//                if (!insert) {
+//                    this.human.setPlaceNumber(d);
+//                    this.human.setSaved(false);
+//                    this.human.getCity().setIsSaved(false);
+//                    this.human.getCity().getMainFrame().setCitySavedButtonEnable();
+//                    this.currentString = numTxt;
+//                }
+//
+//            } catch (NumberFormatException ex) {
+//                insert = true;
+//                Runnable doHighlight = () -> {
+//                    JOptionPane.showOptionDialog(this.human.getCity().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+//                };
+//                SwingUtilities.invokeLater(doHighlight);
+//                insertZero(this.currentString);
+//            }
+//        }
+//
+//        @Override
+//        public void removeUpdate(DocumentEvent e) {
+//            String numTxt = this.jtextField.getText();
+//            if (insert) {
+//                return;
+//            }
+//            String s = this.jtextField.getText();
+//            if (s.length() <= 0 || s.equals("")) {
+//                return;
+//            }
+//
+//            this.human.setPlaceNumber(Integer.parseInt(numTxt));
+//            this.human.setSaved(false);
+//            this.human.getCity().setIsSaved(false);
+//            this.human.getCity().getMainFrame().setCitySavedButtonEnable();
+//            this.currentString = numTxt;
+//
+//        }
+//
+//        @Override
+//        public void changedUpdate(DocumentEvent e) {
+//        }
+//
+//        @Override
+//        public void focusGained(FocusEvent e) {
+//            insert = false;
+//        }
+//
+//        @Override
+//        public void focusLost(FocusEvent e) {
+//            if (this.jtextField.getText().equals("")) {
+//                insert = true;
+//                insertZero(this.currentString);
+//            } else {
+//                insert = false;
+//            }
+//        }
+//
+//    }
 }

@@ -19,17 +19,17 @@ import models.model.SymptomType;
 public class ModelController {
 
     public final static ModelController INSTANCE = new ModelController();
-    private final String insertModel = "insert into models(name, ismain)"
-            + " values(?, ?)";
+    private final String insertModel = "insert into models(name, ismain, infectedNumber, runTime)"
+            + " values(?, ?, ?, ?)";
     private final String updateModel = "update models"
-            + " set name = ?"
+            + " set name = ?, infectedNumber = ?, runTime = ?"
             + " where id = ?";
-    private final String selectAllMain = "select id, name"
+    private final String selectAllMain = "select id, name, infectedNumber, runTime"
             + " from models"
             + " where ismain = 1";
     private final String selectAll = "select id, name "
             + " from models ";
-    private final String select = "select name"
+    private final String select = "select name, infectedNumber, runTime"
             + " from models "
             + " where id = ?";
     private final String setModelNonMain = "update models"
@@ -66,6 +66,8 @@ public class ModelController {
         try {
             this.insertStatement.setString(1, m.getModelName());
             this.insertStatement.setInt(2, 1);
+            this.insertStatement.setInt(3, m.getInfectedNumber());
+            this.insertStatement.setInt(4, m.getRunTime());
             int affectedRows = this.insertStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating model failed, no rows affected.");
@@ -84,7 +86,9 @@ public class ModelController {
     public boolean updateModel(Model m) {
         try {
             this.updateStatement.setString(1, m.getModelName());
-            this.updateStatement.setInt(2, m.getModelId());
+            this.updateStatement.setInt(2, m.getInfectedNumber());
+            this.updateStatement.setInt(3, m.getRunTime());
+            this.updateStatement.setInt(4, m.getModelId());
             int affectedRows = this.updateStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("update model failed, no rows affected.");
@@ -110,7 +114,7 @@ public class ModelController {
                 for (HumanAge ha : listHA) {
                     ha.setListSymptomAges(HumanAgeSymptomController.INSTANCE.selectAll(ha, listS));
                 }
-                list.add(new Model(set.getInt(1), set.getString(2), listS, listSS, listHA));
+                list.add(new Model(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4), listS, listSS, listHA));
             }
             set.close();
             return list;
@@ -168,7 +172,7 @@ public class ModelController {
                 for (HumanAge ha : listHA) {
                     ha.setListSymptomAges(HumanAgeSymptomController.INSTANCE.selectAll(ha, listS));
                 }
-                m = new Model(id, set.getString(1), listS, listSS, listHA);
+                m = new Model(id, set.getString(1), set.getInt(2), set.getInt(3), listS, listSS, listHA);
             }
             setModelMain(id);
             return m;

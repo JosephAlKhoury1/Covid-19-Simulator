@@ -1,5 +1,6 @@
 package views1.model.panel;
 
+import chart.LineChartEx;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import models.client1.Week;
@@ -9,27 +10,22 @@ import models.model.SymptomStage;
 public class StatistiquePanel extends javax.swing.JPanel {
 
     private Model model;
+    LineChartEx chart;
 
     public StatistiquePanel(Model model) {
         initComponents();
         this.model = model;
+        this.chartPanel.setLayout(new BoxLayout(this.chartPanel, BoxLayout.Y_AXIS));
         this.modelNameLabel.setText(model.getModelName());
-        this.healthLabel.setText(model.getCity().getListHealth().size() + "");
-        this.immuneLabel.setText(model.getCity().getListImmune().size() + "");
-        this.deathLabel.setText(model.getCity().getListDeath().size() + "");
+        this.healthLabel.setText(model.getListHealth().size() + "");
+        this.immuneLabel.setText(model.getListImmune().size() + "");
+        this.deathLabel.setText(model.getListDeath().size() + "");
 
         this.weekLabel.setText(model.getCity().getWeek().getWeekNumber() + "");
         this.dayLabel.setText(model.getCity().getWeek().getCurrentDay().getDay().getName());
         this.hourLabel.setText(model.getCity().getWeek().getCurrentDay().getHour() + "");
 
         this.stagePanel.setLayout(new BoxLayout(this.stagePanel, BoxLayout.Y_AXIS));
-
-        if (this.model.getListSymptomStage1sNonHospital() == null) {
-            System.out.println("null non hospital");
-        }
-        if (this.model.getListSymptomStage1sHospital() == null) {
-            System.out.println("null hospital");
-        }
         int he = (this.model.getListSymptomStage1sNonHospital().size() + this.model.getListSymptomStage1sHospital().size()) * 27;
         this.stagePanel.setPreferredSize(new Dimension(299, he));
         this.stagePanel.setMaximumSize(new Dimension(299, he));
@@ -41,6 +37,10 @@ public class StatistiquePanel extends javax.swing.JPanel {
         for (SymptomStage ss : this.model.getListSymptomStage1sHospital()) {
             this.stagePanel.add(ss.getStatistiquePanel());
         }
+
+        chart = new LineChartEx(this.model);
+        this.chartPanel.add(chart);
+
     }
 
     public void updateTime(Week week) {
@@ -50,15 +50,27 @@ public class StatistiquePanel extends javax.swing.JPanel {
     }
 
     public void updateState() {
-        this.healthLabel.setText(this.model.getCity().getListHealth().size() + "");
-        this.immuneLabel.setText(this.model.getCity().getListImmune().size() + "");
-        this.deathLabel.setText(this.model.getCity().getListDeath().size() + "");
+        this.healthLabel.setText(this.model.getListHealth().size() + "");
+        this.immuneLabel.setText(this.model.getListImmune().size() + "");
+        this.deathLabel.setText(this.model.getListDeath().size() + "");
         for (SymptomStage ss : model.getListSymptomStage1sNonHospital()) {
             ss.updateStatistique();
         }
         for (SymptomStage ss : model.getListSymptomStage1sHospital()) {
             ss.updateStatistique();
         }
+    }
+
+    public void initChart() {
+        this.chart.init();
+    }
+
+    public LineChartEx getChart() {
+        return chart;
+    }
+
+    public void setChart(LineChartEx chart) {
+        this.chart = chart;
     }
 
     @SuppressWarnings("unchecked")
@@ -136,7 +148,7 @@ public class StatistiquePanel extends javax.swing.JPanel {
         );
         stagePanelLayout.setVerticalGroup(
             stagePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 220, Short.MAX_VALUE)
+            .addGap(0, 334, Short.MAX_VALUE)
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -208,7 +220,7 @@ public class StatistiquePanel extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(stagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                .addComponent(stagePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
                 .addGap(0, 0, 0)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
@@ -221,11 +233,11 @@ public class StatistiquePanel extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
 
         chartPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -240,7 +252,7 @@ public class StatistiquePanel extends javax.swing.JPanel {
         );
         chartPanelLayout.setVerticalGroup(
             chartPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 280, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -302,19 +314,17 @@ public class StatistiquePanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chartPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 808, Short.MAX_VALUE)
+                    .addComponent(jSeparator1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(modelNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(34, 34, 34)
-                                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addComponent(modelNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -326,9 +336,10 @@ public class StatistiquePanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chartPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(chartPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 

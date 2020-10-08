@@ -97,8 +97,8 @@ public class Messages {
 
     public static String newCityHelpMessage() {
         if (Messages.currantLanguage.equals(Messages.EngLang)) {
-            return "<html><p>Create new city. Specify the name<br/>"
-                    + "name can't be null or begin with space.";
+            return "<html><p>Create new city. Specify the name.<br/>"
+                    + "Name can't be null or begin with space.";
         } else {
             return "";
         }
@@ -127,13 +127,111 @@ public class Messages {
             return "";
         }
     }
-    
-     public static String loadCityHelpMessage() {
+
+    public static String loadCityHelpMessage() {
         if (Messages.currantLanguage.equals(Messages.EngLang)) {
             return "Choose the city you want to open.";
         } else {
             return "";
         }
     }
+
+    public static String runTimeEqual0() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "The run time is 0! \n"
+                    + "This will cause unlimited run time.";
+        } else {
+            return "";
+        }
+    }
+
+    public static String infectedNumberEqual0() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "\n The infected number is 0!\n"
+                    + "The statistique won't change over time. \n";
+        } else {
+            return "";
+        }
+    }
+
+    public static String doYouWantToContinue() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "\n Do you want to continue?";
+        } else {
+            return "";
+        }
+    }
+
+    public static String openTimeError() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "Open time could not be bigger then close time!";
+        } else {
+            return "";
+        }
+    }
+
+    public static String closeTimeError() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "Close time could not be smaller then open time!";
+        } else {
+            return "";
+        }
+    }
+
+    public static String timeExist() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "The Time you choose is including in another row!";
+        } else {
+            return "";
+        }
+    }
+
+    public static String TimeCantBeConsidered() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "The time can't be considered!";
+        } else {
+            return "";
+        }
+    }
+
+    public static String SymptomExist() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "Symptom exist!";
+        } else {
+            return "";
+        }
+    }
+
+    public static String AddNewSymptom() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "Add a new Symptom.";
+        } else {
+            return "";
+        }
+    }
+
+    public static String AddNewSymptomStage() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "Add a new Symptom Stage.";
+        } else {
+            return "";
+        }
+    }
+
+    public static String SymptomStageExist() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "The symptom stage exist!";
+        } else {
+            return "";
+        }
+    }
     
+    public static String HousePopulationPercentageBad() {
+        if (Messages.currantLanguage.equals(Messages.EngLang)) {
+            return "The sum of the percentage is not eqaul to 100 !";
+        } else {
+            return "";
+        }
+    }
+
 }

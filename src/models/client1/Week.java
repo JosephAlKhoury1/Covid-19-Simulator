@@ -2,6 +2,7 @@ package models.client1;
 
 import java.util.ArrayList;
 import java.util.List;
+import models.location1.LocationCategory;
 import models.model.ResultOfDay;
 
 public class Week {
@@ -48,6 +49,15 @@ public class Week {
         this.listDay.add(SUNDAY);
     }
 
+    public void refresh() {
+        this.currentDay = MONDAY;
+        this.hour = 0;
+        this.currentDay.setHour(0);
+        this.minute = 0;
+        this.currentDay.setMinute(0);
+        this.weekNumber = 0;
+    }
+
     public List<Day> getListDay() {
         return listDay;
     }
@@ -67,13 +77,7 @@ public class Week {
                 int i = currentDay.getIndex();
                 this.city.setDayChanged(true);
 
-                ResultOfDay result = new ResultOfDay(city.getListHealth().size(), city.getListImmune().size(),
-                        city.getListDeath().size(), city.getModel().getListSymptomStage1sHospital(),
-                        city.getModel().getListSymptomStage1sNonHospital(), weekNumber, currentDay.getDay().getName());
-
-                System.out.println("new result day = " + result.getDayName() + " week = " + result.getWeek());
-                System.out.println("currentDay day = " + currentDay.getDay().getName() + " week " + weekNumber);
-                city.getModel().getListResult().add(result);
+                addResult();
                 i++;
                 if (i > 6) {
                     currentDay = listDay.get(0);
@@ -88,12 +92,28 @@ public class Week {
         this.currentDay.setMinute(minute);
     }
 
+    public void addResult() {
+        ResultOfDay result = new ResultOfDay(city.getModel().getListHealth().size(), city.getModel().getListImmune().size(),
+                city.getModel().getListDeath().size(), city.getModel().getListSymptomStage1sHospital(),
+                city.getModel().getListSymptomStage1sNonHospital(), weekNumber, currentDay.getDay().getName());
+
+        city.getModel().getListResult().add(result);
+    }
+
     public Day getCurrentDay() {
         return currentDay;
     }
 
     public void setCurrentDay(Day currentDay) {
         this.currentDay = currentDay;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 
     public int getHour() {
@@ -148,4 +168,12 @@ public class Week {
         return SUNDAY;
     }
 
+    public List<LocationCategory> getLocationPerDay(String day, String kind) {
+        for (Day d : this.listDay) {
+            if (d.getDay().getName().equals(day)) {
+                return d.getLocationCategory(kind);
+            }
+        }
+        return null;
+    }
 }

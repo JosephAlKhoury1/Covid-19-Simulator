@@ -248,9 +248,6 @@ public class SymptomStageType {
             String numTxt = this.jtextField.getText();
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
-                if (this.symptomstageType.getModel() == null) {
-                    System.out.println("say null");
-                }
                 Runnable doHighlight = () -> {
                     JOptionPane.showOptionDialog(this.symptomstageType.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };

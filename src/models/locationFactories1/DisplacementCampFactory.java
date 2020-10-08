@@ -12,8 +12,8 @@ public class DisplacementCampFactory extends LocationFactory {
     public static final DisplacementCampFactory INSTANCE = new DisplacementCampFactory();
 
     @Override
-    public Location creatLocation(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city) {
-        return new DisplacementCamp(name, x, y, average_sick, fixed, openTime, closeTime, city);
+    public Location creatLocation(String name, int x, int y, double average_sick,  City city) {
+        return new DisplacementCamp(name, x, y, average_sick, city);
     }
 
     @Override

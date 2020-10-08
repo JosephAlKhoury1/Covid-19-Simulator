@@ -5,8 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import models.client1.City;
+import models.member1.Member;
+import resources.icon.Messages;
+import tools.FileUtilities;
 import views1.MainFrame;
 import views1.model.panel.ModelPanel;
 
@@ -16,6 +22,9 @@ public class Model {
     private String modelName;
 
     private int isMain;
+    private int infectedNumber = 0;
+    private int runTime = 0;
+
     private boolean saved;
     private boolean newModel;
     private boolean deleted;
@@ -38,15 +47,29 @@ public class Model {
     private JMenuItem mapMenu, populationMenu;
     private JMenuItem runMenu, pauseMenu, stopMenu;
 
-    private boolean run = false, pause = false, stop = false, firstTimeRun = true;
+    private boolean run = false, pause = false, stop = false, firstTimeRun = true, refresh = false, canBuild = true;
 
     private List<ResultOfDay> listResult;
 
-    public Model(int modelId, String modelName, List<SymptomType> list, List<SymptomStage> listSS, List<HumanAge> listHA) {
+    private List<Member> listHealth;
+    private List<Member> listDeath;
+    private List<Member> listImmune;
+
+    private int day = 1;
+
+    public Model(int modelId, String modelName, int infectedNumber, int runTime, List<SymptomType> list, List<SymptomStage> listSS, List<HumanAge> listHA) {
         this.modelId = modelId;
         this.modelName = modelName;
+        this.infectedNumber = infectedNumber;
+        this.runTime = runTime;
         this.listSymptomStage1sHospital = new ArrayList();
         this.listSymptomStage1sNonHospital = new ArrayList();
+
+        this.listHealth = new ArrayList();
+        this.listDeath = new ArrayList();
+        this.listImmune = new ArrayList();
+
+        this.refresh = false;
 
         this.listResult = new ArrayList();
         this.listSymptomTypeDeleted = new ArrayList();
@@ -80,12 +103,12 @@ public class Model {
         this.populationMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                city.initPopulation();
-                populationMenu.setEnabled(false);
+                generatePopulation();
             }
         });
 
         this.runMenu = new JMenuItem("Run " + this.modelName);
+        this.runMenu.setEnabled(false);
         this.runMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -98,6 +121,7 @@ public class Model {
         });
 
         this.pauseMenu = new JMenuItem("Pause " + this.modelName);
+        this.pauseMenu.setEnabled(false);
         this.pauseMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -106,9 +130,14 @@ public class Model {
         });
 
         this.stopMenu = new JMenuItem("Stop " + this.modelName);
+        this.stopMenu.setEnabled(false);
         this.stopMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int index = JOptionPane.showOptionDialog(modelPanel, Messages.STOPRUNNING, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+                if (index == JOptionPane.NO_OPTION) {
+                    return;
+                }
                 city.stop();
             }
         });
@@ -127,10 +156,14 @@ public class Model {
         }
     }
 
-    public Model(String name, MainFrame frame, City c) {
+    public Model(String name, int infectedNumber, int runTime, MainFrame frame, City c) {
         this.modelName = name;
+        this.infectedNumber = infectedNumber;
+        this.runTime = runTime;
         this.mainFrame = frame;
         this.isMain = 1;
+
+        this.refresh = false;
 
         this.listResult = new ArrayList();
 
@@ -141,6 +174,10 @@ public class Model {
         this.listSymptomStagesHosAdded = new ArrayList();
         this.listSymptomStagesNonHosAdded = new ArrayList();
         this.listSymptomTypeDeleted = new ArrayList();
+
+        this.listHealth = new ArrayList();
+        this.listDeath = new ArrayList();
+        this.listImmune = new ArrayList();
         this.city = c;
         if (this.city != null) {
             this.city.setModel(this);
@@ -162,12 +199,12 @@ public class Model {
         this.populationMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                city.initPopulation();
-                populationMenu.setEnabled(false);
+                generatePopulation();
             }
         });
 
         this.runMenu = new JMenuItem("Run " + this.modelName);
+        this.runMenu.setEnabled(false);
         this.runMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -180,6 +217,7 @@ public class Model {
         });
 
         this.pauseMenu = new JMenuItem("Pause " + this.modelName);
+        this.pauseMenu.setEnabled(false);
         this.pauseMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -188,9 +226,14 @@ public class Model {
         });
 
         this.stopMenu = new JMenuItem("Stop " + this.modelName);
+        this.stopMenu.setEnabled(false);
         this.stopMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int index = JOptionPane.showOptionDialog(modelPanel, Messages.STOPRUNNING, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+                if (index == JOptionPane.NO_OPTION) {
+                    return;
+                }
                 city.stop();
             }
         });
@@ -204,7 +247,6 @@ public class Model {
         int i = 1;
         for (SymptomStageName stn : this.mainFrame.getListSymptomStageNames()) {
             SymptomStage stgn = new SymptomStage(stn.getName(), 0.0, 0.0, i, stn.getInHospital(), this);
-            //this.listSymptomStage1s.add(stgn);
             if (stgn.getInHospital() == 0) {
                 this.listSymptomStage1sNonHospital.add(stgn);
             } else {
@@ -223,6 +265,18 @@ public class Model {
 
     }
 
+    public void generatePopulation() {
+        city.initPopulation();
+        runMenu.setEnabled(true);
+        if (mainFrame.getCurrentModel() == this) {
+            mainFrame.getRunButton().setEnabled(true);
+        }
+        double per = this.infectedNumber * 100 / city.getListMember().size();
+        this.modelPanel.getPercentageOfSickHumanTxt().setText(per + "");
+        this.modelPanel.getPercentageOfSickHumanTxt().setVisible(true);
+        FileUtilities.saveWeek(this.city.getWeek());
+    }
+
     public List<ResultOfDay> getListResult() {
         return listResult;
     }
@@ -239,6 +293,14 @@ public class Model {
         this.firstTimeRun = firstTimeRun;
     }
 
+    public int getRunTime() {
+        return runTime;
+    }
+
+    public void setRunTime(int runTime) {
+        this.runTime = runTime;
+    }
+
     public void generateMapLocation() {
         this.city.generateMapLocation();
     }
@@ -247,8 +309,57 @@ public class Model {
         return stopMenu;
     }
 
+    public int getDay() {
+        return day;
+    }
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public void incrementDay() {
+        this.day++;
+        this.modelPanel.getStatistiquePane().getChart().checkValue();
+    }
+
     public List<SymptomType> getListSymptomTypeDeleted() {
         return listSymptomTypeDeleted;
+    }
+
+    public boolean isCanBuild() {
+        return canBuild;
+    }
+
+    public void setCanBuild(boolean canBuild) {
+        this.canBuild = canBuild;
+    }
+
+    public int getInfectedNumber() {
+        return infectedNumber;
+    }
+
+    public boolean isRefresh() {
+        return refresh;
+    }
+
+    public void setRefresh(boolean refresh) {
+        this.refresh = refresh;
+    }
+
+    public void setInfectedNumber(int infectedNumber) {
+        this.infectedNumber = infectedNumber;
+    }
+
+    public List<Member> getListHealth() {
+        return listHealth;
+    }
+
+    public List<Member> getListDeath() {
+        return listDeath;
+    }
+
+    public List<Member> getListImmune() {
+        return listImmune;
     }
 
     public void setListSymptomTypeDeleted(List<SymptomType> listSymptomTypeDeleted) {
@@ -372,7 +483,15 @@ public class Model {
     }
 
     public void setCity(City c) {
-        this.city = c;
+        City newCity = null;
+        try {
+            newCity = (City) c.clone();
+            this.city = newCity;
+            newCity.setModel(this);
+        } catch (CloneNotSupportedException ex) {
+            Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public City getCity() {
@@ -417,10 +536,6 @@ public class Model {
 
     public void setMainFrame(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-
-        /*for (SymptomStage st : this.listSymptomStage) {
-            st.setModel(this);
-        }*/
     }
 
     public boolean isDeleted() {
@@ -437,41 +552,6 @@ public class Model {
 
     public void setModelPanel(ModelPanel modelPanel) {
         this.modelPanel = modelPanel;
-    }
-
-    public void removeHumanAge(List<HumanAge> list) {
-//        for (SymptomType st : this.listSymptomsType) {
-//            st.updateHumanAge(list);
-//        }
-        for (HumanAge ha : list) {
-            if (ha.isIsNew()) {
-                if (!ha.isDeleted()) {
-                    //HumanAge han = new HumanAge(ha.getName(), ha.getMinAge(), ha.getMaxAge(), this);
-                    //this.listHumanAge.add(han);
-                    //this.listHumanAgeAdd.add(han);
-                } else {
-
-                }
-            } else {
-                if (ha.isDeleted()) {
-                    HumanAge tmp = null;
-                    for (HumanAge hat : this.listHumanAge) {
-                        if (hat.getName().equals(ha.getName())) {
-                            hat.setDeleted(true);
-                            tmp = hat;
-                            break;
-                        }
-                    }
-                    if (this.listHumanAgeAdd.contains(tmp)) {
-                        this.listHumanAgeAdd.remove(tmp);
-                    }
-                    this.listHumanAge.remove(tmp);
-                    this.listHumanAgeDeleted.add(tmp);
-                } else {
-
-                }
-            }
-        }
     }
 
     public List<HumanAge> getListHumanAge() {
@@ -549,50 +629,33 @@ public class Model {
     }
 
     public void refresh() {
+        this.listHealth.clear();
+        this.day = 1;
+        this.listDeath.clear();
+        this.listImmune.clear();
+        for (SymptomStage st : this.listSymptomStage1sHospital) {
+            st.getListMember().clear();
+        }
+        for (SymptomStage st : this.listSymptomStage1sNonHospital) {
+            st.getListMember().clear();
+        }
+        run = false;
+        pause = false;
+        stop = false;
+        firstTimeRun = true;
+        refresh = false;
+        canBuild = true;
+        this.mainFrame.getRunButton().setEnabled(true);
+        this.mainFrame.getBuildButton().setEnabled(true);
+        this.runMenu.setEnabled(true);
+        this.populationMenu.setEnabled(true);
         this.city.refresh();
+        this.changeState(this.infectedNumber);
+        this.getModelPanel().getStatistiquePane().updateState();
+        this.getModelPanel().getStatistiquePane().updateTime(this.city.getWeek());
+        this.getModelPanel().getStatistiquePane().getChart().init();
     }
 
-    /* public void removeSymptomStage(List<SymptomStage> list) {
-        listSymptomType.forEach((st) -> {
-            st.updateSymptomStage(list);
-        });
-        for (SymptomStage sts : list) {
-            if (sts.isIsNew()) {
-                if (!sts.isDeleted()) {
-                    SymptomStage ss = new SymptomStage(sts.getName(), sts.getDeathPercentage(), sts.getImmunePercentage(), sts.getIndex(), sts.getInHospital(), this);
-                    this.listSymptomStage1s.add(ss);
-                    //this.listAdd.add(ss);
-                } else {
-                }
-            } else {
-                for (SymptomStage st : this.listSymptomStage1s) {
-                    if (st.getName().equals(sts.getName())) {
-                        if (sts.isDeleted()) {
-                            st.setDeleted(true);
-                            this.listStageDeleted.add(st);
-                        } else {
-                            st.setIndex(sts.getIndex());
-                            st.setSaved(false);
-                        }
-                    }
-                }
-            }
-        }
-        for (SymptomStage st : this.listStageDeleted) {
-            this.listSymptomStage1s.remove(st);
-        }
-
-        SymptomStage[] tab = new SymptomStage[listSymptomStage1s.size()];
-        for (SymptomStage ss : listSymptomStage1s) {
-            tab[ss.getIndex()] = ss;
-        }
-
-        listSymptomStage1s.clear();
-
-        for (SymptomStage ss : tab) {
-            listSymptomStage1s.add(ss);
-        }
-    }*/
     public void addNewHumanAge() {
         HumanAge age = new HumanAge("between 999 and 1000", 999, 1000, this.getListSymptomType(), this);
         this.listHumanAge.add(age);
@@ -629,6 +692,7 @@ public class Model {
     }
 
     public void changeState(int num) {
+        this.infectedNumber = num;
         this.city.changeState(num);
     }
 
@@ -660,5 +724,14 @@ public class Model {
         for (SymptomStage ss : this.listSymptomStage1sNonHospital) {
             ss.setDisable();
         }
+    }
+
+    public SymptomType getSymptomType(int age) {
+        for (HumanAge ha : getListHumanAge()) {
+            if (age >= ha.getMinAge() && age <= ha.getMaxAge()) {
+                return ha.monteCarlo();
+            }
+        }
+        return null;
     }
 }

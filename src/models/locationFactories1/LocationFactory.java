@@ -9,7 +9,7 @@ import models.location1.Location;
  */
 public abstract class LocationFactory {
 
-    public abstract Location creatLocation(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city);
+    public abstract Location creatLocation(String name, int x, int y, double average_sick, City city);
 
     public abstract int getWTile();
 

@@ -20,6 +20,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import models.location1.LocationCategory;
+import models.model.Model;
 import views.dialog1.NewLocationDialog;
 
 /**
@@ -61,37 +62,40 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
         nameToAddTxt.getDocument().addDocumentListener(addListener);
         removeButton.addActionListener(new RemoveListener());
         this.jPanel1.add(listScrollPane);
-        // this.locationPropertiesPanel.setLayout(new BorderLayout());
 
         for (Entry<String, LocationCategory> e : this.cityPanel.getCity1().getMapLocation().entrySet()) {
             addRows(e.getValue());
         }
     }
 
-    public void addNewRow(String name, String kind, double per, int qua, String days, int openTime, int closeTime, int fixed) {
+    public void addNewRow(String name, String kind, double per, int qua) {
         int index = listLocation.getSelectedIndex();
         if (index == -1) {
             index = 0;
         } else {
             index++;
         }
-        LocationCategory lc = new LocationCategory(name, kind, per, qua, days, openTime, closeTime, fixed, this.cityPanel.getCity1());
+        LocationCategory lc = new LocationCategory(name, kind, per, qua, this.cityPanel.getCity1());
         LocationProperties lp = new LocationProperties(lc);
         this.mapLocation.put(lc.getName(), lp);
 
         this.cityPanel.getCity1().getMapLocation().put(lc.getName() + " " + lc.getKind(), lc);
         this.cityPanel.getLocationPropertiesPanel().removeAll();
         this.cityPanel.getLocationPropertiesPanel().add(lp);
-////        this.locationPropertiesPanel.removeAll();
-////        this.locationPropertiesPanel.add(mapLocation.get(lc.getName()));
         this.listModel.insertElementAt(lc.getName(), index);
         this.nameToAddTxt.requestFocusInWindow();
         this.nameToAddTxt.setText("");
         this.listLocation.setSelectedIndex(index);
         this.listLocation.ensureIndexIsVisible(index);
-//        this.locationPropertiesPanel.repaint();
         this.cityPanel.getLocationPropertiesPanel().repaint();
         this.removeButton.setEnabled(true);
+
+        for (Model m : this.mainFrame.getListModel()) {
+            LocationCategory lcNew = (LocationCategory) lc.clone(m.getCity());
+            m.getCity().getMapLocation().put(lcNew.getName() + " " + lcNew.getKind(), lcNew);
+            //  m.getModelPanel().reinitLocationPanel();
+            m.getModelPanel().getModelLocationsPanel().addRow(lcNew);
+        }
         this.mainFrame.setVisible(true);
     }
 
@@ -311,6 +315,9 @@ public class LocationListPanel extends JPanel implements ListSelectionListener {
                 listLocation.ensureIndexIsVisible(index);
                 cityPanel.getLocationPropertiesPanel().removeAll();
                 cityPanel.getLocationPropertiesPanel().add(mapLocation.get(listLocation.getSelectedValue()));
+            }
+            for (Model m : mainFrame.getListModel()) {
+                m.getModelPanel().getModelLocationsPanel().removeRow(name);
             }
             cityPanel.getLocationPropertiesPanel().repaint();
             mainFrame.setCitySavedButtonEnable();

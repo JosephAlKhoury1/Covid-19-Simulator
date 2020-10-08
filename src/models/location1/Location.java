@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.client1.City;
-import models.client1.Day;
 import models.member1.Member;
 import views.tile.Tile;
 import views1.Maps;
@@ -23,8 +22,6 @@ public abstract class Location implements Cloneable {
     protected double average_sick;
     protected int locationCategoryId;
     protected Maps map;
-    protected String days;
-    protected int workTime;
     protected double percentageToBeSick = 0.0;
 
     protected List<Member> listMember;
@@ -36,144 +33,51 @@ public abstract class Location implements Cloneable {
     protected int fixedLocation;
     protected Image image;
 
-    protected List<Day> listDay;
     protected List<Tile> listTile;
     protected int openTimeToVisit;
     protected int closeTimeToVisit;
 
-    public Location(String name, int x, int y, double average_sick, String days, int fixed, int locationCategoryId, City city) {
+    protected List<DayRow> listDayRow;
+
+    public Location(String name, int x, int y, double average_sick, int locationCategoryId, City city) {
         this.name = name;
         this.x = x;
         this.y = y;
         this.city = city;
-        this.fixedLocation = fixed;
         this.average_sick = average_sick;
         this.locationCategoryId = locationCategoryId;
-        this.days = days;
-        this.listDay = new ArrayList();
         this.listTile = new ArrayList();
         this.listMember = new ArrayList();
         this.isNew = true;
         this.saved = false;
-
-        String[] tab = days.split(" ");
-        for (String s : tab) {
-            switch (s) {
-                case "Monday":
-                    this.listDay.add(city.getWeek().getMONDAY());
-                    break;
-                case "Tuesday":
-                    this.listDay.add(city.getWeek().getTUESDAY());
-                    break;
-                case "Wednesday":
-                    this.listDay.add(city.getWeek().getWEDNESDAY());
-                    break;
-                case "Thursday":
-                    this.listDay.add(city.getWeek().getTHURSDAY());
-                    break;
-                case "Friday":
-                    this.listDay.add(city.getWeek().getFRIDAY());
-                    break;
-                case "Saturday":
-                    this.listDay.add(city.getWeek().getSATURDAY());
-                    break;
-                case "Sunday":
-                    this.listDay.add(city.getWeek().getSUNDAY());
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
-    public Location(String name, int x, int y, double average_sick, String days, int fixed, City city) {
+    public Location(String name, int x, int y, double average_sick, City city) {
         this.name = name;
         this.x = x;
         this.y = y;
         this.city = city;
-        this.fixedLocation = fixed;
         this.average_sick = average_sick;
-        this.days = days;
-        this.listDay = new ArrayList();
         this.listTile = new ArrayList();
         this.listMember = new ArrayList();
         this.isNew = true;
         this.saved = false;
-        String[] tab = days.split(" ");
-        for (String s : tab) {
-            switch (s) {
-                case "Monday":
-                    this.listDay.add(city.getWeek().getMONDAY());
-                    break;
-                case "Tuesday":
-                    this.listDay.add(city.getWeek().getTUESDAY());
-                    break;
-                case "Wednesday":
-                    this.listDay.add(city.getWeek().getWEDNESDAY());
-                    break;
-                case "Thursday":
-                    this.listDay.add(city.getWeek().getTHURSDAY());
-                    break;
-                case "Friday":
-                    this.listDay.add(city.getWeek().getFRIDAY());
-                    break;
-                case "Saturday":
-                    this.listDay.add(city.getWeek().getSATURDAY());
-                    break;
-                case "Sunday":
-                    this.listDay.add(city.getWeek().getSUNDAY());
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
-    public Location(int id, String name, int x, int y, int width, int height, double average_sick, String days, int fixed, int locationCategoryId, City c) {
+    public Location(int id, String name, int x, int y, int width, int height, double average_sick, int locationCategoryId, City c) {
         this.id = id;
         this.name = name;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.fixedLocation = fixed;
-        this.days = days;
         this.average_sick = average_sick;
         this.locationCategoryId = locationCategoryId;
-        this.listDay = new ArrayList();
         this.listTile = new ArrayList();
         this.listMember = new ArrayList();
         this.isNew = false;
         this.saved = true;
         this.city = c;
-        String[] tab = days.split(" ");
-        for (String s : tab) {
-            switch (s) {
-                case "Monday":
-                    this.listDay.add(city.getWeek().getMONDAY());
-                    break;
-                case "Tuesday":
-                    this.listDay.add(city.getWeek().getTUESDAY());
-                    break;
-                case "Wednesday":
-                    this.listDay.add(city.getWeek().getWEDNESDAY());
-                    break;
-                case "Thursday":
-                    this.listDay.add(city.getWeek().getTHURSDAY());
-                    break;
-                case "Friday":
-                    this.listDay.add(city.getWeek().getFRIDAY());
-                    break;
-                case "Saturday":
-                    this.listDay.add(city.getWeek().getSATURDAY());
-                    break;
-                case "Sunday":
-                    this.listDay.add(city.getWeek().getSUNDAY());
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     public boolean isIsNew() {
@@ -211,12 +115,12 @@ public abstract class Location implements Cloneable {
     public Location() {
     }
 
-    public List<Day> getListDay() {
-        return listDay;
+    public List<DayRow> getListDayRow() {
+        return listDayRow;
     }
 
-    public void setListDay(List<Day> listDay) {
-        this.listDay = listDay;
+    public void setListDayRow(List<DayRow> listDayRow) {
+        this.listDayRow = listDayRow;
     }
 
     public int getLocationCategoryId() {
@@ -302,7 +206,7 @@ public abstract class Location implements Cloneable {
     public void addMember(Member m) {
         this.listMember.add(m);
         this.city.getListMember().put(m.getId(), m);
-        this.city.getListHealth().add(m);
+        this.city.getModel().getListHealth().add(m);
     }
 
     public int getFixedLocation() {
@@ -313,36 +217,16 @@ public abstract class Location implements Cloneable {
         this.fixedLocation = fixedLocation;
     }
 
-    public void addDay(Day d) {
-        this.listDay.add(d);
-        d.addLocation(this);
-        this.days = "";
-        for (Day dd : this.listDay) {
-            days += dd.getDay().getName() + " ";
-        }
-    }
 
-    public void removeDay(Day d) {
-        this.listDay.remove(d);
-        d.removeLocation(this);
-        this.days = "";
-        for (Day dd : this.listDay) {
-            days += dd.getDay().getName() + " ";
-        }
-    }
-
-//    public void addWorker(Human h) {
-//        this.listWorker.add(h);
-//    }
     public boolean containX(int x) {
-        if (this.x < x && this.x + this.width > x) {
+        if (this.x <= x && this.x + this.width > x) {
             return true;
         }
         return false;
     }
 
     public boolean containY(int y) {
-        if (this.y < y && this.y + this.height > y) {
+        if (this.y <= y && this.y + this.height > y) {
             return true;
         }
         return false;
@@ -384,46 +268,6 @@ public abstract class Location implements Cloneable {
         this.listTile.add(t);
     }
 
-    public abstract void setOpenTime(int openTime);
-
-    public abstract void setCloseTime(int closeTime);
-
-    public abstract int getOpenTime();
-
-    public abstract int getCloseTime();
-
-    public String getDays() {
-        return this.days;
-    }
-
-    public void setDays(String days) {
-        this.days = days;
-    }
-
-    public int getWorkTime() {
-        return workTime;
-    }
-
-    public void setWorkTime(int workTime) {
-        this.workTime = workTime;
-    }
-
-    public int getOpenTimeToVisit() {
-        return openTimeToVisit;
-    }
-
-    public void setOpenTimeToVisit(int openTimeToVisit) {
-        this.openTimeToVisit = openTimeToVisit;
-    }
-
-    public int getCloseTimeToVisit() {
-        return closeTimeToVisit;
-    }
-
-    public void setCloseTimeToVisit(int closeTimeToVisit) {
-        this.closeTimeToVisit = closeTimeToVisit;
-    }
-
     public abstract void draw(Graphics g);
 
     protected abstract void loadImage();
@@ -436,7 +280,6 @@ public abstract class Location implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         Location lNew = (Location) super.clone();
         lNew.listMember = new ArrayList();
-        lNew.listDay = new ArrayList();
         return lNew;
     }
 
@@ -445,35 +288,6 @@ public abstract class Location implements Cloneable {
         try {
             lNew = (Location) this.clone();
             lNew.setCity(c);
-            String[] tab = lNew.getDays().split(" ");
-            for (String s : tab) {
-                switch (s) {
-                    case "Monday":
-                        lNew.listDay.add(c.getWeek().getMONDAY());
-                        break;
-                    case "Tuesday":
-                        lNew.listDay.add(c.getWeek().getTUESDAY());
-                        break;
-                    case "Wednesday":
-                        lNew.listDay.add(c.getWeek().getWEDNESDAY());
-                        break;
-                    case "Thursday":
-                        lNew.listDay.add(c.getWeek().getTHURSDAY());
-                        break;
-                    case "Friday":
-                        lNew.listDay.add(c.getWeek().getFRIDAY());
-                        break;
-                    case "Saturday":
-                        lNew.listDay.add(c.getWeek().getSATURDAY());
-                        break;
-                    case "Sunday":
-                        lNew.listDay.add(c.getWeek().getSUNDAY());
-                        break;
-                    default:
-                        break;
-                }
-            }
-
             lNew.listMember = new ArrayList();
             for (Member m : this.listMember) {
                 Member mNew = (Member) m.clone(c);

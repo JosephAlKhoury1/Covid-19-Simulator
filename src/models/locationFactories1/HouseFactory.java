@@ -12,8 +12,8 @@ public class HouseFactory extends LocationFactory {
     public static final HouseFactory INSTANCE = new HouseFactory();
 
     @Override
-    public Location creatLocation(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city) {
-        return new House(name, x, y, average_sick, fixed, city);
+    public Location creatLocation(String name, int x, int y, double average_sick,  City city) {
+        return new House(name, x, y, average_sick,  city);
     }
 
     @Override

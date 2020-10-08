@@ -25,17 +25,18 @@ import models.member1.Member;
 import models.model.HumanAgeName;
 import models.model.Model;
 import models.model.ReligionName;
+import models.model.SymptomStage;
 import models.transportation1.Transportation;
+import resources.icon.Colors;
+import resources.icon.Icons;
 import resources.icon.Messages;
 import tools.Excel;
-import tools.FileUtilities;
 import views.tile.Tile;
 import views.tile.TileType;
 import views1.CityPanel;
 import views1.MainFrame;
 import views1.Maps;
 import views1.model.panel.FileChooser;
-import views1.model.panel.StatistiquePanel;
 
 public class City extends UnicastRemoteObject implements ICity, Runnable, Cloneable {
 
@@ -89,22 +90,15 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     private Day currentDay;
     private Thread thread;
     private JMenuItem mapMenu, populationMenu;
-    // private JMenuItem runMenu, pauseMenu;
     private JSeparator separator, separatorPopulation;
-    //private JSeparator runSeparator, pauseSeparator;
+
+    private boolean populationGenerated = false;
 
     private int speed = 5;
 
-    private StatistiquePanel statistiquePanel;
-    private List<Member> listHealth;
-    private List<Member> listDeath;
-    private List<Member> listImmune;
-
     private Model model;
 
-    public CityPanel getCityPanel() {
-        return cityPanel;
-    }
+    private int runTime = 0;
 
     public City(int id, String name, int nbPopulation, int width, int height, int isMain,
             int countryId, List<HumanCityAgeType> list, List<ReligionType> listR, List<HousePopulation> listHp, List<SexeType> listSt) throws RemoteException {
@@ -141,29 +135,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
             }
         });
         this.separatorPopulation = new JSeparator(SwingConstants.HORIZONTAL);
-
-//        this.runMenu = new JMenuItem("Run " + this.name);
-//        this.runMenu.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (model.isPause()) {
-//                    resume();
-//                } else {
-//                    start();
-//                }
-//            }
-//        });
-//
-//        this.pauseMenu = new JMenuItem("Pause " + this.name);
-//        this.pauseMenu.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                pause();
-//            }
-//        });
-//
-//        this.runSeparator = new JSeparator(SwingConstants.HORIZONTAL);
-//        this.pauseSeparator = new JSeparator(SwingConstants.HORIZONTAL);
         this.listHumanAgeType = list;
         this.listHumanAgeTypeDeleted = new ArrayList();
 
@@ -208,13 +179,7 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
             st.setCity(this);
         });
 
-        this.listHealth = new ArrayList();
-        this.listDeath = new ArrayList();
-        this.listImmune = new ArrayList();
-
-        if (this.model != null) {
-            this.statistiquePanel = new StatistiquePanel(this.model);
-        }
+        // FileUtilities.saveWeek(week);
     }
 
     public City(String name, int nbPopulation, int width, int height,
@@ -240,11 +205,13 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.listHumanAgeTypeDeleted = new ArrayList();
 
         for (HumanAgeName han : this.mainFrame.getListHumanAgeName()) {
-            this.listHumanAgeType.add(new HumanCityAgeType(han.getName(), han.getMinAge(), han.getMaxAge(), 0.0, 0, 0.0, this));
+            this.listHumanAgeType.add(new HumanCityAgeType(han.getName(), han.getMinAge(), han.getMaxAge(), 0.0, 0.0, this));
         }
         this.listLocationToGo = new ArrayList();
         for (String s : Data.tabLocation) {
-            this.listLocationToGo.add(new LocationToGo(s, this));
+            if (!"House".equals(s)) {
+                this.listLocationToGo.add(new LocationToGo(s, this));
+            }
         }
         this.listrelReligionTypes = new ArrayList();
         this.listReligionDeleted = new ArrayList();
@@ -269,30 +236,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
             }
         });
         this.separatorPopulation = new JSeparator(SwingConstants.HORIZONTAL);
-
-//        this.runMenu = new JMenuItem("Run " + this.name);
-//        this.runMenu.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (model.isPause()) {
-//                    resume();
-//                } else {
-//                    start();
-//                }
-//
-//            }
-//        });
-//
-//        this.pauseMenu = new JMenuItem("Pause " + this.name);
-//        this.pauseMenu.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                pause();
-//            }
-//        });
-//
-//        this.runSeparator = new JSeparator(SwingConstants.HORIZONTAL);
-//        this.pauseSeparator = new JSeparator(SwingConstants.HORIZONTAL);
         for (ReligionName rn : this.mainFrame.getListReligionName()) {
             this.listrelReligionTypes.add(new ReligionType(rn.getName(), 100 / this.mainFrame.getListReligionName().size(), rn.getPrayLocation(), this));
         }
@@ -326,24 +269,22 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.topCities = new HashMap();
 
         Data.initData(this.listrelReligionTypes, this.listHousePopulations, this.listHumanAgeType, this.listSexeType);
-
-        this.listHealth = new ArrayList();
-        this.listDeath = new ArrayList();
-        this.listImmune = new ArrayList();
-
     }
 
     public List<HumanCityAgeType> getListHumanAgeType() {
         return listHumanAgeType;
     }
 
+    public CityPanel getCityPanel() {
+        return cityPanel;
+    }
+
     public void generateMapLocation() {
-        this.currentMap = new Maps(mainFrame, this);
-        //this.mainFrame.setCurrentMap(this.currentMap);
+        if (this.currentMap == null) {
+            this.currentMap = new Maps(mainFrame, this);
+        }
         JScrollPane p = new JScrollPane(this.currentMap);
         this.currentMap.setScrollPane(p);
-//        this.mainFrame.getjTabbedPane2().addTab("Map", this.currentMap.getScrollPane());
-//        this.mainFrame.getjTabbedPane2().setTabComponentAt(this.mainFrame.getjTabbedPane2().getTabCount() - 1, this.currentMap.getButton());
         this.model.getModelPanel().getjTabbedPane1().addTab("Map", this.currentMap.getScrollPane());
         this.model.getModelPanel().getjTabbedPane1().setTabComponentAt(this.model.getModelPanel().getjTabbedPane1().getTabCount() - 1, this.currentMap.getButton());
     }
@@ -354,6 +295,14 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
     public void setSpeed(int speed) {
         this.speed = speed;
+    }
+
+    public boolean isPopulationGenerated() {
+        return populationGenerated;
+    }
+
+    public void setPopulationGenerated(boolean populationGenerated) {
+        this.populationGenerated = populationGenerated;
     }
 
     public int getWidth() {
@@ -376,9 +325,14 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.mapMenu = mapMenu;
     }
 
-//    public JSeparator getRunSeparator() {
-//        return runSeparator;
-//    }
+    public int getRunTime() {
+        return runTime;
+    }
+
+    public void setRunTime(int runTime) {
+        this.runTime = runTime;
+    }
+
     public Day getCurrentDay() {
         return currentDay;
     }
@@ -391,9 +345,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.currentDay = currentDay;
     }
 
-//    public JSeparator getPauseSeparator() {
-//        return pauseSeparator;
-//    }
     public void setWidth(int width) {
         this.width = width;
     }
@@ -444,18 +395,6 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public List<Member> getListHealth() {
-        return listHealth;
-    }
-
-    public List<Member> getListDeath() {
-        return listDeath;
-    }
-
-    public List<Member> getListImmune() {
-        return listImmune;
     }
 
     public void addLeftCity(City c) {
@@ -509,14 +448,28 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
     public void initPopulation() {
         this.listMember.clear();
+        this.model.getListHealth().clear();
+        this.model.getListDeath().clear();
+        this.model.getListImmune().clear();
+        for (SymptomStage ss : this.model.getListSymptomStage1sHospital()) {
+            ss.getListMember().clear();
+        }
+        for (SymptomStage ss : this.model.getListSymptomStage1sNonHospital()) {
+            ss.getListMember().clear();
+        }
         Data.populationNumber = 0;
         mapLocation.entrySet().forEach((Entry<String, LocationCategory> e) -> {
             e.getValue().getListLocation().forEach((l) -> {
                 l.initPopulation();
             });
         });
-        this.statistiquePanel.updateState();
-        FileUtilities.saveStat(this.listMember);
+        this.populationGenerated = true;
+        int infected = this.model.getInfectedNumber();
+        if (infected > 0) {
+            this.model.changeState(infected);
+        }
+        this.model.getModelPanel().getStatistiquePane().updateState();
+        //FileUtilities.saveStat(this.listMember);
     }
 
     public Map<String, LocationCategory> getMapLocation() {
@@ -533,7 +486,7 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
     public void setMapLocation(Map<String, LocationCategory> mapLocation) {
         this.mapLocation = mapLocation;
-        FileUtilities.saveWeek(this.week);
+        // FileUtilities.saveWeek(this.week);
     }
 
     @Override
@@ -624,24 +577,22 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.listHousePopulationsDeleted.add(hp);
     }
 
-    public Location getLocationDay(String kind) {
-        List<String> list = new ArrayList();
-        for (Entry<String, LocationCategory> e : this.currentDay.getListLocationCategory().entrySet()) {
-            if (e.getValue().getKind().equals(kind)) {
-                list.add(e.getKey());
+    public Location getLocationDay(String kind, String day) {
+        List<LocationCategory> list = week.getLocationPerDay(day, kind);
+
+        if (!list.isEmpty()) {
+            while (true) {
+                int index = MonteCarlo.getNextInt(list.size());
+                LocationCategory lc = list.get(index);
+                if (!lc.getListLocation().isEmpty()) {
+                    int index2 = MonteCarlo.getNextInt(lc.getListLocation().size());
+                    Location l = lc.getListLocation().get(index2);
+                    return l;
+                }
             }
+        } else {
+            return null;
         }
-        while (list.size() > 0) {
-            int index = MonteCarlo.getNextInt(list.size());
-            String name = list.get(index);
-            if (this.currentDay.getListLocationCategory().get(name).getListLocation().size() > 0) {
-                int in = MonteCarlo.getNextInt(this.currentDay.getListLocationCategory().get(name).getListLocation().size());
-                return this.currentDay.getListLocationCategory().get(name).getListLocation().get(in);
-            } else {
-                list.remove(name);
-            }
-        }
-        return null;
     }
 
     public Model getModel() {
@@ -650,13 +601,7 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
     public void setModel(Model model) {
         this.model = model;
-        if (this.model != null) {
-            this.statistiquePanel = new StatistiquePanel(this.model);
-        }
-    }
 
-    public StatistiquePanel getStatistiquePanel() {
-        return statistiquePanel;
     }
 
     public Location getRandomLocation() {
@@ -683,37 +628,19 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     @Override
     public Location getLocation(String kind) throws RemoteException {
         List<String> list = new ArrayList();
-        if (kind.equals("work")) {
-            for (Entry<String, LocationCategory> e : this.mapLocation.entrySet()) {
-                if (!e.getValue().getKind().equals("House") && !e.getValue().getKind().equals("Mosque") && !e.getValue().getKind().equals("Church")) {
-                    list.add(e.getKey());
-                }
+        for (Entry<String, LocationCategory> e : this.mapLocation.entrySet()) {
+            if (e.getValue().getKind().equals(kind)) {
+                list.add(e.getKey());
             }
-            while (list.size() > 0) {
-                int index = MonteCarlo.getNextInt(list.size());
-                String name = list.get(index);
-                if (mapLocation.get(name).getListLocation().size() > 0) {
-                    int in = MonteCarlo.getNextInt(mapLocation.get(name).getListLocation().size());
-                    return mapLocation.get(name).getListLocation().get(in);
-                } else {
-                    list.remove(name);
-                }
-            }
-        } else {
-            for (Entry<String, LocationCategory> e : this.mapLocation.entrySet()) {
-                if (e.getValue().getKind().equals(kind)) {
-                    list.add(e.getKey());
-                }
-            }
-            while (list.size() > 0) {
-                int index = MonteCarlo.getNextInt(list.size());
-                String name = list.get(index);
-                if (mapLocation.get(name).getListLocation().size() > 0) {
-                    int in = MonteCarlo.getNextInt(mapLocation.get(name).getListLocation().size());
-                    return mapLocation.get(name).getListLocation().get(in);
-                } else {
-                    list.remove(name);
-                }
+        }
+        while (list.size() > 0) {
+            int index = MonteCarlo.getNextInt(list.size());
+            String n = list.get(index);
+            if (mapLocation.get(n).getListLocation().size() > 0) {
+                int in = MonteCarlo.getNextInt(mapLocation.get(n).getListLocation().size());
+                return mapLocation.get(n).getListLocation().get(in);
+            } else {
+                list.remove(n);
             }
         }
         return null;
@@ -728,19 +655,43 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     }
 
     public void start() {
+        String message = " ";
+        if (this.model.getRunTime() == 0) {
+            message = message + Messages.runTimeEqual0();
+        }
+
+        if (this.model.getInfectedNumber() == 0) {
+            message = message + Messages.infectedNumberEqual0();
+        }
+        int reply = 0;
+        if (!message.equals(" ")) {
+            message = message + Messages.doYouWantToContinue();
+            reply = JOptionPane.showOptionDialog(mainFrame, message, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+        }
+        if (reply == JOptionPane.NO_OPTION || reply == JOptionPane.CLOSED_OPTION) {
+            return;
+        }
+
+        this.model.setDisable();
         this.model.setRun(true);
         this.model.setPause(false);
         this.model.setStop(false);
+        this.model.setRefresh(false);
         this.model.setFirstTimeRun(false);
+        this.model.setCanBuild(false);
         this.thread.start();
         if (this.mainFrame.getCurrentModel() == this.model) {
             this.mainFrame.getRunButton().setEnabled(false);
             this.mainFrame.getPauseButton().setEnabled(true);
             this.mainFrame.getStopButton().setEnabled(true);
+            this.mainFrame.getBuildButton().setEnabled(false);
         }
         this.model.getRunMenu().setEnabled(false);
         this.model.getPauseMenu().setEnabled(true);
         this.model.getStopMenu().setEnabled(true);
+        this.populationMenu.setEnabled(false);
+
+        this.model.getModelPanel().getStatistiquePane().getChart().init();
     }
 
     public void pause() {
@@ -769,74 +720,44 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         this.model.getPauseMenu().setEnabled(true);
     }
 
-    public void stop() {
-        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.STOPRUNNING, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
-        if (index == JOptionPane.NO_OPTION) {
-            return;
-        }
-        this.thread.stop();
+    public void stopRun() {
         this.model.setStop(true);
+        this.week.addResult();
+        this.model.setRefresh(true);
         if (this.mainFrame.getCurrentModel() == this.model) {
             this.mainFrame.getRunButton().setEnabled(false);
             this.mainFrame.getPauseButton().setEnabled(false);
             this.mainFrame.getStopButton().setEnabled(false);
+            this.mainFrame.getRefleshButton().setEnabled(true);
         }
         this.model.getRunMenu().setEnabled(false);
         this.model.getPauseMenu().setEnabled(false);
         this.model.getStopMenu().setEnabled(false);
+        this.model.getModelPanel().getStatistiquePane().getChart().stop();
         JFrame f = new JFrame();
         f.setSize(700, 500);
         f.setLocation(300, 200);
-        FileChooser cf = new FileChooser();
+
+        FileChooser cf = new FileChooser(this.name + " " + this.model.getModelName());
         cf.setSize(700, 500);
         int r = cf.j.showSaveDialog(cf.j);
         f.add(cf);
-        //f.setVisible(true);
-        String ff = null;
-        if (r == cf.j.APPROVE_OPTION) {
-            ff = cf.j.getSelectedFile().getAbsolutePath();
-            ff = ff + "\\";
-            f.setVisible(false);
-            File file = null;
 
-            int o = 0;
-            while (true) {
-                if (o == 0) {
-                    file = new File(ff + this.name + " " + this.model.getModelName() + ".xls");
-                    if (!file.exists()) {
-                        break;
-                    } else {
-                        o++;
-                    }
-                } else {
-                    file = new File(ff + name + " " + this.model.getModelName() + o + ".xls");
-                    if (!file.exists()) {
-                        break;
-                    } else {
-                        o++;
-                    }
-                }
-            }
+        if (r == cf.j.APPROVE_OPTION) {
+            File file = cf.getFile();
             Excel.writeResult(file, model);
         }
+    }
+
+    public void stop() {
+        this.thread.stop();
+        stopRun();
     }
 
     public Tile[][] getMap() {
         return map;
     }
 
-//    public JMenuItem getRunMenu() {
-//        return runMenu;
-//    }
-//    public void setRunMenu(JMenuItem runMenu) {
-//        this.runMenu = runMenu;
-//    }
-//    public JMenuItem getPauseMenu() {
-//        return pauseMenu;
-//    }
-//    public void setPauseMenu(JMenuItem pauseMenu) {
-//        this.pauseMenu = pauseMenu;
-//    }
     public List<HousePopulation> getListHousePopulations() {
         return listHousePopulations;
     }
@@ -900,32 +821,51 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
 
     @Override
     public void run() {
+        boolean stop = false;
+//        int listMemberSize = listMember.size();
+//        Runnable r = new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        };
         while (true) {
             try {
                 this.thread.sleep(speed);
                 week.changeTime();
-                if (statistiquePanel != null) {
-                    statistiquePanel.updateState();
-                    statistiquePanel.updateTime(week);
+                model.getModelPanel().getStatistiquePane().updateState();
+                model.getModelPanel().getStatistiquePane().updateTime(week);
+                if (dayChanged) {
+                    this.runTime++;
                 }
                 for (Entry<Integer, Member> e : listMember.entrySet()) {
                     if (dayChanged) {
-                        e.getValue().move(dayChanged);
+                        e.getValue().move(week.getCurrentDay().getDay().getName());
                     } else {
                         e.getValue().move();
                     }
                 }
+
                 this.setDayChanged(false);
                 if (this.currentMap != null) {
                     this.currentMap.repaint();
                 }
-                this.mainFrame.setVisible(true);
+                // this.mainFrame.setVisible(true);
 
+                if (this.model.getRunTime() != 0) {
+                    if (this.model.getRunTime() == this.runTime) {
+                        stop = true;
+                    }
+                }
+                if (stop) {
+                    break;
+                }
             } catch (InterruptedException ex) {
                 Logger.getLogger(City.class
                         .getName()).log(Level.SEVERE, null, ex);
             }
         }
+        this.stopRun();
     }
 
     public boolean isDayChanged() {
@@ -1088,13 +1028,16 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
         c.mapLocation = new HashMap();
         c.listMember = new HashMap();
         this.mapLocation.entrySet().forEach((e) -> {
-            c.mapLocation.put(e.getKey(), (LocationCategory) e.getValue().clone(c));
+            LocationCategory lcNew = (LocationCategory) e.getValue().clone(c);
+            c.mapLocation.put(e.getKey(), lcNew);
+
         });
         return c;
     }
 
     public void changeDay(Day d) {
         this.currentDay = d;
+        this.model.incrementDay();
         this.listMember.entrySet().forEach((e) -> {
             e.getValue().setDay(d);
         });
@@ -1107,27 +1050,49 @@ public class City extends UnicastRemoteObject implements ICity, Runnable, Clonea
     }
 
     public void changeState(int num) {
-//        this.listHealth.clear();
-//        for (Entry<Integer, Member> e : this.listMember.entrySet()) {
-//            this.listHealth.add(e.getValue());
-//        }
-        for (int i = 0; i < num; i++) {
-            int y = MonteCarlo.getNextInt(this.listHealth.size());
-            Member m = this.listHealth.get(y);
-            this.listHealth.remove(y);
-            m.setInfected(true);
+        if (this.populationGenerated) {
+            for (int i = 0; i < num; i++) {
+                int y = MonteCarlo.getNextInt(this.model.getListHealth().size());
+                Member m = this.model.getListHealth().get(y);
+                this.model.getListHealth().remove(y);
+                m.setInfected(true);
+            }
+            this.model.getModelPanel().getStatistiquePane().updateState();
         }
-        this.statistiquePanel.updateState();
     }
 
     public void refresh() {
-        this.listHealth.clear();
+        this.week.refresh();
+        this.thread = new Thread(this);
+        this.runTime = 0;
         for (Entry<Integer, Member> e : this.listMember.entrySet()) {
             e.getValue().refresh();
-            this.listHealth.add(e.getValue());
+            this.model.getListHealth().add(e.getValue());
         }
-        this.listDeath.clear();
-        this.listImmune.clear();
-        this.statistiquePanel.updateState();
+        if (this.currentMap != null) {
+            this.currentMap.repaint();
+        }
+    }
+
+    public void checkHousePopulationPercentage() {
+        double newPer = 0;
+        for (HousePopulation h : this.listHousePopulations) {
+            newPer += h.getPercentage();
+        }
+        if (newPer != 100) {
+            this.cityPanel.housePopulationPercentageLabel.setBackground(Colors.WARNINGCOLOR);
+            this.cityPanel.housePopulationPercentageLabel.setIcon(Icons.WARNINGICON);
+            this.cityPanel.housePopulationPercentageLabel.setToolTipText(Messages.HousePopulationPercentageBad());
+            for (HousePopulation h : getListHousePopulations()) {
+                h.percentageTxt.setBackground(Colors.WARNINGCOLOR);
+            }
+        } else {
+            this.cityPanel.housePopulationPercentageLabel.setBackground(Colors.WHITE);
+            this.cityPanel.housePopulationPercentageLabel.setIcon(null);
+            this.cityPanel.housePopulationPercentageLabel.setToolTipText(null);
+            for (HousePopulation h : getListHousePopulations()) {
+                h.percentageTxt.setBackground(Colors.WHITE);
+            }
+        }
     }
 }

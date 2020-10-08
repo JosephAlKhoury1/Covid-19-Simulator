@@ -9,7 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -106,7 +108,7 @@ public class HumanAge {
         this.maxAgeTxt.addFocusListener(this.maxListener);
         this.maxAgeTxt.getDocument().addDocumentListener(this.maxListener);
 
-        removeButton = new JButton("-");
+        removeButton = new JButton();
         removeButton.setPreferredSize(new Dimension(40, 35));
         removeButton.setMinimumSize(new Dimension(40, 35));
         removeButton.setMaximumSize(new Dimension(40, 35));
@@ -117,6 +119,7 @@ public class HumanAge {
                 removeActionPerformed();
             }
         });
+        removeButton.setIcon(Icons.DELETEICON);
     }
 
     public HumanAge(String name, int minAge, int maxAge, List<SymptomType> listSymptom, Model model) {
@@ -208,7 +211,7 @@ public class HumanAge {
                 sa.getPercentageTxt().setBackground(Colors.WHITE);
             }
         }
-        removeButton = new JButton("-");
+        removeButton = new JButton();
         removeButton.setPreferredSize(new Dimension(40, 35));
         removeButton.setMinimumSize(new Dimension(40, 35));
         removeButton.setMaximumSize(new Dimension(40, 35));
@@ -219,6 +222,7 @@ public class HumanAge {
             }
         });
         this.panel.add(removeButton);
+        removeButton.setIcon(Icons.DELETEICON);
     }
 
     public Component getcPanel() {
@@ -460,11 +464,40 @@ public class HumanAge {
     }
 
     public SymptomType monteCarlo() {
+        Map<SymptomAge, Double> newMap = new HashMap();
+        List<SymptomAge> newList = new ArrayList();
+        double sumPercentage = 0;
+        boolean allZero = true;
+
+        if (listSymptomAges.isEmpty()) {
+            return null;
+        }
+        for (SymptomAge sa : this.listSymptomAges) {
+            sumPercentage += sa.getPercentage();
+            if (sa.getPercentage() > 0) {
+                allZero = false;
+            }
+        }
+        if (allZero) {
+            double newPercentage = 100 / listSymptomAges.size();
+            for (SymptomAge sa : this.listSymptomAges) {
+                newMap.put(sa, newPercentage);
+                newList.add(sa);
+            }
+        } else {
+            for (SymptomAge sa : this.listSymptomAges) {
+                if (sa.getPercentage() != 0) {
+                    double newPerc = sa.getPercentage() * 100 / sumPercentage;
+                    newMap.put(sa, newPerc);
+                    newList.add(sa);
+                }
+            }
+        }
+
         while (true) {
-            int index = MonteCarlo.uniformFixedSeed.nextInt(this.listSymptomAges.size());
-            System.out.println("index");
-            SymptomAge sage = (SymptomAge) this.listSymptomAges.get(index);
-            Double prob = sage.getPercentage() / 100d;
+            int index = MonteCarlo.uniformFixedSeed.nextInt(newMap.size());
+            SymptomAge sage = (SymptomAge) newList.get(index);
+            Double prob = newMap.get(sage) / 100d;
             double newRandom = MonteCarlo.uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
                 return sage.getSymptomType();
@@ -486,141 +519,35 @@ public class HumanAge {
 
     public void removeSymptomType(SymptomType st) {
         SymptomAge tmp = null;
+        double newPer = 0;
         for (SymptomAge sa : this.listSymptomAges) {
             if (sa.getSymptomType() == st) {
                 tmp = sa;
-                break;
+            } else {
+                newPer += sa.getPercentage();
             }
         }
+
         tmp.setDeleted(true);
         this.listSymptomAgesDeleted.add(tmp);
         this.listSymptomAges.remove(tmp);
         this.panel.remove(tmp.getPercentageTxt());
+        if (newPer != 100) {
+            getNameLabel().setBackground(Colors.WARNINGCOLOR);
+            getNameLabel().setIcon(Icons.WARNINGICON);
+            getNameLabel().setToolTipText(Messages.AGEPERCENTAGEWARNING);
+            for (SymptomAge sa : getListSymptomAges()) {
+                sa.getPercentageTxt().setBackground(Colors.WARNINGCOLOR);
+            }
+        } else {
+            getNameLabel().setBackground(Colors.WHITE);
+            getNameLabel().setIcon(null);
+            getNameLabel().setToolTipText(null);
+            for (SymptomAge sa : getListSymptomAges()) {
+                sa.getPercentageTxt().setBackground(Colors.WHITE);
+            }
+        }
         this.panel.repaint();
-    }
-
-    private class JTextFieldDoubleListener implements DocumentListener, FocusListener {
-
-        private final JTextField jtextField;
-        private MainFrame mainFrame;
-        private String currentString;
-        private final String greaterMessage = "Number can't be greater 100!";
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
-        private boolean insert = false;
-        private HumanAge humanAge;
-
-        public JTextFieldDoubleListener(JTextField textField, String value, MainFrame frame, HumanAge humanAge) {
-            this.jtextField = textField;
-            this.currentString = value;
-            this.humanAge = humanAge;
-            this.mainFrame = frame;
-        }
-
-        public JTextFieldDoubleListener(JTextField textField, String value, HumanAge humanAge) {
-            this.jtextField = textField;
-            this.currentString = value;
-            this.humanAge = humanAge;
-        }
-
-        public MainFrame getMainFrame() {
-            return mainFrame;
-        }
-
-        public void setMainFrame(MainFrame mainFrame) {
-            this.mainFrame = mainFrame;
-        }
-
-        private void insertZero(String s) {
-            Runnable doHighlight = () -> {
-                jtextField.setText(s);
-            };
-            SwingUtilities.invokeLater(doHighlight);
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (numTxt.contains("f") || numTxt.contains("d")) {
-                this.insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-            }
-            try {
-                Double d = Double.parseDouble(numTxt);
-                if (!insert) {
-                    this.currentString = numTxt;
-                    //this.humanAge.setPercentage(Double.parseDouble(numTxt));
-                    mainFrame.setModelSavedButtonEnable();
-                    this.humanAge.getModel().setSaved(false);
-                    this.humanAge.setSaved(false);
-                }
-                if (d > 100) {
-                    Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.mainFrame, this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                    };
-                    SwingUtilities.invokeLater(doHighlight);
-                    insertZero(this.currentString);
-                    this.insert = false;
-                }
-            } catch (NumberFormatException ex) {
-                this.insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-            }
-            this.insert = false;
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            if (insert) {
-                return;
-            }
-            String s = this.jtextField.getText();
-            if (s.length() <= 0 || s.equals("")) {
-                return;
-            }
-            this.currentString = s;
-            // this.humanAge.setPercentage(Double.parseDouble(s));
-            mainFrame.setModelSavedButtonEnable();
-            this.humanAge.getModel().setSaved(false);
-            this.humanAge.setSaved(false);
-
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-        }
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            insert = false;
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (numTxt.equals("")) {
-                insert = true;
-                insertZero(this.currentString);
-            } else if (numTxt.startsWith(".")) {
-                this.currentString = "0" + this.currentString;
-                insert = true;
-                insertZero(this.currentString);
-            } else if (numTxt.endsWith(".")) {
-                this.currentString = this.currentString + "0";
-                insertZero(this.currentString);
-            } else {
-                insert = false;
-            }
-        }
-
     }
 
     private class JTextFieldMinIntegerListener implements DocumentListener, FocusListener {

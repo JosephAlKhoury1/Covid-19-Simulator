@@ -150,8 +150,7 @@ public class Maps extends javax.swing.JPanel {
         public void actionPerformed(ActionEvent e) {
             int i = pane.indexOfComponent(scrollPane);
             pane.removeTabAt(i);
-            city1.getMapMenu().setEnabled(true);
-            // this.mp = null;
+            city1.getModel().getMapMenu().setEnabled(true);
         }
     }
 

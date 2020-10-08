@@ -25,6 +25,7 @@ public class SymptomsController {
     private final String selectAll = "select id, name, contagiousDay "
             + " from symptoms "
             + " where modelId = ?";
+    
     private final String delete = "delete "
             + " from symptoms "
             + " where id = ?";

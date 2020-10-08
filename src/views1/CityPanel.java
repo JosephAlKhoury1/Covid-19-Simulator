@@ -8,12 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -42,7 +40,6 @@ public class CityPanel extends javax.swing.JPanel {
     private City currentCity;
     private final LocationListPanel currentLocationListPanel;
     private Maps currentMap;
-    private List<Maps> listMaps;
     private final JTabbedPane pane;
     private final ButtonTilte button;
     private boolean isSaved = false;
@@ -53,8 +50,8 @@ public class CityPanel extends javax.swing.JPanel {
         this.currentCity = city;
         this.currentCity.setMainFrame(mainFrame);
         this.button = new ButtonTilte(this);
+        this.currentCity.setCityPanel(this);
 
-        this.listMaps = new ArrayList();
         this.initComponents();
         this.locationPanel.setLayout(new BorderLayout());
         this.locationPropertiesPanel.setLayout(new BorderLayout());
@@ -73,6 +70,7 @@ public class CityPanel extends javax.swing.JPanel {
         for (LocationToGo lt : this.currentCity.getListLocationToGo()) {
             this.locationToGoPanel.add(lt.getNameLabel());
             this.locationToGoPanel.add(lt.getcName());
+
         }
         this.currentCity.getListrelReligionTypes().stream().map((rl) -> {
             this.religionPanel.add(rl);
@@ -122,6 +120,7 @@ public class CityPanel extends javax.swing.JPanel {
         }).forEachOrdered((hp) -> {
             hp.setCity(city);
         });
+        this.currentCity.checkHousePopulationPercentage();
 
         this.currentCity.getListSexeType().stream().map((st) -> {
             Component c = Box.createVerticalStrut(3);
@@ -140,11 +139,11 @@ public class CityPanel extends javax.swing.JPanel {
         try {
             this.currentCity = new City(name, 0, 2000, 1000, 1, mainFrame);
             this.currentCity.setMainFrame(mainFrame);
+            this.currentCity.setCityPanel(this);
         } catch (RemoteException ex) {
             Logger.getLogger(CityPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.button = new ButtonTilte(this);
-        this.listMaps = new ArrayList();
         this.initComponents();
         this.currentLocationListPanel = new LocationListPanel(this.mainFrame, this);
 
@@ -214,6 +213,7 @@ public class CityPanel extends javax.swing.JPanel {
         }).forEachOrdered((hp) -> {
             hp.setCity(this.currentCity);
         });
+        this.currentCity.checkHousePopulationPercentage();
 
         this.currentCity.getListSexeType().stream().map((st) -> {
             Component c = Box.createVerticalStrut(3);
@@ -348,7 +348,6 @@ public class CityPanel extends javax.swing.JPanel {
         jLabel22 = new javax.swing.JLabel();
         locationToGoPanel = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
         agePanel = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
@@ -357,7 +356,7 @@ public class CityPanel extends javax.swing.JPanel {
         addHousePopulationButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        housePopulationPercentageLabel = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         housePopulationPanel = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
@@ -378,27 +377,11 @@ public class CityPanel extends javax.swing.JPanel {
         jLabel17 = new javax.swing.JLabel();
         jScrollPane6 = new javax.swing.JScrollPane();
         religionPanel = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
-        widthTxt = new javax.swing.JTextField();
-        jLabel31 = new javax.swing.JLabel();
-        jLabel32 = new javax.swing.JLabel();
-        heighTxt = new javax.swing.JTextField();
-        jPanel8 = new javax.swing.JPanel();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        jComboBox1 = new JComboBox(this.hours)
-        ;
-        jComboBox2 = new JComboBox(this.hours);
-        jPanel4 = new javax.swing.JPanel();
-        jLabel40 = new javax.swing.JLabel();
-        stayHomePerTxt = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        populationLabel = new javax.swing.JLabel();
         jPanel17 = new javax.swing.JPanel();
         locationPanel = new javax.swing.JPanel();
         locationPropertiesPanel = new javax.swing.JPanel();
 
-        jPanel5.setBackground(new java.awt.Color(255, 255, 51));
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
         jPanel5.setPreferredSize(new java.awt.Dimension(900, 1000));
         jPanel5.setRequestFocusEnabled(false);
 
@@ -410,10 +393,12 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel6.setPreferredSize(new java.awt.Dimension(174, 29));
 
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel7.setText("Year Distribution");
 
         addYeardistributionButton.setText("+");
         addYeardistributionButton.setToolTipText("Add new distribution");
+        addYeardistributionButton.setEnabled(false);
         addYeardistributionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addYeardistributionButtonActionPerformed(evt);
@@ -425,7 +410,7 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(addYeardistributionButton))
         );
@@ -440,17 +425,20 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel30.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel1.setBackground(new Color(255,204,51));
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Min");
         jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jLabel1.setPreferredSize(new java.awt.Dimension(20, 35));
 
         jLabel2.setBackground(new Color(255,204,51));
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Max");
         jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jLabel2.setPreferredSize(new java.awt.Dimension(24, 35));
 
+        percentageOfHumanLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         percentageOfHumanLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         percentageOfHumanLabel.setText("% of human");
         percentageOfHumanLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -459,6 +447,7 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel16.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel16.setPreferredSize(new java.awt.Dimension(124, 35));
 
+        jLabel22.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel22.setText("year");
         jLabel22.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -490,14 +479,11 @@ public class CityPanel extends javax.swing.JPanel {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
+        jLabel18.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel18.setText("Work");
         jLabel18.setToolTipText("");
         jLabel18.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel19.setText("Place number");
-        jLabel19.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout jPanel30Layout = new javax.swing.GroupLayout(jPanel30);
         jPanel30.setLayout(jPanel30Layout);
@@ -513,23 +499,20 @@ public class CityPanel extends javax.swing.JPanel {
                 .addGap(0, 0, 0)
                 .addComponent(percentageOfHumanLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
                 .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(locationToGoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 932, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(locationToGoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 1048, Short.MAX_VALUE))
         );
         jPanel30Layout.setVerticalGroup(
             jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel30Layout.createSequentialGroup()
                 .addGroup(jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(percentageOfHumanLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(percentageOfHumanLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(locationToGoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -578,7 +561,7 @@ public class CityPanel extends javax.swing.JPanel {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 437, Short.MAX_VALUE))
         );
 
-        jPanel15.setBackground(new java.awt.Color(255, 255, 51));
+        jPanel15.setBackground(new java.awt.Color(255, 255, 255));
         jPanel15.setMinimumSize(new java.awt.Dimension(100, 230));
         jPanel15.setName(""); // NOI18N
         jPanel15.setPreferredSize(new java.awt.Dimension(957, 230));
@@ -590,7 +573,8 @@ public class CityPanel extends javax.swing.JPanel {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel4.setText("House Population:");
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel4.setText("  House Population:");
 
         addHousePopulationButton.setText("+");
         addHousePopulationButton.setToolTipText("Add new population");
@@ -605,7 +589,7 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(addHousePopulationButton))
         );
@@ -618,28 +602,30 @@ public class CityPanel extends javax.swing.JPanel {
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Number");
         jLabel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("Percentage");
-        jLabel6.setToolTipText("");
-        jLabel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        housePopulationPercentageLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        housePopulationPercentageLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        housePopulationPercentageLabel.setText("Percentage");
+        housePopulationPercentageLabel.setToolTipText("");
+        housePopulationPercentageLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(housePopulationPercentageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+            .addComponent(housePopulationPercentageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -671,7 +657,7 @@ public class CityPanel extends javax.swing.JPanel {
                 .addGap(0, 0, 0)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
         );
 
         jPanel12.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -681,6 +667,7 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel13.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel13.setPreferredSize(new java.awt.Dimension(130, 29));
 
+        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel13.setText("Sexe Distribution");
 
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
@@ -688,8 +675,8 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel13Layout.setHorizontalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel13Layout.createSequentialGroup()
-                .addComponent(jLabel13)
-                .addContainerGap(189, Short.MAX_VALUE))
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -698,10 +685,12 @@ public class CityPanel extends javax.swing.JPanel {
 
         jPanel14.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel15.setText("Name");
         jLabel15.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel16.setText("Percentage");
         jLabel16.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -714,7 +703,7 @@ public class CityPanel extends javax.swing.JPanel {
                 .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -761,7 +750,9 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel10.setPreferredSize(new java.awt.Dimension(165, 29));
 
-        jLabel9.setText("House Religion");
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel9.setText("  House Religion");
+        jLabel9.setToolTipText("");
 
         addAgeButton.setText("+");
         addAgeButton.setToolTipText("Add new Religion");
@@ -776,7 +767,7 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel10Layout.setHorizontalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel10Layout.createSequentialGroup()
-                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(addAgeButton))
         );
@@ -789,17 +780,20 @@ public class CityPanel extends javax.swing.JPanel {
         jPanel11.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel11.setPreferredSize(new java.awt.Dimension(228, 35));
 
+        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel11.setText("Religion name");
         jLabel11.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jLabel11.setPreferredSize(new java.awt.Dimension(110, 18));
 
+        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("Percentage");
         jLabel12.setToolTipText("");
         jLabel12.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jLabel12.setPreferredSize(new java.awt.Dimension(110, 18));
 
+        jLabel17.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel17.setText("Prayer's place");
         jLabel17.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -875,149 +869,15 @@ public class CityPanel extends javax.swing.JPanel {
             .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
         );
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        widthTxt.setText("2000");
-        widthTxt.setToolTipText("");
-
-        jLabel31.setText("width:");
-
-        jLabel32.setText("Height:");
-
-        heighTxt.setText("1000");
-        heighTxt.setToolTipText("");
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel31, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel32, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(heighTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(widthTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(54, Short.MAX_VALUE))
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(widthTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel32, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(heighTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 17, Short.MAX_VALUE))
-        );
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel8.setText("Open Time:");
-
-        jLabel10.setText("Close Time:");
-
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jComboBox1, 0, 216, Short.MAX_VALUE))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
-        );
-
-        jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel40.setText("Stay home percentage:");
-
-        stayHomePerTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        stayHomePerTxt.setText("50");
-
-        jLabel3.setText("Population:");
-
-        populationLabel.setToolTipText("");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel40, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(stayHomePerTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(populationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(stayHomePerTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(55, 55, 55))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(populationLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-        );
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, 1031, Short.MAX_VALUE)
-                        .addComponent(jPanel47, javax.swing.GroupLayout.DEFAULT_SIZE, 1031, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 179, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, 1031, Short.MAX_VALUE)
+                    .addComponent(jPanel47, javax.swing.GroupLayout.DEFAULT_SIZE, 1031, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1026,12 +886,7 @@ public class CityPanel extends javax.swing.JPanel {
                 .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel47, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 84, Short.MAX_VALUE))
-                .addContainerGap(164, Short.MAX_VALUE))
+                .addContainerGap(254, Short.MAX_VALUE))
         );
 
         jScrollPane5.setViewportView(jPanel5);
@@ -1048,7 +903,7 @@ public class CityPanel extends javax.swing.JPanel {
         );
         locationPanelLayout.setVerticalGroup(
             locationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 848, Short.MAX_VALUE)
+            .addGap(0, 816, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout locationPropertiesPanelLayout = new javax.swing.GroupLayout(locationPropertiesPanel);
@@ -1087,12 +942,12 @@ public class CityPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 880, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 848, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void addHousePopulationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addHousePopulationButtonActionPerformed
-        HousePopulation hp = new HousePopulation(0, 10.0, this.currentCity);
+        HousePopulation hp = new HousePopulation(this.currentCity);
         this.housePopulationPanel.add(hp);
         Component c = Box.createVerticalStrut(3);
         hp.setComp(c);
@@ -1100,20 +955,12 @@ public class CityPanel extends javax.swing.JPanel {
         this.currentCity.getListHousePopulations().add(hp);
         this.housePopulationPanel.revalidate();
         this.currentCity.setIsSaved(false);
+        this.currentCity.checkHousePopulationPercentage();
         this.mainFrame.setCitySavedButtonEnable();
         this.mainFrame.setVisible(true);
     }//GEN-LAST:event_addHousePopulationButtonActionPerformed
 
     private void addYeardistributionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addYeardistributionButtonActionPerformed
-        /*HumanCityAgeType hc = new HumanCityAgeType("", 0, 0, 10.0, 0.0, 0.0, 0.0, this.currentCity);
-        this.agePanel.add(hc);
-        Component c = Box.createVerticalStrut(3);
-        hc.setComp(c);
-        this.agePanel.add(c);
-        this.currentCity.getListHumanAgeType().add(hc);
-        this.currentCity.setIsSaved(false);
-        this.mainFrame.setCitySavedButtonEnable();
-        this.mainFrame.setVisible(true);*/
         ManageLocationToGoDistributionDialog dialog = new ManageLocationToGoDistributionDialog(this.mainFrame);
         dialog.setVisible(true);
         this.mainFrame.setEnabled(false);
@@ -1200,12 +1047,9 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JButton addYeardistributionButton;
     private javax.swing.JPanel agePanel;
     private javax.swing.JPanel agePanelFathef;
-    private javax.swing.JTextField heighTxt;
     private javax.swing.JPanel housePopulationPanel;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
+    public javax.swing.JLabel housePopulationPercentageLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -1213,18 +1057,11 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -1238,12 +1075,9 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -1255,10 +1089,7 @@ public class CityPanel extends javax.swing.JPanel {
     private javax.swing.JPanel locationPropertiesPanel;
     private javax.swing.JPanel locationToGoPanel;
     public javax.swing.JLabel percentageOfHumanLabel;
-    private javax.swing.JLabel populationLabel;
     private javax.swing.JPanel religionPanel;
     private javax.swing.JPanel sexePanel;
-    private javax.swing.JTextField stayHomePerTxt;
-    private javax.swing.JTextField widthTxt;
     // End of variables declaration//GEN-END:variables
 }

@@ -20,12 +20,12 @@ public class HumanCityAgeContoller {
 
     public static final HumanCityAgeContoller INSTANCE = new HumanCityAgeContoller();
 
-    private final String insert = "insert into humancityagetype(name, minAge, maxAge, humanPercentage, placeNumber, workPercentage, cityId)"
-            + " values(?,?,?,?,?,?,?)";
+    private final String insert = "insert into humancityagetype(name, minAge, maxAge, humanPercentage, workPercentage, cityId)"
+            + " values(?,?,?,?,?,?)";
     private final String update = "update humancityagetype  "
-            + " set name = ?, minAge = ?, maxAge = ?, humanPercentage = ?, placeNumber = ?, workPercentage = ? "
+            + " set name = ?, minAge = ?, maxAge = ?, humanPercentage = ?, workPercentage = ? "
             + " where id = ?";
-    private final String selectAll = "select id, name, minAge, maxAge, humanPercentage, placeNumber, workPercentage "
+    private final String selectAll = "select id, name, minAge, maxAge, humanPercentage, workPercentage "
             + " from humancityagetype  "
             + " where cityId = ? ";
 
@@ -50,9 +50,8 @@ public class HumanCityAgeContoller {
             this.insertStatement.setInt(2, hat.getMin());
             this.insertStatement.setInt(3, hat.getMax());
             this.insertStatement.setDouble(4, hat.getHumanPercentage());
-            this.insertStatement.setInt(5, hat.getPlaceNumber());
-            this.insertStatement.setDouble(6, hat.getWorkPercentage());
-            this.insertStatement.setInt(7, hat.getCity().getId());
+            this.insertStatement.setDouble(5, hat.getWorkPercentage());
+            this.insertStatement.setInt(6, hat.getCity().getId());
 
             int affectedRows = this.insertStatement.executeUpdate();
             if (affectedRows == 0) {
@@ -75,9 +74,8 @@ public class HumanCityAgeContoller {
             this.updateStatement.setInt(2, hat.getMin());
             this.updateStatement.setInt(3, hat.getMax());
             this.updateStatement.setDouble(4, hat.getHumanPercentage());
-            this.updateStatement.setInt(5, hat.getPlaceNumber());
-            this.updateStatement.setDouble(6, hat.getWorkPercentage());
-            this.updateStatement.setInt(7, hat.getId());
+            this.updateStatement.setDouble(5, hat.getWorkPercentage());
+            this.updateStatement.setInt(6, hat.getId());
             this.updateStatement.executeUpdate();
             return true;
         } catch (SQLException ex) {
@@ -94,7 +92,7 @@ public class HumanCityAgeContoller {
             while (set.next()) {
                 List<LocationToGo> listLocationTo = LocationToGoController.INSTANCE.selectAll(set.getInt(1));
                 List<String> listN = LocationToGoController.INSTANCE.selectAllName(set.getInt(1));
-                list.add(new HumanCityAgeType(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4), set.getDouble(5), set.getInt(6), set.getDouble(7), listLocationTo, listN));
+                list.add(new HumanCityAgeType(set.getInt(1), set.getString(2), set.getInt(3), set.getInt(4), set.getDouble(5), set.getDouble(6), listLocationTo, listN));
             }
             set.close();
             return list;

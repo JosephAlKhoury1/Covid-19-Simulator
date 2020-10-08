@@ -1,5 +1,9 @@
 package models.client1;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class MonteCarlo {
@@ -36,10 +40,38 @@ public class MonteCarlo {
     }
 
     public static HumanCityAgeType getHumanAgeTypeWithoutChildren() {
+        if (Data.populationAgePercentageWithoutChildren.isEmpty()) {
+            return null;
+        }
+        int sumPercentage = 0;
+        boolean allZero = true;
+        for (HumanCityAgeType ha : Data.populationAgePercentageWithoutChildren) {
+            sumPercentage += ha.getHumanPercentage();
+            if (ha.getHumanPercentage() > 0) {
+                allZero = false;
+            }
+        }
+        Map<HumanCityAgeType, Double> newMap = new HashMap();
+        List<HumanCityAgeType> newList = new ArrayList();
+        if (allZero) {
+            double newPercentage = 100 / Data.populationAgePercentageWithoutChildren.size();
+            for (HumanCityAgeType ha : Data.populationAgePercentageWithoutChildren) {
+                newMap.put(ha, newPercentage);
+                newList.add(ha);
+            }
+        } else {
+            for (HumanCityAgeType ha : Data.populationAgePercentageWithoutChildren) {
+                if (ha.getHumanPercentage() != 0) {
+                    double per = 100 * ha.getHumanPercentage() / sumPercentage;
+                    newMap.put(ha, per);
+                    newList.add(ha);
+                }
+            }
+        }
         while (true) {
-            int index = uniformFixedSeed.nextInt(Data.populationAgePercentageWithoutChildren.size());
-            HumanCityAgeType ht = (HumanCityAgeType) Data.populationAgePercentageWithoutChildren.get(index);
-            Double prob = ht.getHumanPercentage() / 100d;
+            int index = uniformFixedSeed.nextInt(newMap.size());
+            HumanCityAgeType ht = newList.get(index);
+            Double prob = newMap.get(ht) / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
                 return ht;
@@ -48,10 +80,38 @@ public class MonteCarlo {
     }
 
     public static HumanCityAgeType getHumanAgeType() {
+        if (Data.populationAgePercentageWithoutChildren.isEmpty()) {
+            return null;
+        }
+        int sumPercentage = 0;
+        boolean allZero = true;
+        for (HumanCityAgeType ha : Data.populationAgePercentage) {
+            sumPercentage += ha.getHumanPercentage();
+            if (ha.getHumanPercentage() > 0) {
+                allZero = false;
+            }
+        }
+        Map<HumanCityAgeType, Double> newMap = new HashMap();
+        List<HumanCityAgeType> newList = new ArrayList();
+        if (allZero) {
+            double newPercentage = 100 / Data.populationAgePercentage.size();
+            for (HumanCityAgeType ha : Data.populationAgePercentage) {
+                newMap.put(ha, newPercentage);
+                newList.add(ha);
+            }
+        } else {
+            for (HumanCityAgeType ha : Data.populationAgePercentage) {
+                if (ha.getHumanPercentage() != 0) {
+                    double per = 100 * ha.getHumanPercentage() / sumPercentage;
+                    newMap.put(ha, per);
+                    newList.add(ha);
+                }
+            }
+        }
         while (true) {
-            int index = uniformFixedSeed.nextInt(Data.populationAgePercentage.size());
-            HumanCityAgeType ht = (HumanCityAgeType) Data.populationAgePercentage.get(index);
-            Double prob = ht.getHumanPercentage() / 100d;
+            int index = uniformFixedSeed.nextInt(newMap.size());
+            HumanCityAgeType ht = newList.get(index);
+            Double prob = newMap.get(ht) / 100d;
             double newRandom = uniformFixedSeed.nextDouble();
             if (newRandom <= prob) {
                 return ht;
@@ -60,6 +120,10 @@ public class MonteCarlo {
     }
 
     public static int getHumanAge(HumanCityAgeType humanAgeType) {
+        if (humanAgeType == null) {
+            int index = getNextInt(100);
+            return Data.listAge.get(index);
+        }
         return getNextIntBetween2Number(humanAgeType.getMin(), humanAgeType.getMax());
     }
 

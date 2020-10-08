@@ -50,7 +50,6 @@ public class SymptomStage extends JPanel {
 
     private JTextField dayTxt;
 
-    private JTextField percentageTxt;
     private JLabel nameLabel1, nameLabel2;
     private Component cName1;
 
@@ -130,7 +129,7 @@ public class SymptomStage extends JPanel {
         indexTxt.addFocusListener(indexListener);
         indexTxt.getDocument().addDocumentListener(indexListener);
 
-        removeButton = new JButton("-");
+        removeButton = new JButton();
         removeButton.setPreferredSize(new Dimension(40, 35));
         removeButton.setMinimumSize(new Dimension(40, 35));
         removeButton.setMaximumSize(new Dimension(40, 35));
@@ -141,6 +140,7 @@ public class SymptomStage extends JPanel {
                 removeActionPerformed();
             }
         });
+        removeButton.setIcon(Icons.DELETEICON);
 
         this.iList = new JTextFieldDoubleImmuneListener(this.immunePercentageTxt, this.immunePercentage + "", this);
         this.dList = new JTextFieldDoubleDeathListener(this.deathPercentageTxt, this.deathPercentage + "", this);
@@ -150,9 +150,9 @@ public class SymptomStage extends JPanel {
         deathPercentageTxt.getDocument().addDocumentListener(dList);
 
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(622, 35));
-        this.panel.setMinimumSize(new Dimension(622, 35));
-        this.panel.setMaximumSize(new Dimension(622, 35));
+        this.panel.setPreferredSize(new Dimension(708, 35));
+        this.panel.setMinimumSize(new Dimension(708, 35));
+        this.panel.setMaximumSize(new Dimension(708, 35));
         this.panel.setBorder(BorderFactory.createEtchedBorder());
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
         this.panel.add(this.nameLabel1);
@@ -277,7 +277,7 @@ public class SymptomStage extends JPanel {
         indexTxt.addFocusListener(indexListener);
         indexTxt.getDocument().addDocumentListener(indexListener);
 
-        removeButton = new JButton("-");
+        removeButton = new JButton();
         removeButton.setPreferredSize(new Dimension(40, 35));
         removeButton.setMinimumSize(new Dimension(40, 35));
         removeButton.setMaximumSize(new Dimension(40, 35));
@@ -288,6 +288,7 @@ public class SymptomStage extends JPanel {
                 removeActionPerformed();
             }
         });
+        removeButton.setIcon(Icons.DELETEICON);
 
         this.iList = new JTextFieldDoubleImmuneListener(this.immunePercentageTxt, this.immunePercentage + "", this);
         this.dList = new JTextFieldDoubleDeathListener(this.deathPercentageTxt, this.deathPercentage + "", this);
@@ -297,9 +298,9 @@ public class SymptomStage extends JPanel {
         deathPercentageTxt.getDocument().addDocumentListener(dList);
 
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(622, 35));
-        this.panel.setMinimumSize(new Dimension(622, 35));
-        this.panel.setMaximumSize(new Dimension(622, 35));
+        this.panel.setPreferredSize(new Dimension(708, 35));
+        this.panel.setMinimumSize(new Dimension(708, 35));
+        this.panel.setMaximumSize(new Dimension(708, 35));
         this.panel.setBorder(BorderFactory.createEtchedBorder());
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
         this.panel.add(this.nameLabel1);

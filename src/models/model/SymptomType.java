@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import resources.icon.Icons;
 import resources.icon.Messages;
 import views1.MainFrame;
 
@@ -99,7 +100,7 @@ public class SymptomType extends javax.swing.JPanel {
         this.dayTxt.addFocusListener(listener);
         this.dayTxt.getDocument().addDocumentListener(listener);
 
-        removeButton = new JButton("-");
+        removeButton = new JButton();
         removeButton.setPreferredSize(new Dimension(40, 35));
         removeButton.setMinimumSize(new Dimension(40, 35));
         removeButton.setMaximumSize(new Dimension(40, 35));
@@ -110,6 +111,7 @@ public class SymptomType extends javax.swing.JPanel {
                 removeActionPerformed();
             }
         });
+        removeButton.setIcon(Icons.DELETEICON);
 
         this.symptomeStagePanel.setLayout(new BoxLayout(this.symptomeStagePanel, BoxLayout.X_AXIS));
 
@@ -172,7 +174,7 @@ public class SymptomType extends javax.swing.JPanel {
         dayTxt.setMinimumSize(new java.awt.Dimension(130, 35));
         dayTxt.setPreferredSize(new java.awt.Dimension(130, 35));
 
-        removeButton = new JButton("-");
+        removeButton = new JButton();
         removeButton.setPreferredSize(new Dimension(40, 35));
         removeButton.setMinimumSize(new Dimension(40, 35));
         removeButton.setMaximumSize(new Dimension(40, 35));
@@ -183,6 +185,7 @@ public class SymptomType extends javax.swing.JPanel {
                 removeActionPerformed();
             }
         });
+        removeButton.setIcon(Icons.DELETEICON);
 
         this.saved = true;
         this.inNew = false;
@@ -215,7 +218,7 @@ public class SymptomType extends javax.swing.JPanel {
     public void removeActionPerformed() {
         int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETESYMPTOMTYPE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
 
-        if (index == JOptionPane.NO_OPTION) {
+        if (index == JOptionPane.NO_OPTION || index == JOptionPane.CLOSED_OPTION) {
             return;
         }
         this.setDeleted(true);

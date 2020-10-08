@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import models.location1.*;
 
 public class Day implements Cloneable {
@@ -74,4 +75,14 @@ public class Day implements Cloneable {
         return d;
     }
 
+    public List<LocationCategory> getLocationCategory(String kind) {
+        List<LocationCategory> list = new ArrayList();
+
+        for (Entry<String, LocationCategory> lc : this.listLocationCategory.entrySet()) {
+            if (lc.getValue().getKind().equals(kind)) {
+                list.add(lc.getValue());
+            }
+        }
+        return list;
+    }
 }

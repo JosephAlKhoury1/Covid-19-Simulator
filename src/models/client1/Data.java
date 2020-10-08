@@ -1,6 +1,6 @@
 package models.client1;
 
-import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +12,15 @@ import java.util.Map;
 public class Data {
 
     public static int TileWidth = 25, TileHeight = 25;
-    public static String[] tabLocation = {"House", "Univerity", "School", "Church", "Mosque", "Restaurant", "Shop", "Factory"};
+    public static String[] tabLocation = {"House", "University", "School", "Church", "Mosque", "Restaurant", "Shop", "Factory"};
 
     public static Map<Integer, ICity> listCity = new HashMap();
     public static List<HousePopulation> housePopulationPercentage;
 
     public static List<HumanCityAgeType> populationAgePercentage;
     public static List<HumanCityAgeType> populationAgePercentageWithoutChildren;
+
+    public static List<Integer> listAgeWithoutChildren, listAge;
 
     public static List<ReligionType> houseReligionTypePercentage;
     public static List<SexeType> sexeTypePercentage;
@@ -34,11 +36,19 @@ public class Data {
 
     public static void iniPopulationAgePercentage(List<HumanCityAgeType> list) {
         populationAgePercentage = list;
+        listAge = new ArrayList();
+        for (int i = 1; i <= 100; i++) {
+            listAge.add(i);
+        }
     }
 
     /////////Childrens can't be alone in a house
     public static void initPopulationAgePercentageWithoutChildren(List<HumanCityAgeType> list) {
         populationAgePercentageWithoutChildren = list;
+        listAge = new ArrayList();
+        for (int i = 10; i <= 100; i++) {
+            listAge.add(i);
+        }
     }
 
     public static void initHumanSex(List<SexeType> listS) {

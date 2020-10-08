@@ -10,8 +10,8 @@ public class FactoryFactory extends LocationFactory {
     public static final FactoryFactory INSTANCE = new FactoryFactory();
 
     @Override
-    public Location creatLocation(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, String days, City city) {
-        return new Factory(name, x, y, average_sick, fixed, openTime, closeTime, days, city);
+    public Location creatLocation(String name, int x, int y, double average_sick, City city) {
+        return new Factory(name, x, y, average_sick,city);
     }
 
     @Override

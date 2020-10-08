@@ -1,12 +1,8 @@
 package views1;
 
 import controller.locationController.CityController;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;

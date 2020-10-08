@@ -29,13 +29,15 @@
     <Component class="javax.swing.JFileChooser" name="j">
       <Properties>
         <Property name="dialogType" type="int" value="1"/>
-        <Property name="fileSelectionMode" type="int" value="1"/>
+        <Property name="dialogTitle" type="java.lang.String" value=""/>
+        <Property name="fileSelectionMode" type="int" value="2"/>
         <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
       <AccessibilityProperties>
         <Property name="AccessibleContext.accessibleName" type="java.lang.String" value=""/>
       </AccessibilityProperties>
       <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JFileChooser()"/>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
       </AuxValues>
     </Component>

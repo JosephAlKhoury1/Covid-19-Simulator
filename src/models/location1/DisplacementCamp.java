@@ -12,25 +12,20 @@ import models.client1.Data;
  */
 public class DisplacementCamp extends Location {
 
-    private int openTime;
-    private int closeTime;
-
-    public DisplacementCamp(String name, int x, int y, double average_sick, int fixed, int locationCategoryId, City city) {
-        super(name, x, y, average_sick, "", locationCategoryId, fixed, city);
+    public DisplacementCamp(String name, int x, int y, double average_sick, int locationCategoryId, City city) {
+        super(name, x, y, average_sick, locationCategoryId, city);
         this.setWidth(LocationData.WTILEDISPLACEMENTCAMP * Data.TileWidth);
         this.setHeight(LocationData.HTILEDISPLACEMENTCAMP * Data.TileHeight);
         loadImage();
     }
 
-    public DisplacementCamp(int id, String name, int x, int y, int width, int height, double average_sick, int fixed, int locationCategoryId, City c) {
-        super(id, name, x, y, width, height, average_sick, "", fixed, locationCategoryId, c);
+    public DisplacementCamp(int id, String name, int x, int y, int width, int height, double average_sick,  int locationCategoryId, City c) {
+        super(id, name, x, y, width, height, average_sick, locationCategoryId, c);
         loadImage();
     }
 
-    public DisplacementCamp(String name, int x, int y, double average_sick, int fixed, int openTime, int closeTime, City city) {
-        super(name, x, y, average_sick, "", fixed, city);
-        this.openTime = openTime;
-        this.closeTime = closeTime;
+    public DisplacementCamp(String name, int x, int y, double average_sick, City city) {
+        super(name, x, y, average_sick, city);
         this.setWidth(LocationData.WTILEDISPLACEMENTCAMP * Data.TileWidth);
         this.setHeight(LocationData.HTILEDISPLACEMENTCAMP * Data.TileHeight);
         loadImage();
@@ -43,25 +38,6 @@ public class DisplacementCamp extends Location {
     public void draw(Graphics g) {
         g.drawImage(image, x, y, width, height, map);
         Toolkit.getDefaultToolkit().sync();
-    }
-
-    public int getOpenTime() {
-        return openTime;
-    }
-
-    @Override
-    public void setOpenTime(int openTime) {
-        this.openTime = openTime;
-    }
-
-    @Override
-    public int getCloseTime() {
-        return closeTime;
-    }
-
-    @Override
-    public void setCloseTime(int closeTime) {
-        this.closeTime = closeTime;
     }
 
     @Override

@@ -21,7 +21,7 @@ public class ManageSymptomTypeDialog extends JDialog {
         this.frame = rf;
         this.setAlwaysOnTop(true);
         this.setLocation(500, 200);
-        this.setSize(400, 300);
+        this.setSize(455, 400);
         this.setResizable(false);
         addWindowListener(new WindowAdapter() {
 
