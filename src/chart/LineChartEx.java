@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package chart;
 
 import org.jfree.chart.ChartFactory;
@@ -18,11 +13,8 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,28 +23,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import models.model.Model;
 import models.model.SymptomStage;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
-import org.jfree.chart.axis.TickUnit;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.data.Range;
-import org.jfree.data.RangeType;
-import org.jfree.data.xy.XYDataItem;
 
 public class LineChartEx extends JPanel implements ActionListener, ChangeListener {
 
-    // private Timer timer = new Timer(1000, this);
     XYSeries series, s1, s2, s3, s4, s5;
     int lastValue = 1;
     private static int SLIDER_INITIAL_VALUE = 1;
@@ -71,18 +56,18 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
     private int numberHuman = 0;
     private JPanel checkBoxPanel;
     private int in = 0;
-    
+
     JFreeChart chart;
-    
+
     private List<JCheckBox> listCheckBox;
-    
+
     public LineChartEx(Model model) {
         initUI();
         this.model = model;
         listSeries = new HashMap();
         this.listSeries2 = new HashMap();
     }
-    
+
     private void initUI() {
         this.removeAll();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -90,7 +75,7 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
         this.slider.addChangeListener(this);
         dataset = createDataset();
         chart = createChart(dataset);
-        
+
         ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         chartPanel.setBackground(Color.white);
@@ -100,21 +85,21 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
         dashboard.setBorder(BorderFactory.createEmptyBorder(0, 4, 4, 4));
         dashboard.add(this.slider);
         add(dashboard, BorderLayout.SOUTH);
-        
+
         this.checkBoxPanel = new JPanel();
         this.checkBoxPanel.setLayout(new BoxLayout(this.checkBoxPanel, BoxLayout.Y_AXIS));
         add(checkBoxPanel);
         this.listCheckBox = new ArrayList();
-        
+
         this.add(dashboard);
     }
-    
+
     private XYSeriesCollection createDataset() {
-        
+
         XYSeriesCollection set = new XYSeriesCollection();
         return set;
     }
-    
+
     private JFreeChart createChart(XYDataset dataset) {
         JFreeChart ch = ChartFactory.createXYLineChart(
                 "Result over time",
@@ -126,42 +111,41 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
                 true,
                 false
         );
-        
+
         XYPlot plot = ch.getXYPlot();
-        
+
         renderer = new XYLineAndShapeRenderer();
-        
+
         plot.setRenderer(renderer);
         plot.setBackgroundPaint(Color.white);
-        
+
         plot.setRangeGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.BLACK);
         this.domainAxis = (NumberAxis) plot.getDomainAxis();
-        
+
         this.domainAxis.setFixedAutoRange(10);
-        
+
         this.domainAxis.setAutoRange(true);
         this.domainAxis.setTickUnit(new NumberTickUnit(1));
         this.valueAxis = plot.getRangeAxis();
-        
+
         plot.setDomainGridlinesVisible(true);
         plot.setDomainGridlinePaint(Color.BLACK);
-        
+
         ch.getLegend().setFrame(BlockBorder.NONE);
-        
+
         ch.setTitle(new TextTitle("Result of study",
                 new Font("Serif", java.awt.Font.BOLD, 18)
         )
         );
-        
+
         return ch;
     }
-    
+
     public void init() {
-//        
-//        if (isStop) {
-//            initUI();
-//        }
+        this.domainAxis.setFixedAutoRange(10);
+
+        this.domainAxis.setAutoRange(true);
         this.slider.setMaximum(1);
         this.slider.setMinimum(0);
         this.slider.setValue(1);
@@ -176,16 +160,16 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
         for (JCheckBox jc : this.listCheckBox) {
             jc.setEnabled(false);
         }
-        
+
         this.in = 0;
         this.sickNumber = 0;
         this.numberHuman = 0;
         this.numberHuman = model.getCity().getListMember().size();
-        this.valueAxis.setRange(new Range(0, model.getListHealth().size() + 20));
-        
+        this.valueAxis.setRange(new Range(0, model.getListHealth().size() + 40));
+
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-        
+
         this.checkBoxPanel.add(p);
         XYSeries hS = new XYSeries("Health");
         hS.add(1, model.getListHealth().size());
@@ -206,13 +190,12 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
                     listSeries.remove("Health");
                     listSeries2.remove("Health");
                 }
-                System.out.println("performed");
                 reset();
             }
         });
         this.listCheckBox.add(heBox);
         p.add(heBox);
-        
+
         in = 1;
         for (SymptomStage ss : this.model.getListSymptomStage1sNonHospital()) {
             if (in % 6 == 0) {
@@ -252,13 +235,13 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
                 p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
                 this.checkBoxPanel.add(p);
             }
-            
+
             XYSeries s = new XYSeries(ss.getName());
             s.add(1, ss.getListMember().size());
             this.listSeries.put(ss.getName(), ss.getColor());
             this.listSeries2.put(ss.getName(), s);
             renderer.setSeriesPaint(in, ss.getColor());
-            
+
             JCheckBox box = new JCheckBox(ss.getName());
             box.setForeground(ss.getColor());
             box.setSelected(true);
@@ -278,22 +261,22 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
             });
             this.listCheckBox.add(box);
             p.add(box);
-            
+
             in++;
         }
-        
+
         if (in % 6 == 0) {
             p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
             this.checkBoxPanel.add(p);
         }
-        
+
         XYSeries sI = new XYSeries("Immune");
         sI.add(1, 0);
         this.listSeries.put("Immune", Color.CYAN);
         this.listSeries2.put("Immune", sI);
         renderer.setSeriesPaint(in, Color.CYAN);
-        
+
         JCheckBox IBox = new JCheckBox("Immune");
         IBox.setForeground(Color.CYAN);
         IBox.setSelected(true);
@@ -313,21 +296,21 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
         });
         this.listCheckBox.add(IBox);
         p.add(IBox);
-        
+
         in++;
-        
+
         if (in % 6 == 0) {
             p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
             this.checkBoxPanel.add(p);
         }
-        
+
         XYSeries sD = new XYSeries("Death");
         sD.add(1, 0);
         this.listSeries.put("Death", Color.BLACK);
         this.listSeries2.put("Death", sD);
         renderer.setSeriesPaint(in, Color.BLACK);
-        
+
         JCheckBox DBox = new JCheckBox("Death");
         DBox.setForeground(Color.BLACK);
         DBox.setSelected(true);
@@ -347,22 +330,21 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
         });
         this.listCheckBox.add(DBox);
         p.add(DBox);
-        
+
         in++;
-        
+
         if (in % 6 == 0) {
             p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
             this.checkBoxPanel.add(p);
         }
-        
+
         XYSeries sickSeries = new XYSeries("Sick");
         this.sickNumber = this.numberHuman - model.getListHealth().size();
         sickSeries.add(1, this.sickNumber);
         this.listSeries.put("Sick", Color.RED);
         this.listSeries2.put("Sick", sickSeries);
         renderer.setSeriesPaint(in, Color.RED);
-//        renderer.setSeriesStroke(in, new BasicStroke(5.0f));
 
         JCheckBox sickBox = new JCheckBox("Sick");
         sickBox.setForeground(Color.RED);
@@ -383,7 +365,7 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
         });
         this.listCheckBox.add(sickBox);
         p.add(sickBox);
-        
+
         int o = 0;
         for (Entry<String, XYSeries> s : this.listSeries2.entrySet()) {
             this.dataset.addSeries(s.getValue());
@@ -391,9 +373,9 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
             o++;
         }
         this.slider.setEnabled(false);
-        
+
     }
-    
+
     public void stop() {
         this.slider.setEnabled(true);
         this.isStop = true;
@@ -401,7 +383,7 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
             jc.setEnabled(true);
         }
     }
-    
+
     public void reset() {
         int ind = 0;
         this.dataset.removeAllSeries();
@@ -411,7 +393,7 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
             ind++;
         }
     }
-    
+
     public void checkValue() {
         int day = model.getDay();
         this.listSeries2.get("Health").add(day, model.getListHealth().size());
@@ -429,7 +411,7 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
         this.slider.setMaximum(this.lastValue);
         this.slider.setValue(this.lastValue);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         /*this.lastValue += 1;
@@ -446,7 +428,7 @@ public class LineChartEx extends JPanel implements ActionListener, ChangeListene
 
         index += 10;*/
     }
-    
+
     @Override
     public void stateChanged(ChangeEvent e) {
         if (isStop) {

@@ -3,15 +3,15 @@ package views1.model.panel;
 import chart.LineChartEx;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
-import models.client1.Week;
+import models.client.Week;
 import models.model.Model;
 import models.model.SymptomStage;
 
 public class StatistiquePanel extends javax.swing.JPanel {
-
+    
     private Model model;
     LineChartEx chart;
-
+    
     public StatistiquePanel(Model model) {
         initComponents();
         this.model = model;
@@ -20,11 +20,11 @@ public class StatistiquePanel extends javax.swing.JPanel {
         this.healthLabel.setText(model.getListHealth().size() + "");
         this.immuneLabel.setText(model.getListImmune().size() + "");
         this.deathLabel.setText(model.getListDeath().size() + "");
-
+        
         this.weekLabel.setText(model.getCity().getWeek().getWeekNumber() + "");
         this.dayLabel.setText(model.getCity().getWeek().getCurrentDay().getDay().getName());
         this.hourLabel.setText(model.getCity().getWeek().getCurrentDay().getHour() + "");
-
+        
         this.stagePanel.setLayout(new BoxLayout(this.stagePanel, BoxLayout.Y_AXIS));
         int he = (this.model.getListSymptomStage1sNonHospital().size() + this.model.getListSymptomStage1sHospital().size()) * 27;
         this.stagePanel.setPreferredSize(new Dimension(299, he));
@@ -33,22 +33,40 @@ public class StatistiquePanel extends javax.swing.JPanel {
         for (SymptomStage ss : this.model.getListSymptomStage1sNonHospital()) {
             this.stagePanel.add(ss.getStatistiquePanel());
         }
-
+        
         for (SymptomStage ss : this.model.getListSymptomStage1sHospital()) {
             this.stagePanel.add(ss.getStatistiquePanel());
         }
-
+        
         chart = new LineChartEx(this.model);
         this.chartPanel.add(chart);
-
+        
     }
-
+    
+    public void reinitStagePanel() {
+        this.stagePanel.removeAll();
+        this.stagePanel.setLayout(new BoxLayout(this.stagePanel, BoxLayout.Y_AXIS));
+        int he = (this.model.getListSymptomStage1sNonHospital().size() + this.model.getListSymptomStage1sHospital().size()) * 27;
+        this.stagePanel.setPreferredSize(new Dimension(299, he));
+        this.stagePanel.setMaximumSize(new Dimension(299, he));
+        this.stagePanel.setMinimumSize(new Dimension(299, he));
+        for (SymptomStage ss : this.model.getListSymptomStage1sNonHospital()) {
+            this.stagePanel.add(ss.getStatistiquePanel());
+        }
+        
+        for (SymptomStage ss : this.model.getListSymptomStage1sHospital()) {
+            this.stagePanel.add(ss.getStatistiquePanel());
+        }
+        this.stagePanel.repaint();
+        this.stagePanel.setVisible(true);
+    }
+    
     public void updateTime(Week week) {
         this.weekLabel.setText(week.getWeekNumber() + "");
         this.dayLabel.setText(week.getCurrentDay().getDay().getName());
         this.hourLabel.setText(week.getCurrentDay().getHour() + "");
     }
-
+    
     public void updateState() {
         this.healthLabel.setText(this.model.getListHealth().size() + "");
         this.immuneLabel.setText(this.model.getListImmune().size() + "");
@@ -60,19 +78,19 @@ public class StatistiquePanel extends javax.swing.JPanel {
             ss.updateStatistique();
         }
     }
-
+    
     public void initChart() {
         this.chart.init();
     }
-
+    
     public LineChartEx getChart() {
         return chart;
     }
-
+    
     public void setChart(LineChartEx chart) {
         this.chart = chart;
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

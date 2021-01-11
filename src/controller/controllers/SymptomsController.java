@@ -17,12 +17,12 @@ public class SymptomsController {
 
     public static final SymptomsController INSTANCE = new SymptomsController();
 
-    private final String insertSymptom = "insert into symptoms(name, contagiousDay, modelId)"
-            + " values(?, ?, ?)";
+    private final String insertSymptom = "insert into symptoms(name, modelId)"
+            + " values(?, ?)";
     private final String updateSymptom = "update symptoms "
-            + " set name = ?, contagiousDay = ? "
+            + " set name = ?"
             + " where id = ?";
-    private final String selectAll = "select id, name, contagiousDay "
+    private final String selectAll = "select id, name "
             + " from symptoms "
             + " where modelId = ?";
     
@@ -50,8 +50,7 @@ public class SymptomsController {
         int id = -1;
         try {
             this.insertStatement.setString(1, st.getName());
-            this.insertStatement.setInt(2, st.getContagiousDay());
-            this.insertStatement.setInt(3, st.getModel().getModelId());
+            this.insertStatement.setInt(2, st.getModel().getModelId());
             int affectedRows = this.insertStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating symptom failed, no rows affected.");
@@ -69,8 +68,7 @@ public class SymptomsController {
     public boolean updateSymptom(SymptomType st) {
         try {
             this.updateStatement.setString(1, st.getName());
-            this.updateStatement.setInt(2, st.getContagiousDay());
-            this.updateStatement.setInt(3, st.getId());
+            this.updateStatement.setInt(2, st.getId());
             int affectedRows = this.updateStatement.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Creating symptom failed, no rows affected.");
@@ -88,9 +86,7 @@ public class SymptomsController {
             this.selectAllStatement.setInt(1, modelId);
             ResultSet set = this.selectAllStatement.executeQuery();
             while (set.next()) {
-                List<SymptomStage> listSS = SymptomStageController.INSTANCE.selectAll(set.getInt(1));
-                List<HumanAge> listHA = HumanAgeController.INSTANCE.selectAll(set.getInt(1));
-                list.add(new SymptomType(set.getInt(1), set.getString(2), set.getInt(3)));
+                list.add(new SymptomType(set.getInt(1), set.getString(2)));
             }
             set.close();
             return list;

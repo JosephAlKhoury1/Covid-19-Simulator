@@ -10,17 +10,21 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import models.location1.DayRow;
-import models.location1.LocationCategory;
-import models.location1.TimeRow;
-import models.locationFactories1.HouseFactory;
+import models.location.DayRow;
+import models.location.LocationCategory;
+import models.location.TimeRow;
+import models.locationFactories.HouseFactory;
+import resources.Messages.Messages;
+import views1.MainFrame;
 
 public class ModelLocationProperties extends javax.swing.JPanel {
 
     private LocationCategory locationCategory;
+    private MainFrame mainFrame;
 
-    public ModelLocationProperties(LocationCategory lc) {
+    public ModelLocationProperties(LocationCategory lc, MainFrame frame) {
         this.locationCategory = lc;
+        this.mainFrame = frame;
         initComponents();
         lc.setModelLocatioProperties(this);
         this.nameLabel1.setText(lc.getName());
@@ -35,7 +39,7 @@ public class ModelLocationProperties extends javax.swing.JPanel {
         this.saturdayPanel.setLayout(new BoxLayout(this.saturdayPanel, BoxLayout.Y_AXIS));
         this.sundayPanel.setLayout(new BoxLayout(this.sundayPanel, BoxLayout.Y_AXIS));
 
-        for (DayRow d : lc.getListDayRow()) {
+        for (DayRow d : lc.getListDayRowTmp()) {
             if (d.getName().equals("Monday")) {
                 if (d.getUsed() == 1) {
                     this.mondayBox.setSelected(true);
@@ -44,7 +48,6 @@ public class ModelLocationProperties extends javax.swing.JPanel {
                     this.setMondayPanelEnable(false);
                 }
                 for (TimeRow tr : d.getListTimeRow()) {
-                    this.mondayPanel.add(tr.getPanel());
                     if (tr.getOpenTime() == 0) {
                         for (TimeRow trt : d.getPreviousDayRow().getListTimeRow()) {
                             if (trt.getCloseTime() == 24) {
@@ -63,6 +66,7 @@ public class ModelLocationProperties extends javax.swing.JPanel {
                             }
                         }
                     }
+                    this.mondayPanel.add(tr.getPanel());
                 }
             }
             if (d.getName().equals("Tuesday")) {
@@ -1400,15 +1404,11 @@ public class ModelLocationProperties extends javax.swing.JPanel {
     }//GEN-LAST:event_sundayBoxActionPerformed
 
     private void mondayAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mondayAddButtonActionPerformed
-        boolean isOk = true;
         for (TimeRow tr : this.locationCategory.getMondayRow().getListTimeRow()) {
-            if (tr.isOpenTimeNotSet() || tr.isCloseTimeNotSet()) {
-                isOk = false;
-                break;
+            if (!tr.isMinValid() || !tr.isMaxValid()) {
+                JOptionPane.showOptionDialog(this.mainFrame, Messages.cantAddNewtimeInterval(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                return;
             }
-        }
-        if (!isOk) {
-            return;
         }
         TimeRow row = new TimeRow(this.locationCategory.getMondayRow());
         this.locationCategory.getMondayRow().getListTimeRow().add(row);
@@ -1422,16 +1422,11 @@ public class ModelLocationProperties extends javax.swing.JPanel {
     }//GEN-LAST:event_mondayAddButtonActionPerformed
 
     private void tuesdayAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tuesdayAddButtonActionPerformed
-        boolean isOk = true;
         for (TimeRow tr : this.locationCategory.getTuesdayRow().getListTimeRow()) {
-            if (tr.isOpenTimeNotSet() || tr.isCloseTimeNotSet()) {
-                isOk = false;
-                break;
+            if (!tr.isMinValid() || !tr.isMaxValid()) {
+                JOptionPane.showOptionDialog(this.mainFrame, Messages.cantAddNewtimeInterval(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                return;
             }
-        }
-        if (!isOk) {
-
-            return;
         }
         TimeRow row = new TimeRow(this.locationCategory.getTuesdayRow());
         this.locationCategory.getTuesdayRow().getListTimeRow().add(row);
@@ -1445,16 +1440,11 @@ public class ModelLocationProperties extends javax.swing.JPanel {
     }//GEN-LAST:event_tuesdayAddButtonActionPerformed
 
     private void wednesdayAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_wednesdayAddButtonActionPerformed
-        boolean isOk = true;
         for (TimeRow tr : this.locationCategory.getWednesdayRow().getListTimeRow()) {
-            if (tr.isOpenTimeNotSet() || tr.isCloseTimeNotSet()) {
-                isOk = false;
-                break;
+            if (!tr.isMinValid() || !tr.isMaxValid()) {
+                JOptionPane.showOptionDialog(this.mainFrame, Messages.cantAddNewtimeInterval(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                return;
             }
-        }
-        if (!isOk) {
-
-            return;
         }
         TimeRow row = new TimeRow(this.locationCategory.getWednesdayRow());
         this.locationCategory.getWednesdayRow().getListTimeRow().add(row);
@@ -1468,15 +1458,11 @@ public class ModelLocationProperties extends javax.swing.JPanel {
     }//GEN-LAST:event_wednesdayAddButtonActionPerformed
 
     private void thursdayAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_thursdayAddButtonActionPerformed
-        boolean isOk = true;
         for (TimeRow tr : this.locationCategory.getThursdayRow().getListTimeRow()) {
-            if (tr.isOpenTimeNotSet() || tr.isCloseTimeNotSet()) {
-                isOk = false;
-                break;
+            if (!tr.isMinValid() || !tr.isMaxValid()) {
+                JOptionPane.showOptionDialog(this.mainFrame, Messages.cantAddNewtimeInterval(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                return;
             }
-        }
-        if (!isOk) {
-            return;
         }
         TimeRow row = new TimeRow(this.locationCategory.getThursdayRow());
         this.locationCategory.getThursdayRow().getListTimeRow().add(row);
@@ -1490,16 +1476,11 @@ public class ModelLocationProperties extends javax.swing.JPanel {
     }//GEN-LAST:event_thursdayAddButtonActionPerformed
 
     private void fridayAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fridayAddButtonActionPerformed
-        boolean isOk = true;
         for (TimeRow tr : this.locationCategory.getFridayRow().getListTimeRow()) {
-            if (tr.isOpenTimeNotSet() || tr.isCloseTimeNotSet()) {
-                isOk = false;
-                break;
+            if (!tr.isMinValid() || !tr.isMaxValid()) {
+                JOptionPane.showOptionDialog(this.mainFrame, Messages.cantAddNewtimeInterval(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                return;
             }
-        }
-        if (!isOk) {
-
-            return;
         }
         TimeRow row = new TimeRow(this.locationCategory.getFridayRow());
         this.locationCategory.getFridayRow().getListTimeRow().add(row);
@@ -1513,16 +1494,11 @@ public class ModelLocationProperties extends javax.swing.JPanel {
     }//GEN-LAST:event_fridayAddButtonActionPerformed
 
     private void saturdayAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saturdayAddButtonActionPerformed
-        boolean isOk = true;
         for (TimeRow tr : this.locationCategory.getSatursayRow().getListTimeRow()) {
-            if (tr.isOpenTimeNotSet() || tr.isCloseTimeNotSet()) {
-                isOk = false;
-                break;
+            if (!tr.isMinValid() || !tr.isMaxValid()) {
+                JOptionPane.showOptionDialog(this.mainFrame, Messages.cantAddNewtimeInterval(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                return;
             }
-        }
-        if (!isOk) {
-
-            return;
         }
         TimeRow row = new TimeRow(this.locationCategory.getSatursayRow());
         this.locationCategory.getSatursayRow().getListTimeRow().add(row);
@@ -1536,15 +1512,11 @@ public class ModelLocationProperties extends javax.swing.JPanel {
     }//GEN-LAST:event_saturdayAddButtonActionPerformed
 
     private void sundayAddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sundayAddButtonActionPerformed
-        boolean isOk = true;
         for (TimeRow tr : this.locationCategory.getSundayRow().getListTimeRow()) {
-            if (tr.isOpenTimeNotSet() || tr.isCloseTimeNotSet()) {
-                isOk = false;
-                break;
+            if (!tr.isMinValid() || !tr.isMaxValid()) {
+                JOptionPane.showOptionDialog(this.mainFrame, Messages.cantAddNewtimeInterval(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                return;
             }
-        }
-        if (!isOk) {
-            return;
         }
         TimeRow row = new TimeRow(this.locationCategory.getSundayRow());
         this.locationCategory.getSundayRow().getListTimeRow().add(row);
@@ -1559,7 +1531,7 @@ public class ModelLocationProperties extends javax.swing.JPanel {
 
     private void setMondayPanelEnable(boolean ok) {
         this.mondayAddButton.setEnabled(ok);
-        this.mondayPanel.setEnabled(ok);
+        this.mondayAddButton.setEnabled(ok);
         for (TimeRow tr : this.locationCategory.getMondayRow().getListTimeRow()) {
             tr.getPanel().setEnable(ok);
         }
@@ -1617,9 +1589,6 @@ public class ModelLocationProperties extends javax.swing.JPanel {
 
         private final JTextField jtextField;
         private String currentString;
-        private final String greaterMessage = "Number can't be greater 100!";
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
 
         public JTextFieldDoubleListener(JTextField textField) {
@@ -1640,29 +1609,39 @@ public class ModelLocationProperties extends javax.swing.JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(locationCategory.getCity().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(locationCategory.getCity().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
             }
             try {
-                Double d = Double.parseDouble(numTxt);
-                if (!insert) {
-                    this.currentString = numTxt;
-                    locationCategory.setPercentageToBeSick(Integer.parseInt(numTxt));
+                if (numTxt.contains(" ")) {
+                    this.insert = true;
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(locationCategory.getCity().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(this.currentString);
+                    return;
                 }
+
+                Double d = Double.parseDouble(numTxt);
                 if (d > 100) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(locationCategory.getCity().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(locationCategory.getCity().getMainFrame(), Messages.percentageCanBbeGreaterThen100(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
                     this.insert = false;
+                } else if (!insert) {
+                    this.currentString = numTxt;
+                    locationCategory.setPercentageToBeSick(Integer.parseInt(numTxt));
                 }
+
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(locationCategory.getCity().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(locationCategory.getCity().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);

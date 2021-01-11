@@ -23,10 +23,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import models.member1.Member;
-import resources.icon.Colors;
+import models.member.Member;
+import resources.Colors.Colors;
 import resources.icon.Icons;
-import resources.icon.Messages;
+import resources.Messages.Messages;
 import views1.MainFrame;
 
 public class SymptomStage extends JPanel {
@@ -46,7 +46,6 @@ public class SymptomStage extends JPanel {
     private boolean isNew, saved, deleted;
 
     private Component component;
-    private JTextFieldIntegerListener listener = null;
 
     private JTextField dayTxt;
 
@@ -369,9 +368,9 @@ public class SymptomStage extends JPanel {
     }
 
     public void removeActionPerformed() {
-        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETESYMPTOMSTAGE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+        int reply = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETESYMPTOMSTAGE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,Icons.WARNINGICON, null, null);
 
-        if (index == JOptionPane.NO_OPTION) {
+        if (reply == JOptionPane.NO_OPTION || reply == JOptionPane.CLOSED_OPTION) {
             return;
         }
 
@@ -582,14 +581,6 @@ public class SymptomStage extends JPanel {
         this.deathPercentage = deathPercentage;
     }
 
-    public JTextFieldIntegerListener getListener() {
-        return listener;
-    }
-
-    public void setListener(JTextFieldIntegerListener listener) {
-        this.listener = listener;
-    }
-
     public JTextField getDayTxt() {
         return dayTxt;
     }
@@ -629,10 +620,6 @@ public class SymptomStage extends JPanel {
                     humanStatBox.addItem(s);
                 }
             }
-        }
-
-        if (this.listener != null) {
-            this.listener.setMainFrame(model.getMainFrame());
         }
     }
 
@@ -738,127 +725,11 @@ public class SymptomStage extends JPanel {
         this.statistiqueValueNameLabel.setText(this.listMember.size() + "");
     }
 
-    private class JTextFieldIntegerListener implements DocumentListener, FocusListener {
-
-        private JTextField jtextField;
-        private MainFrame mainFrame;
-        private String currentString;
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
-        private boolean insert = false;
-        private final SymptomStage symptomStage;
-
-        public JTextFieldIntegerListener(JTextField textField, MainFrame mainFrame, SymptomStage s) {
-            this.jtextField = textField;
-            this.mainFrame = mainFrame;
-            this.currentString = s.getDayNum() + "";
-            this.symptomStage = s;
-        }
-
-        public JTextFieldIntegerListener(JTextField textField, SymptomStage s) {
-            this.jtextField = textField;
-            this.currentString = s.getDayNum() + "";
-            this.symptomStage = s;
-        }
-
-        public MainFrame getMainFrame() {
-            return mainFrame;
-        }
-
-        public void setMainFrame(MainFrame mainFrame) {
-            this.mainFrame = mainFrame;
-        }
-
-        private void insertZero(String s) {
-            Runnable doHighlight = new Runnable() {
-                @Override
-                public void run() {
-                    jtextField.setText(s);
-                }
-            };
-            SwingUtilities.invokeLater(doHighlight);
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (numTxt.contains("f") || numTxt.contains("d")) {
-                this.insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-                return;
-            }
-            try {
-                int d = Integer.parseInt(numTxt);
-                if (!insert) {
-                    this.symptomStage.setDayNum(d);
-                    this.symptomStage.setSaved(false);
-                    this.symptomStage.getSymptomType().getModel().setSaved(false);
-                    this.symptomStage.getSymptomType().getModel().getMainFrame().setModelSavedButtonEnable();
-                    this.currentString = numTxt;
-                }
-
-            } catch (NumberFormatException ex) {
-                insert = true;
-                Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.mainFrame, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
-                };
-                SwingUtilities.invokeLater(doHighlight);
-                insertZero(this.currentString);
-            }
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            String numTxt = this.jtextField.getText();
-            if (insert) {
-                return;
-            }
-            String s = this.jtextField.getText();
-            if (s.length() <= 0 || s.equals("")) {
-                return;
-            }
-
-            this.symptomStage.setDayNum(Integer.parseInt(numTxt));
-            this.symptomStage.setSaved(false);
-            this.symptomStage.getSymptomType().getModel().setSaved(false);
-            this.currentString = numTxt;
-            this.symptomStage.getSymptomType().getModel().getMainFrame().setModelSavedButtonEnable();
-
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-        }
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            insert = false;
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            if (this.jtextField.getText().equals("")) {
-                insert = true;
-                insertZero(this.currentString);
-            } else {
-                insert = false;
-            }
-        }
-
-    }
-
     private class JTextFieldDoubleDeathListener implements DocumentListener, FocusListener {
 
         private final JTextField jtextField;
         private MainFrame mainFrame;
         private String currentString;
-        private final String greaterMessage = "Number can't be greater 100!";
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
         private SymptomStage symStage;
 
@@ -896,16 +767,26 @@ public class SymptomStage extends JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
             }
             try {
+                if (numTxt.contains(" ")) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(this.currentString);
+                    this.insert = false;
+                    return;
+                }
+
                 Double d = Double.parseDouble(numTxt);
                 if (d > 100) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.percentageCanBbeGreaterThen100(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
@@ -935,7 +816,7 @@ public class SymptomStage extends JPanel {
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -1007,9 +888,6 @@ public class SymptomStage extends JPanel {
         private final JTextField jtextField;
         private MainFrame mainFrame;
         private String currentString;
-        private final String greaterMessage = "Number can't be greater 100!";
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
         private SymptomStage symStage;
 
@@ -1047,16 +925,25 @@ public class SymptomStage extends JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
             }
             try {
+                if (numTxt.contains(" ")) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(this.currentString);
+                    this.insert = false;
+                    return;
+                }
                 Double d = Double.parseDouble(numTxt);
                 if (d > 100) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.percentageCanBbeGreaterThen100(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
@@ -1086,7 +973,7 @@ public class SymptomStage extends JPanel {
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symStage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -1157,10 +1044,7 @@ public class SymptomStage extends JPanel {
     private class JTextFieldIndexListener implements DocumentListener, FocusListener {
 
         private JTextField jtextField;
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = true;
-        private final String numberLower = "Max age can't be lower or equal to min age!";
         private SymptomStage stage;
 
         public JTextFieldIndexListener(JTextField textField, SymptomStage stage) {
@@ -1184,22 +1068,21 @@ public class SymptomStage extends JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(stage.getIndex() + "");
                 return;
             }
             try {
-                int d = Integer.parseInt(numTxt);
+                Integer.parseInt(numTxt);
                 if (!insert) {
                     model.getMainFrame().setModelSavedButtonEnable();
                 }
-
             } catch (NumberFormatException ex) {
                 insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(stage.getIndex() + "");
@@ -1237,14 +1120,14 @@ public class SymptomStage extends JPanel {
             int d = Integer.parseInt(numTxt);
             if (d == 0) {
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.numberCantBeZero(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(stage.getIndex() + "");
             } else if (stage.getInHospital() == 0) {
                 if (d > model.getListSymptomStage1sNonHospital().size()) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(model.getMainFrame(), Messages.numberBetween(1, model.getListSymptomStage1sNonHospital().size()), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(stage.getIndex() + "");
@@ -1268,7 +1151,9 @@ public class SymptomStage extends JPanel {
                 if (d > model.getListSymptomStage1sHospital().size() + model.getListSymptomStage1sNonHospital().size()
                         || d <= model.getListSymptomStage1sNonHospital().size()) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        int first = model.getListSymptomStage1sNonHospital().size() + 1;
+                        int end = model.getListSymptomStage1sNonHospital().size() + 1 + model.getListSymptomStage1sHospital().size();
+                        JOptionPane.showOptionDialog(model.getMainFrame(), Messages.numberBetween(first, end), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(stage.getIndex() + "");

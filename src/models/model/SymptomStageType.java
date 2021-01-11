@@ -14,7 +14,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import resources.icon.Colors;
+import resources.Colors.Colors;
+import resources.Messages.Messages;
 
 public class SymptomStageType {
 
@@ -222,8 +223,6 @@ public class SymptomStageType {
 
         private JTextField jtextField;
         private String currentString;
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
         private final SymptomStageType symptomstageType;
 
@@ -249,7 +248,7 @@ public class SymptomStageType {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symptomstageType.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symptomstageType.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -268,7 +267,7 @@ public class SymptomStageType {
             } catch (NumberFormatException ex) {
                 insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symptomstageType.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symptomstageType.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);

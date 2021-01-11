@@ -20,12 +20,15 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import models.client1.City;
+import models.client.City;
 import models.model.HumanAge;
 import models.model.Model;
+import models.model.PauseTime;
 import models.model.SymptomStage;
 import models.model.SymptomType;
-import resources.icon.Colors;
+import resources.Colors.Colors;
+import resources.icon.Icons;
+import resources.Messages.Messages;
 import views1.MainFrame;
 import views1.model.dialog.ManageSymptomStagesDialog;
 import views1.model.dialog.ManageSymptomTypeDialog;
@@ -54,6 +57,13 @@ public class ModelPanel extends javax.swing.JPanel {
         modelLocationsPanel = new ModelLocationPanel(currentModel);
         this.locationBigPanel.add(modelLocationsPanel);
 
+        this.virusNameTxt.setText(model.getVirusName());
+
+        this.contagiousDayTxt.setText(model.getContagiousDay() + "");
+        JTextFieldContagiousListener1 contagiousListener = new JTextFieldContagiousListener1(this.contagiousDayTxt);
+        this.contagiousDayTxt.addFocusListener(contagiousListener);
+        this.contagiousDayTxt.getDocument().addDocumentListener(contagiousListener);
+
         this.infectedNunberTxt.setText(model.getInfectedNumber() + "");
         this.timeTxt.setText(model.getRunTime() + "");
 
@@ -62,6 +72,7 @@ public class ModelPanel extends javax.swing.JPanel {
         initPanel();
         initAgePanel();
         initSymptomPanel();
+        initPauseTimePanel();
         this.percentageOfSickHumanTxt.setVisible(false);
         this.statistiquePane = new StatistiquePanel(model);
         this.statistiquePanel.add(this.statistiquePane);
@@ -73,6 +84,10 @@ public class ModelPanel extends javax.swing.JPanel {
         JTextFieldIntegerListener1 listener1 = new JTextFieldIntegerListener1(timeTxt);
         this.timeTxt.addFocusListener(listener1);
         this.timeTxt.getDocument().addDocumentListener(listener1);
+
+        VirusNameListener vListener = new VirusNameListener(this.virusNameTxt);
+        this.virusNameTxt.getDocument().addDocumentListener(vListener);
+
     }
 
     public ModelPanel(MainFrame frame, String name, JTabbedPane pane, City c) {
@@ -80,10 +95,12 @@ public class ModelPanel extends javax.swing.JPanel {
         this.statistiquePanel.setLayout(new BoxLayout(this.statistiquePanel, BoxLayout.Y_AXIS));
         this.locationBigPanel.setLayout(new BorderLayout());
         this.mainframe = frame;
-        this.currentModel = new Model(name, 0, 0, frame, c);
+        this.currentModel = new Model(name, frame, c);
         modelLocationsPanel = new ModelLocationPanel(currentModel);
         this.locationBigPanel.add(modelLocationsPanel);
         this.infectedNunberTxt.setText("0");
+        this.virusNameTxt.setText(" ");
+        this.contagiousDayTxt.setText("0");
         this.timeTxt.setText("0");
         this.currentModel.setModelPanel(this);
         this.pane = pane;
@@ -91,6 +108,8 @@ public class ModelPanel extends javax.swing.JPanel {
         initPanel();
         initAgePanel();
         initSymptomPanel();
+        initPauseTimePanel();
+
         this.percentageOfSickHumanTxt.setVisible(false);
         this.statistiquePane = new StatistiquePanel(this.currentModel);
         this.statistiquePanel.add(this.statistiquePane);
@@ -103,11 +122,25 @@ public class ModelPanel extends javax.swing.JPanel {
         this.timeTxt.addFocusListener(listener1);
         this.timeTxt.getDocument().addDocumentListener(listener1);
 
+        JTextFieldContagiousListener1 contagiousListener = new JTextFieldContagiousListener1(this.contagiousDayTxt);
+        this.contagiousDayTxt.addFocusListener(contagiousListener);
+        this.contagiousDayTxt.getDocument().addDocumentListener(contagiousListener);
+
+        VirusNameListener vListener = new VirusNameListener(this.virusNameTxt);
+        this.virusNameTxt.getDocument().addDocumentListener(vListener);
+
         this.mainframe.repaint();
     }
 
     public JLabel getPercentageOfSickHumanTxt() {
         return percentageOfSickHumanTxt;
+    }
+
+    private void initPauseTimePanel() {
+        this.pauseTimePanel.setLayout(new BoxLayout(this.pauseTimePanel, BoxLayout.Y_AXIS));
+        for (PauseTime pt : this.currentModel.getListPauseTime()) {
+            this.pauseTimePanel.add(pt.getPanel());
+        }
     }
 
     private void initSymptomPanel() {
@@ -125,6 +158,15 @@ public class ModelPanel extends javax.swing.JPanel {
         for (SymptomStage stg : this.currentModel.getListSymptomStage1sHospital()) {
             this.symptomStageHospitalPanel.add(stg.getPanel());
         }
+    }
+
+    public void reinitPauseTimePanel() {
+        this.pauseTimePanel.removeAll();
+        this.pauseTimePanel.setPreferredSize(new Dimension(this.pauseTimePanel.getWidth(), this.currentModel.getListPauseTime().size() * 35));
+        for (PauseTime pt : this.currentModel.getListPauseTime()) {
+            this.pauseTimePanel.add(pt.getPanel());
+        }
+        this.repaint();
     }
 
     public void reinitSymptomPanel() {
@@ -146,7 +188,6 @@ public class ModelPanel extends javax.swing.JPanel {
 
     private void initPanel() {
         this.symptomNamePane.setLayout(new BoxLayout(this.symptomNamePane, BoxLayout.Y_AXIS));
-        this.contagiousDaysPanel.setLayout(new BoxLayout(this.contagiousDaysPanel, BoxLayout.Y_AXIS));
 
         this.symptomsDayPanel.setLayout(new BoxLayout(this.symptomsDayPanel, BoxLayout.Y_AXIS));
         this.symptomStageNamePanel.setLayout(new BoxLayout(this.symptomStageNamePanel, BoxLayout.X_AXIS));
@@ -179,12 +220,6 @@ public class ModelPanel extends javax.swing.JPanel {
             Component c1 = Box.createVerticalStrut(3);
             st.setcName1(c1);
             this.symptomNamePane.add(c1);
-
-            this.contagiousDaysPanel.add(st.getDayTxt());
-            Component c2 = Box.createVerticalStrut(3);
-            st.setcContDay(c2);
-            this.contagiousDaysPanel.add(c2);
-
             this.symptomsDayPanel.add(st);
             Component c3 = Box.createVerticalStrut(3);
             st.setcState(c3);
@@ -197,7 +232,6 @@ public class ModelPanel extends javax.swing.JPanel {
         this.symptomStageNamePanel.removeAll();
         this.symptomNamePane.removeAll();
         this.symptomsDayPanel.removeAll();
-        this.contagiousDaysPanel.removeAll();
 
         this.nonHospitalNamePanel.setPreferredSize(new Dimension(this.currentModel.getListSymptomStage1sNonHospital().size() * 122, this.nonHospitalNamePanel.getHeight()));
         this.hospitalPanelName.setPreferredSize(new Dimension(this.currentModel.getListSymptomStage1sHospital().size() * 122, this.hospitalPanelName.getHeight()));
@@ -235,11 +269,6 @@ public class ModelPanel extends javax.swing.JPanel {
             Component c1 = Box.createVerticalStrut(3);
             st.setcName1(c1);
             this.symptomNamePane.add(c1);
-
-            this.contagiousDaysPanel.add(st.getDayTxt());
-            Component c2 = Box.createVerticalStrut(3);
-            st.setcContDay(c2);
-            this.contagiousDaysPanel.add(c2);
 
             this.symptomsDayPanel.add(st);
             Component c3 = Box.createVerticalStrut(3);
@@ -409,15 +438,12 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel11 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         symptomStageNamePanel = new javax.swing.JPanel();
-        jPanel15 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jPanel17 = new javax.swing.JPanel();
         symptomNamePane = new javax.swing.JPanel();
         symptomsDayPanel = new javax.swing.JPanel();
-        contagiousDaysPanel = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
         nonHospitalNamePanel = new javax.swing.JPanel();
@@ -474,11 +500,26 @@ public class ModelPanel extends javax.swing.JPanel {
         jLabel11 = new javax.swing.JLabel();
         jPanel25 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        virusNameTxt = new javax.swing.JTextField();
+        jPanel15 = new javax.swing.JPanel();
+        jPanel26 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel28 = new javax.swing.JPanel();
+        jLabel13 = new javax.swing.JLabel();
+        contagiousDayTxt = new javax.swing.JTextField();
+        jLabel14 = new javax.swing.JLabel();
+        jPanel29 = new javax.swing.JPanel();
+        jPanel30 = new javax.swing.JPanel();
+        jLabel15 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        pauseTimePanel = new javax.swing.JPanel();
+        jPanel31 = new javax.swing.JPanel();
+        jLabel17 = new javax.swing.JLabel();
         statistiquePanel = new javax.swing.JPanel();
         locationBigPanel = new javax.swing.JPanel();
 
-        setPreferredSize(new java.awt.Dimension(1000, 1508));
+        setPreferredSize(new java.awt.Dimension(1530, 1508));
 
         jScrollPane1.setPreferredSize(new java.awt.Dimension(1000, 1500));
 
@@ -534,34 +575,12 @@ public class ModelPanel extends javax.swing.JPanel {
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        jPanel15.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel15.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        jPanel15.setPreferredSize(new java.awt.Dimension(130, 31));
-
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Contagious days");
-        jLabel4.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        jLabel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jLabel4.setPreferredSize(new java.awt.Dimension(130, 18));
-
-        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
-        jPanel15.setLayout(jPanel15Layout);
-        jPanel15Layout.setHorizontalGroup(
-            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
-        );
-        jPanel15Layout.setVerticalGroup(
-            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-        );
-
         jPanel18.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel18.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Symptoms");
+        jLabel3.setText(Messages.humanSituations());
         jLabel3.setAlignmentX(Component.LEFT_ALIGNMENT);
         jLabel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -573,7 +592,7 @@ public class ModelPanel extends javax.swing.JPanel {
         );
         jPanel18Layout.setVerticalGroup(
             jPanel18Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
@@ -582,15 +601,12 @@ public class ModelPanel extends javax.swing.JPanel {
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(symptomStageNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
-                .addGap(0, 0, 0)
-                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(symptomStageNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 839, Short.MAX_VALUE))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(symptomStageNamePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
-            .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
             .addComponent(jPanel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -622,26 +638,11 @@ public class ModelPanel extends javax.swing.JPanel {
         symptomsDayPanel.setLayout(symptomsDayPanelLayout);
         symptomsDayPanelLayout.setHorizontalGroup(
             symptomsDayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 693, Short.MAX_VALUE)
+            .addGap(0, 833, Short.MAX_VALUE)
         );
         symptomsDayPanelLayout.setVerticalGroup(
             symptomsDayPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 280, Short.MAX_VALUE)
-        );
-
-        contagiousDaysPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        contagiousDaysPanel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        contagiousDaysPanel.setPreferredSize(new java.awt.Dimension(134, 4));
-
-        javax.swing.GroupLayout contagiousDaysPanelLayout = new javax.swing.GroupLayout(contagiousDaysPanel);
-        contagiousDaysPanel.setLayout(contagiousDaysPanelLayout);
-        contagiousDaysPanelLayout.setHorizontalGroup(
-            contagiousDaysPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 132, Short.MAX_VALUE)
-        );
-        contagiousDaysPanelLayout.setVerticalGroup(
-            contagiousDaysPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel17Layout = new javax.swing.GroupLayout(jPanel17);
@@ -650,16 +651,13 @@ public class ModelPanel extends javax.swing.JPanel {
             jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel17Layout.createSequentialGroup()
                 .addComponent(symptomNamePane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(symptomsDayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
-                .addGap(0, 0, 0)
-                .addComponent(contagiousDaysPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(symptomsDayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 837, Short.MAX_VALUE))
         );
         jPanel17Layout.setVerticalGroup(
             jPanel17Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(symptomNamePane, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
             .addComponent(symptomsDayPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
-            .addComponent(contagiousDaysPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
         );
 
         jScrollPane3.setViewportView(jPanel17);
@@ -687,7 +685,7 @@ public class ModelPanel extends javax.swing.JPanel {
 
         nonHospitalLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         nonHospitalLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        nonHospitalLabel.setText("Non hospital");
+        nonHospitalLabel.setText(Messages.nonHospital());
         nonHospitalLabel.setToolTipText("");
         nonHospitalLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -706,7 +704,7 @@ public class ModelPanel extends javax.swing.JPanel {
 
         hospitalLabel.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         hospitalLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        hospitalLabel.setText("Hospital");
+        hospitalLabel.setText(Messages.hospital());
         hospitalLabel.setToolTipText("");
         hospitalLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         hospitalLabel.setMaximumSize(new java.awt.Dimension(54545, 18));
@@ -751,9 +749,9 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 973, Short.MAX_VALUE)
-            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, 973, Short.MAX_VALUE)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 973, Short.MAX_VALUE)
+            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
+            .addComponent(jPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 983, Short.MAX_VALUE)
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -779,7 +777,7 @@ public class ModelPanel extends javax.swing.JPanel {
         );
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        jLabel1.setText("    Distribution of the symptoms in symptom stages");
+        jLabel1.setText(Messages.humanSituations());
         jLabel1.setToolTipText("");
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
@@ -789,8 +787,8 @@ public class ModelPanel extends javax.swing.JPanel {
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE))
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 975, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 568, Short.MAX_VALUE))
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 985, Short.MAX_VALUE)
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -822,7 +820,7 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 865, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 875, Short.MAX_VALUE)
                 .addGap(80, 80, 80)
                 .addComponent(manageAgeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -958,7 +956,7 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 975, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 985, Short.MAX_VALUE)
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
@@ -970,6 +968,8 @@ public class ModelPanel extends javax.swing.JPanel {
         );
 
         jPanel37.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel37.setPreferredSize(new java.awt.Dimension(371, 96));
+        jPanel37.setRequestFocusEnabled(false);
 
         jPanel38.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -1015,7 +1015,7 @@ public class ModelPanel extends javax.swing.JPanel {
                 .addComponent(infectedNunberTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(percentageOfSickHumanTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 37, Short.MAX_VALUE))
         );
         jPanel39Layout.setVerticalGroup(
             jPanel39Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1046,7 +1046,7 @@ public class ModelPanel extends javax.swing.JPanel {
 
         jLabel24.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel24.setText("Symptom Stages");
+        jLabel24.setText(Messages.symptoms());
         jLabel24.setToolTipText("");
         jLabel24.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jLabel24.setPreferredSize(new java.awt.Dimension(85, 18));
@@ -1081,7 +1081,7 @@ public class ModelPanel extends javax.swing.JPanel {
                 .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(88, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel24Layout.setVerticalGroup(
             jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1096,7 +1096,7 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        jLabel6.setText("  Symptom stages");
+        jLabel6.setText(Messages.symptoms());
         jLabel6.setToolTipText("");
 
         manageStageButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icon/plus icon.jpg"))); // NOI18N
@@ -1259,7 +1259,7 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel20.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        jLabel10.setText(" The run time");
+        jLabel10.setText(Messages.runTime());
         jLabel10.setToolTipText("");
 
         javax.swing.GroupLayout jPanel20Layout = new javax.swing.GroupLayout(jPanel20);
@@ -1277,7 +1277,7 @@ public class ModelPanel extends javax.swing.JPanel {
         jPanel21.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel27.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel27.setText(" Time:");
+        jLabel27.setText(Messages.time());
         jLabel27.setToolTipText("");
 
         timeTxt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -1286,7 +1286,7 @@ public class ModelPanel extends javax.swing.JPanel {
 
         jLabel28.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel28.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel28.setText("days");
+        jLabel28.setText(Messages.day());
         jLabel28.setToolTipText("");
 
         javax.swing.GroupLayout jPanel21Layout = new javax.swing.GroupLayout(jPanel21);
@@ -1325,6 +1325,7 @@ public class ModelPanel extends javax.swing.JPanel {
         );
 
         jPanel22.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel22.setPreferredSize(new java.awt.Dimension(600, 83));
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         jLabel11.setText("  Virus name");
@@ -1339,9 +1340,9 @@ public class ModelPanel extends javax.swing.JPanel {
         jLabel12.setText(" Name:");
         jLabel12.setToolTipText("");
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField1.setToolTipText("The virus name");
+        virusNameTxt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        virusNameTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        virusNameTxt.setToolTipText("The virus name");
 
         javax.swing.GroupLayout jPanel25Layout = new javax.swing.GroupLayout(jPanel25);
         jPanel25.setLayout(jPanel25Layout);
@@ -1350,12 +1351,12 @@ public class ModelPanel extends javax.swing.JPanel {
             .addGroup(jPanel25Layout.createSequentialGroup()
                 .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1))
+                .addComponent(virusNameTxt))
         );
         jPanel25Layout.setVerticalGroup(
             jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jTextField1)
+            .addComponent(virusNameTxt)
         );
 
         javax.swing.GroupLayout jPanel22Layout = new javax.swing.GroupLayout(jPanel22);
@@ -1374,20 +1375,175 @@ public class ModelPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
+        jPanel15.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel15.setPreferredSize(new java.awt.Dimension(326, 118));
+
+        jPanel26.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel4.setText(Messages.contagiousDay());
+
+        javax.swing.GroupLayout jPanel26Layout = new javax.swing.GroupLayout(jPanel26);
+        jPanel26.setLayout(jPanel26Layout);
+        jPanel26Layout.setHorizontalGroup(
+            jPanel26Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel26Layout.setVerticalGroup(
+            jPanel26Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+        );
+
+        jPanel28.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel28.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel13.setText(Messages.time());
+
+        contagiousDayTxt.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        contagiousDayTxt.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        contagiousDayTxt.setToolTipText("");
+
+        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel14.setText(Messages.day());
+
+        javax.swing.GroupLayout jPanel28Layout = new javax.swing.GroupLayout(jPanel28);
+        jPanel28.setLayout(jPanel28Layout);
+        jPanel28Layout.setHorizontalGroup(
+            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel28Layout.createSequentialGroup()
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(contagiousDayTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel28Layout.setVerticalGroup(
+            jPanel28Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(contagiousDayTxt, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+            .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+        jPanel15.setLayout(jPanel15Layout);
+        jPanel15Layout.setHorizontalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel26, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel28, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel15Layout.setVerticalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addComponent(jPanel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel28, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 32, Short.MAX_VALUE))
+        );
+
+        jPanel29.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jPanel30.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        jLabel15.setText("Pause times");
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icon/plus icon.jpg"))); // NOI18N
+        jButton1.setToolTipText("");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel30Layout = new javax.swing.GroupLayout(jPanel30);
+        jPanel30.setLayout(jPanel30Layout);
+        jPanel30Layout.setHorizontalGroup(
+            jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel30Layout.createSequentialGroup()
+                .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6))
+        );
+        jPanel30Layout.setVerticalGroup(
+            jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout pauseTimePanelLayout = new javax.swing.GroupLayout(pauseTimePanel);
+        pauseTimePanel.setLayout(pauseTimePanelLayout);
+        pauseTimePanelLayout.setHorizontalGroup(
+            pauseTimePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 320, Short.MAX_VALUE)
+        );
+        pauseTimePanelLayout.setVerticalGroup(
+            pauseTimePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 198, Short.MAX_VALUE)
+        );
+
+        jScrollPane5.setViewportView(pauseTimePanel);
+
+        jPanel31.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel17.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel17.setText("Days");
+        jLabel17.setToolTipText("");
+
+        javax.swing.GroupLayout jPanel31Layout = new javax.swing.GroupLayout(jPanel31);
+        jPanel31.setLayout(jPanel31Layout);
+        jPanel31Layout.setHorizontalGroup(
+            jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel31Layout.createSequentialGroup()
+                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel31Layout.setVerticalGroup(
+            jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel17, javax.swing.GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel29Layout = new javax.swing.GroupLayout(jPanel29);
+        jPanel29.setLayout(jPanel29Layout);
+        jPanel29Layout.setHorizontalGroup(
+            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel30, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane5)
+            .addComponent(jPanel31, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanel29Layout.setVerticalGroup(
+            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel29Layout.createSequentialGroup()
+                .addComponent(jPanel30, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(jPanel31, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel36Layout = new javax.swing.GroupLayout(jPanel36);
         jPanel36.setLayout(jPanel36Layout);
         jPanel36Layout.setHorizontalGroup(
             jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel36Layout.createSequentialGroup()
-                .addGroup(jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(jPanel36Layout.createSequentialGroup()
                         .addGroup(jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 979, Short.MAX_VALUE)
-                            .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 979, Short.MAX_VALUE)
-                            .addComponent(jPanel23, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 11, Short.MAX_VALUE))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 989, Short.MAX_VALUE)
+                            .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 989, Short.MAX_VALUE)
+                            .addGroup(jPanel36Layout.createSequentialGroup()
+                                .addGap(0, 0, 0)
+                                .addComponent(jPanel23, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel29, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel36Layout.createSequentialGroup()
-                        .addComponent(jPanel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel22, javax.swing.GroupLayout.DEFAULT_SIZE, 610, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel37, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1400,14 +1556,19 @@ public class ModelPanel extends javax.swing.JPanel {
                 .addGroup(jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel37, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel22, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel36Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel36Layout.createSequentialGroup()
+                        .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel29, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 412, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(170, Short.MAX_VALUE))
+                .addContainerGap(187, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanel36);
@@ -1431,7 +1592,7 @@ public class ModelPanel extends javax.swing.JPanel {
         locationBigPanel.setLayout(locationBigPanelLayout);
         locationBigPanelLayout.setHorizontalGroup(
             locationBigPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1002, Short.MAX_VALUE)
+            .addGap(0, 1316, Short.MAX_VALUE)
         );
         locationBigPanelLayout.setVerticalGroup(
             locationBigPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1455,11 +1616,17 @@ public class ModelPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void manageAgeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageAgeButtonActionPerformed
+        for (HumanAge ha : this.currentModel.getListHumanAge()) {
+            if (!ha.isMinAgeValid() || !ha.isMaxAgeValid()) {
+                JOptionPane.showOptionDialog(this.mainframe, Messages.cantAddModelAge(), "Warning", JOptionPane.CLOSED_OPTION, JOptionPane.WARNING_MESSAGE, Icons.WARNINGICON, null, null);
+                return;
+            }
+        }
         this.currentModel.addNewHumanAge();
     }//GEN-LAST:event_manageAgeButtonActionPerformed
 
     private void manageStageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageStageButtonActionPerformed
-        ManageSymptomStagesDialog dialog = new ManageSymptomStagesDialog(mainframe,this.currentModel);
+        ManageSymptomStagesDialog dialog = new ManageSymptomStagesDialog(mainframe, this.currentModel);
         dialog.setVisible(true);
         this.mainframe.setEnabled(false);
     }//GEN-LAST:event_manageStageButtonActionPerformed
@@ -1470,26 +1637,41 @@ public class ModelPanel extends javax.swing.JPanel {
         this.mainframe.setEnabled(false);
     }//GEN-LAST:event_manageSymptomTypeButtonActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        PauseTime pt = new PauseTime(0, this.currentModel);
+        this.currentModel.getListPauseTime().add(pt);
+        this.mainframe.setModelSavedButtonEnable();
+        this.reinitPauseTimePanel();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     public void setEnable() {
         this.currentModel.setEnable();
+        this.virusNameTxt.setEnabled(true);
+        this.contagiousDayTxt.setEnabled(true);
+        this.infectedNunberTxt.setEnabled(true);
+        this.jButton1.setEnabled(true);
         this.manageAgeButton.setEnabled(true);
         this.manageStageButton.setEnabled(true);
         this.infectedNunberTxt.setEnabled(true);
+        this.manageSymptomTypeButton.setEnabled(true);
     }
 
     public void setDisable() {
         this.currentModel.setDisable();
+        this.virusNameTxt.setEnabled(false);
+        this.contagiousDayTxt.setEnabled(false);
+        this.jButton1.setEnabled(false);
+        this.infectedNunberTxt.setEnabled(false);
         this.manageAgeButton.setEnabled(false);
         this.manageStageButton.setEnabled(false);
         this.infectedNunberTxt.setEnabled(false);
+        this.manageSymptomTypeButton.setEnabled(false);
     }
 
     private class JTextFieldIntegerListener implements DocumentListener, FocusListener {
 
         private JTextField jtextField;
         private String currentString;
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
 
         public JTextFieldIntegerListener(JTextField textField) {
@@ -1513,7 +1695,7 @@ public class ModelPanel extends javax.swing.JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(mainframe, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(mainframe, Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -1525,7 +1707,7 @@ public class ModelPanel extends javax.swing.JPanel {
             } catch (NumberFormatException ex) {
                 insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(mainframe, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(mainframe, Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -1586,8 +1768,6 @@ public class ModelPanel extends javax.swing.JPanel {
 
         private JTextField jtextField;
         private String currentString;
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
 
         public JTextFieldIntegerListener1(JTextField textField) {
@@ -1611,7 +1791,7 @@ public class ModelPanel extends javax.swing.JPanel {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(mainframe, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(mainframe, Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -1623,7 +1803,7 @@ public class ModelPanel extends javax.swing.JPanel {
             } catch (NumberFormatException ex) {
                 insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(mainframe, this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(mainframe, Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
@@ -1640,7 +1820,6 @@ public class ModelPanel extends javax.swing.JPanel {
             if (s.length() <= 0 || s.equals("")) {
                 return;
             }
-//            currentModel.changeState(Integer.parseInt(numTxt));
             this.currentString = numTxt;
 
         }
@@ -1667,16 +1846,138 @@ public class ModelPanel extends javax.swing.JPanel {
             }
         }
     }
+
+    private class JTextFieldContagiousListener1 implements DocumentListener, FocusListener {
+
+        private JTextField jtextField;
+        private String currentString;
+        private boolean insert = false;
+
+        public JTextFieldContagiousListener1(JTextField textField) {
+            this.jtextField = textField;
+            this.currentString = currentModel.getContagiousDay() + "";
+        }
+
+        private void insertZero(String s) {
+            Runnable doHighlight = new Runnable() {
+                @Override
+                public void run() {
+                    jtextField.setText(s);
+                }
+            };
+            SwingUtilities.invokeLater(doHighlight);
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            String numTxt = this.jtextField.getText();
+            if (numTxt.contains("f") || numTxt.contains("d")) {
+                this.insert = true;
+                Runnable doHighlight = () -> {
+                    JOptionPane.showOptionDialog(mainframe, Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                };
+                SwingUtilities.invokeLater(doHighlight);
+                insertZero(this.currentString);
+                return;
+            }
+            try {
+                int d = Integer.parseInt(numTxt);
+                this.currentString = d + "";
+            } catch (NumberFormatException ex) {
+                insert = true;
+                Runnable doHighlight = () -> {
+                    JOptionPane.showOptionDialog(mainframe, Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                };
+                SwingUtilities.invokeLater(doHighlight);
+                insertZero(this.currentString);
+            }
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            String numTxt = this.jtextField.getText();
+            if (insert) {
+                return;
+            }
+            String s = this.jtextField.getText();
+            if (s.length() <= 0 || s.equals("")) {
+                return;
+            }
+            this.currentString = numTxt;
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            insert = false;
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            if (this.jtextField.getText().equals("") || this.jtextField.getText().length() <= 0) {
+                insert = true;
+                insertZero(this.currentString);
+            } else {
+                int d = Integer.parseInt(currentString);
+                currentModel.setContagiousDay(d);
+                currentModel.setSaved(false);
+                mainframe.setModelSavedButtonEnable();
+            }
+        }
+    }
+
+    private class VirusNameListener implements DocumentListener {
+
+        private JTextField txt;
+
+        public VirusNameListener(JTextField txt) {
+            this.txt = txt;
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            String name = txt.getText().trim();
+            currentModel.setVirusName(name);
+            currentModel.setSaved(false);
+            mainframe.setModelSavedButtonEnable();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            String name = txt.getText().trim();
+            currentModel.setVirusName(name);
+            currentModel.setSaved(false);
+            mainframe.setModelSavedButtonEnable();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            String name = txt.getText().trim();
+            currentModel.setVirusName(name);
+            currentModel.setSaved(false);
+            mainframe.setModelSavedButtonEnable();
+        }
+
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel contagiousDaysPanel;
+    private javax.swing.JTextField contagiousDayTxt;
     private javax.swing.JLabel hospitalLabel;
     private javax.swing.JPanel hospitalPanel;
     private javax.swing.JPanel hospitalPanelName;
     private javax.swing.JTextField infectedNunberTxt;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
@@ -1710,8 +2011,13 @@ public class ModelPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel30;
+    private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
     private javax.swing.JPanel jPanel38;
@@ -1726,9 +2032,9 @@ public class ModelPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JPanel locationBigPanel;
     private javax.swing.JButton manageAgeButton;
     private javax.swing.JButton manageStageButton;
@@ -1737,6 +2043,7 @@ public class ModelPanel extends javax.swing.JPanel {
     private javax.swing.JPanel noHospitalPanel;
     private javax.swing.JLabel nonHospitalLabel;
     private javax.swing.JPanel nonHospitalNamePanel;
+    private javax.swing.JPanel pauseTimePanel;
     private javax.swing.JLabel percentageOfSickHumanTxt;
     private javax.swing.JPanel statistiquePanel;
     private javax.swing.JPanel symptomNamePane;
@@ -1747,5 +2054,6 @@ public class ModelPanel extends javax.swing.JPanel {
     private javax.swing.JPanel symptomsAgePanel;
     private javax.swing.JPanel symptomsDayPanel;
     private javax.swing.JTextField timeTxt;
+    private javax.swing.JTextField virusNameTxt;
     // End of variables declaration//GEN-END:variables
 }

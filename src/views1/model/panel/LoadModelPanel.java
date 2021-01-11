@@ -4,7 +4,7 @@ import controller.controllers.ModelController;
 import java.util.Map;
 import java.util.Map.Entry;
 import models.model.Model;
-import resources.icon.Messages;
+import resources.Messages.Messages;
 import views1.MainFrame;
 import views1.model.dialog.LoadModelDialog;
 

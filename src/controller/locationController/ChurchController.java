@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.client1.City;
-import models.location1.Church;
-import models.location1.Location;
+import models.client.City;
+import models.location.Church;
+import models.location.Location;
 
 /**
  *
@@ -22,7 +22,7 @@ public class ChurchController {
     public static final ChurchController INSTANCE = new ChurchController();
 
     private final String insert = "insert into church(name, x, y, width, height, sickPercentage, locationCategoryId)"
-            + " values(?, ?, ?, ?, ?, ?, ?, ) ";
+            + " values(?, ?, ?, ?, ?, ?, ?) ";
     private final String update = "update church"
             + " set sickPercentage = ? "
             + " where id = ? ";

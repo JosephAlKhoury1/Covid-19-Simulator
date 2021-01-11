@@ -1,13 +1,9 @@
 package views1.model.panel;
 
-import java.util.Map;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import models.model.Model;
 import models.model.SymptomType;
-import resources.icon.Messages;
+import resources.Messages.Messages;
 import views1.MainFrame;
 import views1.model.dialog.ManageSymptomTypeDialog;
 

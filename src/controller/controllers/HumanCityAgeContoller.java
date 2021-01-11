@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.client1.HumanCityAgeType;
-import models.client1.LocationToGo;
+import models.client.HumanCityAgeType;
+import models.client.LocationToGo;
 
 /**
  *
@@ -28,16 +28,19 @@ public class HumanCityAgeContoller {
     private final String selectAll = "select id, name, minAge, maxAge, humanPercentage, workPercentage "
             + " from humancityagetype  "
             + " where cityId = ? ";
+    private final String delete = "delete from humancityagetype where id = ?";
 
     private PreparedStatement insertStatement;
     private PreparedStatement updateStatement;
     private PreparedStatement selectAllStatement;
+    private PreparedStatement deleteStatement;
 
     public HumanCityAgeContoller() {
         try {
             this.insertStatement = DataSource.getConnection().prepareStatement(insert, Statement.RETURN_GENERATED_KEYS);
             this.updateStatement = DataSource.getConnection().prepareStatement(update);
             this.selectAllStatement = DataSource.getConnection().prepareStatement(selectAll);
+            this.deleteStatement = DataSource.getConnection().prepareStatement(delete);
         } catch (SQLException ex) {
             Logger.getLogger(HumanCityAgeContoller.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -100,5 +103,14 @@ public class HumanCityAgeContoller {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    public void delete(int id) {
+        try {
+            this.deleteStatement.setInt(1, id);
+            this.deleteStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(HumanCityAgeContoller.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

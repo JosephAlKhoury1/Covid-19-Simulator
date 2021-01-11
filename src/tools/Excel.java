@@ -15,6 +15,47 @@ import models.model.ResultOfDay;
 
 public class Excel {
 
+    public static void writeResult1(File f, Model model) {
+        try {
+            WritableWorkbook books = Workbook.createWorkbook(f);
+            WritableSheet sheet = books.createSheet("my sheet", 0);
+            Label l = new Label(0, 0, "Model :");
+            Label l1 = new Label(1, 0, model.getModelName());
+            Label l2 = new Label(0, 1, "City : ");
+            Label l3 = new Label(1, 1, model.getCity().getName());
+
+            sheet.addCell(l);
+            sheet.addCell(l1);
+            sheet.addCell(l2);
+            sheet.addCell(l3);
+
+            Label l5 = new Label(0, 5, "Day");
+            Label l6 = new Label(1, 5, "Health");
+            Label l7 = new Label(2, 5, "Immune");
+            Label l8 = new Label(3, 5, "Death");
+            Label l9 = new Label(4, 5, "Sick");
+
+            sheet.addCell(l5);
+            sheet.addCell(l6);
+            sheet.addCell(l7);
+            sheet.addCell(l8);
+            sheet.addCell(l9);
+
+            for (int i = 0; i < model.getListResult().size(); i++) {
+                sheet.addCell(new Label(0, 6 + i, model.getListResult().get(i).getDayName()));
+                sheet.addCell(new Label(1, 6 + i, model.getListResult().get(i).getHealth() + ""));
+                sheet.addCell(new Label(2, 6 + i, model.getListResult().get(i).getImmune() + ""));
+                sheet.addCell(new Label(3, 6 + i, model.getListResult().get(i).getDeath() + ""));
+                sheet.addCell(new Label(4, 6 + i, model.getListResult().get(i).getSick() + ""));
+            }
+            books.write();
+            books.close();
+
+        } catch (IOException | WriteException ex) {
+            Logger.getLogger(Excel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public static void writeResult(File f, Model model) {
 
         try {
@@ -74,7 +115,8 @@ public class Excel {
             books.close();
 
         } catch (IOException | WriteException ex) {
-            Logger.getLogger(Excel.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Excel.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

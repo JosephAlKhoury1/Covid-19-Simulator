@@ -18,24 +18,35 @@ public class ResultOfDay {
     private String dayName;
 
     private Map<String, Integer> listStageResult;
+    private int sick = 0;
 
-    public ResultOfDay(int health, int immune, int death, List<SymptomStage> listHospital, List<SymptomStage> listNonHospital, int week, String dayName) {
+    public ResultOfDay(int health, int immune, int death, List<SymptomStage> listHospital, List<SymptomStage> listNonHospital, int week, String dayName, int sick) {
         this.health = health;
         this.immune = immune;
         this.death = death;
         this.week = week;
+        this.sick = sick;
         this.dayName = dayName;
         listStageResult = new HashMap();
-        for (SymptomStage ss : listNonHospital) {
+        listNonHospital.forEach((ss) -> {
             listStageResult.put(ss.getName(), ss.getListMember().size());
-        }
-        for (SymptomStage ss : listHospital) {
+        });
+        listHospital.forEach((ss) -> {
             listStageResult.put(ss.getName(), ss.getListMember().size());
-        }
+        });
+        this.listStageResult.put("sick", this.sick);
     }
 
     public int getWeek() {
         return week;
+    }
+
+    public int getSick() {
+        return sick;
+    }
+
+    public void setSick(int sick) {
+        this.sick = sick;
     }
 
     public void setWeek(int week) {

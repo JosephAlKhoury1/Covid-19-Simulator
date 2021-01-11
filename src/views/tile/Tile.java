@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import models.client1.Data;
-import models.member1.Member;
+import models.client.Data;
+import models.member.Member;
 
 public class Tile {
 

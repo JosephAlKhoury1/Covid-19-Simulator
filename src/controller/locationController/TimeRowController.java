@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.location1.DayRow;
-import models.location1.TimeRow;
+import models.location.DayRow;
+import models.location.TimeRow;
 
 public class TimeRowController {
 

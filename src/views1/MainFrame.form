@@ -28,6 +28,9 @@
                 <Property name="text" type="java.lang.String" value="New city"/>
                 <Property name="toolTipText" type="java.lang.String" value="create new city"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="newCityMenuItemActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
             </MenuItem>
@@ -45,6 +48,9 @@
                 <Property name="text" type="java.lang.String" value="Load city"/>
                 <Property name="toolTipText" type="java.lang.String" value="Load an existing city"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadCityMenuItemActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
             </MenuItem>
@@ -64,6 +70,9 @@
                 <Property name="toolTipText" type="java.lang.String" value="Save this city"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveCityMenuItmActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
             </MenuItem>
@@ -254,7 +263,7 @@
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jTabbedPane2" min="-2" pref="644" max="-2" attributes="0"/>
-              <EmptySpace pref="168" max="32767" attributes="0"/>
+              <EmptySpace pref="167" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -340,7 +349,9 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jSeparator5" min="-2" pref="10" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="RefleshButton" min="-2" max="-2" attributes="0"/>
+                  <Component id="RefleshButton" min="-2" pref="29" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="saveToFileButton" min="-2" pref="34" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -351,7 +362,7 @@
               <Component id="newModelButton" alignment="0" max="32767" attributes="0"/>
               <Component id="jSeparator1" alignment="0" max="32767" attributes="0"/>
               <Component id="stopButton" alignment="0" max="32767" attributes="0"/>
-              <Component id="jSlider1" alignment="1" pref="34" max="32767" attributes="0"/>
+              <Component id="jSlider1" alignment="1" max="32767" attributes="0"/>
               <Component id="RefleshButton" alignment="0" max="32767" attributes="0"/>
               <Component id="loadModelButton" alignment="0" max="32767" attributes="0"/>
               <Component id="loadCityButton" alignment="0" max="32767" attributes="0"/>
@@ -361,6 +372,7 @@
               <Component id="runButton" alignment="0" max="32767" attributes="0"/>
               <Component id="pauseButton" alignment="0" max="32767" attributes="0"/>
               <Component id="jSeparator5" alignment="0" max="32767" attributes="0"/>
+              <Component id="saveToFileButton" alignment="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -541,6 +553,21 @@
           <Properties>
             <Property name="orientation" type="int" value="1"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="saveToFileButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/icon/excelIcon.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveToFileButtonActionPerformed"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

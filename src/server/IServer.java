@@ -2,7 +2,7 @@ package server;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import models.client1.ICity;
+import models.client.ICity;
 
 /**
  *

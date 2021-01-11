@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import models.location1.LocationCategory;
+import models.location.LocationCategory;
 import models.model.Model;
 
 /**
@@ -62,7 +62,6 @@ public class ModelLocationPanel extends javax.swing.JPanel {
 
     public void reinit() {
         this.mapProperties.clear();
-        //this.listLocation.removeAll();
         this.listModel.removeAllElements();
         this.propertiesPanel.removeAll();
         for (Entry<String, LocationCategory> e : this.model.getCity().getMapLocation().entrySet()) {
@@ -77,7 +76,7 @@ public class ModelLocationPanel extends javax.swing.JPanel {
         } else {
             index++;
         }
-        ModelLocationProperties lp = new ModelLocationProperties(lc);
+        ModelLocationProperties lp = new ModelLocationProperties(lc, model.getMainFrame());
         lc.setModelLocatioProperties(lp);
         this.propertiesPanel.removeAll();
         this.propertiesPanel.add(lp);
@@ -98,7 +97,7 @@ public class ModelLocationPanel extends javax.swing.JPanel {
         } else {
             index++;
         }
-        ModelLocationProperties lp = new ModelLocationProperties(lc);
+        ModelLocationProperties lp = new ModelLocationProperties(lc, model.getMainFrame());
         lc.setModelLocatioProperties(lp);
         this.mapProperties.put(lc.getName(), lp);
 

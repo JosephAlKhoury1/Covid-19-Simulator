@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.client1.City;
-import models.location1.DayRow;
-import models.location1.Location;
-import models.location1.LocationCategory;
+import models.client.City;
+import models.location.DayRow;
+import models.location.Location;
+import models.location.LocationCategory;
 
 public class LocationCategoryController {
 

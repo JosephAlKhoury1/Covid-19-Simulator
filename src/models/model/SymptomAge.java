@@ -11,9 +11,9 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import resources.icon.Colors;
+import resources.Colors.Colors;
 import resources.icon.Icons;
-import resources.icon.Messages;
+import resources.Messages.Messages;
 
 /**
  *
@@ -179,9 +179,6 @@ public class SymptomAge {
 
         private final JTextField jtextField;
         private String currentString;
-        private final String greaterMessage = "Number can't be greater 100!";
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = false;
         private SymptomAge symage;
 
@@ -204,16 +201,25 @@ public class SymptomAge {
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);
             }
             try {
+                if (numTxt.contains(" ")) {
+                    Runnable doHighlight = () -> {
+                        JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    };
+                    SwingUtilities.invokeLater(doHighlight);
+                    insertZero(this.currentString);
+                    this.insert = false;
+                    return;
+                }
                 Double d = Double.parseDouble(numTxt);
                 if (d > 100) {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), this.greaterMessage, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), Messages.percentageCanBbeGreaterThen100(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(this.currentString);
@@ -248,7 +254,7 @@ public class SymptomAge {
             } catch (NumberFormatException ex) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(this.symage.getModel().getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(this.currentString);

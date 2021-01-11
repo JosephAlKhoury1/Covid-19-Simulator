@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.client1.City;
-import models.location1.House;
-import models.location1.Location;
+import models.client.City;
+import models.location.House;
+import models.location.Location;
 
 /**
  *

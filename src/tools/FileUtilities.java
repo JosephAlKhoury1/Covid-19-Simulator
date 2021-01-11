@@ -7,12 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.client1.Day;
-import models.client1.Week;
-import models.location1.Location;
-import models.location1.LocationCategory;
-import models.member1.Member;
-import models.member1.SpecifiedLocation;
+import models.client.Week;
+import models.member.Member;
+import models.member.SpecifiedLocation;
 
 /**
  *

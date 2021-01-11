@@ -20,7 +20,7 @@ public class NewModelDialog extends JDialog {
         this.frame = rf;
         this.setAlwaysOnTop(true);
         this.setLocation(370, 150);
-        this.setSize(470, 300);
+        this.setSize(545, 475);
         this.setResizable(false);
         addWindowListener(new WindowAdapter() {
 

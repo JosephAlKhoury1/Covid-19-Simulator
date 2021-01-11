@@ -19,7 +19,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import models.client1.Data;
+import models.client.Data;
 import models.model.ReligionName;
 import views1.MainFrame;
 import views1.model.dialog.ManageReligionDialog;

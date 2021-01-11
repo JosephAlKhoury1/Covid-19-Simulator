@@ -1,5 +1,8 @@
 package views1;
 
+import views1.city.panel.LocationListPanel;
+import views1.city.panel.Maps;
+import views1.city.panel.CityPanel;
 import controller.controllers.HumanAgeNameController;
 import controller.controllers.HumanStateNameController;
 import views1.model.panel.ModelPanel;
@@ -8,6 +11,7 @@ import controller.controllers.ReligionNameController;
 import controller.controllers.SymptomNameController;
 import controller.controllers.SymptomStageNameController;
 import controller.locationController.CityController;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -17,21 +21,25 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
-import models.client1.City;
+import models.client.City;
 import models.model.HumanAgeName;
 import models.model.HumanStatName;
 import models.model.Model;
+import models.model.PauseTime;
 import models.model.ReligionName;
 import models.model.SymptomName;
 import models.model.SymptomStageName;
-import resources.icon.Messages;
-import views.dialog1.LoadCityDialog;
-import views.dialog1.NewCityDialog;
+import resources.icon.Icons;
+import resources.Messages.Messages;
+import tools.Excel;
+import views1.city.dialog.LoadCityDialog;
+import views1.city.dialog.NewCityDialog;
 import views1.model.dialog.LoadModelDialog;
 import views1.model.dialog.NewModelDialog;
 import views1.model.dialog.ManageHumanAgeDialog;
 import views1.model.dialog.ManageReligionDialog;
 import views1.model.dialog.ManageSymptomStageDialog;
+import views1.model.panel.FileChooser;
 
 public class MainFrame extends JFrame {
 
@@ -53,6 +61,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         this.listModelPanel = new ArrayList();
+
         this.listModel = new ArrayList();
         this.listSymptomName = SymptomNameController.INSTANCE.selectAll();
         this.listSymptomStageNames = SymptomStageNameController.INSTANCE.selectAll();
@@ -64,6 +73,11 @@ public class MainFrame extends JFrame {
             this.humanStatTab[i] = this.listHumanStatName.get(i).getName();
         }
         initComponents();
+        jMenu5.setVisible(false);
+        jMenu2.setVisible(false);
+        symptomMenu.setVisible(false);
+        religionMenuItem.setVisible(false);
+
         this.jTabbedPane2.removeTabAt(0);
 
         this.currentCity = CityController.INSTANCE.getMainCity(1);
@@ -187,7 +201,6 @@ public class MainFrame extends JFrame {
 
         for (Model m : this.listModel) {
             m.setCity(this.currentCity);
-            // m.getModelPanel().reinitLocationPanel();
             m.getModelPanel().getModelLocationsPanel().reinit();
         }
 
@@ -218,6 +231,35 @@ public class MainFrame extends JFrame {
         this.currentModel.save();
         this.jTabbedPane2.addTab(this.currentModel.getModelName(), this.currentModelPanel);
         this.jTabbedPane2.setTabComponentAt(this.jTabbedPane2.getTabCount() - 1, this.currentModelPanel.getButton());
+        this.repaint();
+    }
+
+    public void newModel(Model model) {
+        City c = null;
+        if (this.currentCity != null) {
+            try {
+                c = (City) this.currentCity.clone();
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (c != null) {
+            model.setCity(c);
+        }
+        model.setMainFrame(this);
+        this.currentModelPanel = new ModelPanel(this, model, this.jTabbedPane2);
+        this.currentModel = model;
+        this.generateLocationMenu.add(this.currentModel.getMapMenu());
+        this.generatePopulationMenu.add(this.currentModel.getPopulationMenu());
+        this.runMenu.add(this.currentModel.getRunMenu());
+        this.pauseMenu.add(this.currentModel.getPauseMenu());
+
+        this.listModel.add(this.currentModel);
+        this.listModelPanel.add(this.currentModelPanel);
+        this.currentModel.save();
+        this.jTabbedPane2.addTab(this.currentModel.getModelName(), this.currentModelPanel);
+        this.jTabbedPane2.setTabComponentAt(this.jTabbedPane2.getTabCount() - 1, this.currentModelPanel.getButton());
+        this.jTabbedPane2.setSelectedIndex(this.jTabbedPane2.getTabCount() - 1);
         this.repaint();
     }
 
@@ -389,6 +431,7 @@ public class MainFrame extends JFrame {
         RefleshButton = new javax.swing.JButton();
         buildButton = new javax.swing.JButton();
         jSeparator5 = new javax.swing.JSeparator();
+        saveToFileButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         newModelMenuItem = new javax.swing.JMenuItem();
@@ -566,6 +609,15 @@ public class MainFrame extends JFrame {
 
         jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
+        saveToFileButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/icon/excelIcon.png"))); // NOI18N
+        saveToFileButton.setToolTipText("");
+        saveToFileButton.setEnabled(false);
+        saveToFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveToFileButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -597,7 +649,9 @@ public class MainFrame extends JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(RefleshButton)
+                .addComponent(RefleshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(saveToFileButton, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -606,7 +660,7 @@ public class MainFrame extends JFrame {
             .addComponent(newModelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jSeparator1)
             .addComponent(stopButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jSlider1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+            .addComponent(jSlider1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(RefleshButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(loadModelButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(loadCityButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -616,6 +670,7 @@ public class MainFrame extends JFrame {
             .addComponent(runButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(pauseButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jSeparator5)
+            .addComponent(saveToFileButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jMenu1.setText("File");
@@ -631,6 +686,11 @@ public class MainFrame extends JFrame {
 
         newCityMenuItem.setText("New city");
         newCityMenuItem.setToolTipText("create new city");
+        newCityMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newCityMenuItemActionPerformed(evt);
+            }
+        });
         jMenu1.add(newCityMenuItem);
         jMenu1.add(jSeparator2);
 
@@ -645,6 +705,11 @@ public class MainFrame extends JFrame {
 
         loadCityMenuItem.setText("Load city");
         loadCityMenuItem.setToolTipText("Load an existing city");
+        loadCityMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadCityMenuItemActionPerformed(evt);
+            }
+        });
         jMenu1.add(loadCityMenuItem);
         jMenu1.add(jSeparator3);
 
@@ -661,6 +726,11 @@ public class MainFrame extends JFrame {
         saveCityMenuItm.setText("Save city");
         saveCityMenuItm.setToolTipText("Save this city");
         saveCityMenuItm.setEnabled(false);
+        saveCityMenuItm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveCityMenuItmActionPerformed(evt);
+            }
+        });
         jMenu1.add(saveCityMenuItm);
         jMenu1.add(jSeparator4);
 
@@ -800,7 +870,7 @@ public class MainFrame extends JFrame {
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 644, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(168, Short.MAX_VALUE))
+                .addContainerGap(167, Short.MAX_VALUE))
         );
 
         pack();
@@ -835,7 +905,8 @@ public class MainFrame extends JFrame {
     }//GEN-LAST:event_saveModelButtonActionPerformed
 
     private void saveModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveModelMenuItemActionPerformed
-//        this.saveModel();
+        this.currentModel.save();
+        this.setModelSavedButtonDisable();
     }//GEN-LAST:event_saveModelMenuItemActionPerformed
 
     private void newCityButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newCityButtonActionPerformed
@@ -966,6 +1037,7 @@ public class MainFrame extends JFrame {
 
         if (mp != null) {
             this.setModelSavedButtonDisable();
+            this.saveToFileButton.setEnabled(false);
             this.currentModel = this.listModel.get(index - 1);
             this.jSlider1.setEnabled(true);
             this.jSlider1.setValue(this.currentModel.getCity().getSpeed());
@@ -974,7 +1046,9 @@ public class MainFrame extends JFrame {
                 this.runButton.setEnabled(false);
                 this.pauseButton.setEnabled(false);
                 this.jSlider1.setEnabled(false);
+                this.saveToFileButton.setEnabled(true);
             } else {
+                this.saveToFileButton.setEnabled(false);
                 if (this.currentModel.isRun()) {
                     this.runButton.setEnabled(false);
                 } else {
@@ -1020,12 +1094,13 @@ public class MainFrame extends JFrame {
             this.pauseButton.setEnabled(false);
             this.stopButton.setEnabled(false);
             this.buildButton.setEnabled(false);
+            this.saveToFileButton.setEnabled(false);
         }
     }//GEN-LAST:event_jTabbedPane2StateChanged
 
     private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
         if (this.currentModel.isPause()) {
-            this.currentModel.getCity().resume();
+            this.currentModel.getCity().resume("by");
         } else {
             this.currentModel.getCity().start();
         }
@@ -1036,16 +1111,23 @@ public class MainFrame extends JFrame {
     }//GEN-LAST:event_pauseButtonActionPerformed
 
     private void RefleshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RefleshButtonActionPerformed
+        int index = JOptionPane.showOptionDialog(this.currentModel.getModelPanel(), Messages.DoYouWantToRefresh(), "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, Icons.WARNINGICON, null, null);
+        if (index == JOptionPane.NO_OPTION || index == JOptionPane.CLOSED_OPTION) {
+            return;
+        }
         this.currentModel.refresh();
         this.RefleshButton.setEnabled(false);
+        this.saveToFileButton.setEnabled(false);
     }//GEN-LAST:event_RefleshButtonActionPerformed
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
         int index = JOptionPane.showOptionDialog(this.currentModel.getModelPanel(), Messages.STOPRUNNING, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
-        if (index == JOptionPane.NO_OPTION) {
+        if (index == JOptionPane.NO_OPTION || index == JOptionPane.CLOSED_OPTION) {
             return;
         }
         this.currentModel.getCity().stop();
+        this.saveToFileButton.setEnabled(true);
+
     }//GEN-LAST:event_stopButtonActionPerformed
 
     private void loadModelMenuItmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadModelMenuItmActionPerformed
@@ -1057,6 +1139,99 @@ public class MainFrame extends JFrame {
     private void buildButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buildButtonActionPerformed
         this.currentModel.generatePopulation();
     }//GEN-LAST:event_buildButtonActionPerformed
+
+    private void saveToFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveToFileButtonActionPerformed
+        JFrame f = new JFrame();
+        f.setSize(700, 500);
+        f.setLocation(300, 200);
+
+        FileChooser cf = new FileChooser(this.currentCity.getName() + " " + this.currentModel.getModelName());
+        cf.setSize(700, 500);
+        int r = cf.j.showSaveDialog(cf.j);
+        f.add(cf);
+
+        if (r == cf.j.APPROVE_OPTION) {
+            File file = cf.getFile();
+            Excel.writeResult(file, this.currentModel);
+        }
+    }//GEN-LAST:event_saveToFileButtonActionPerformed
+
+    private void loadCityMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadCityMenuItemActionPerformed
+        String ti = "New city";
+        String message = "Would you like to save this city and the result?";
+        if (this.currentCity != null) {
+            if (!this.currentCity.isIsSaved()) {
+                int reply = JOptionPane.showConfirmDialog(this, message, ti, JOptionPane.YES_NO_CANCEL_OPTION);
+                switch (reply) {
+                    case JOptionPane.YES_OPTION:
+                        this.currentCityPanel.getCity1().save();
+                        LoadCityDialog dialog = new LoadCityDialog(this);
+                        dialog.setVisible(true);
+                        this.setEnabled(false);
+                        break;
+                    case JOptionPane.NO_OPTION:
+                        LoadCityDialog dialo = new LoadCityDialog(this);
+                        dialo.setVisible(true);
+                        this.setEnabled(false);
+                        break;
+                    case JOptionPane.CANCEL_OPTION:
+                        return;
+                    default:
+                        return;
+                }
+            } else {
+                LoadCityDialog dialog = new LoadCityDialog(this);
+                dialog.setVisible(true);
+                this.setEnabled(false);
+            }
+        } else {
+            LoadCityDialog dialog = new LoadCityDialog(this);
+            dialog.setVisible(true);
+            this.setEnabled(false);
+        }
+        this.setCitySavedButtonDisable();
+    }//GEN-LAST:event_loadCityMenuItemActionPerformed
+
+    private void newCityMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newCityMenuItemActionPerformed
+        String ti = "New city";
+        String message = "Would you like to save this city and the result?";
+        if (this.currentCity != null) {
+            if (!this.currentCity.isIsSaved()) {
+                int reply = JOptionPane.showConfirmDialog(this, message, ti, JOptionPane.YES_NO_CANCEL_OPTION);
+                switch (reply) {
+                    case JOptionPane.YES_OPTION:
+                        this.currentCityPanel.getCity1().save();
+                        NewCityDialog dialo = new NewCityDialog(this);
+                        dialo.setVisible(true);
+                        this.setEnabled(false);
+                        break;
+                    case JOptionPane.NO_OPTION:
+                        NewCityDialog dialog = new NewCityDialog(this);
+                        dialog.setVisible(true);
+                        this.setEnabled(false);
+                        break;
+                    case JOptionPane.CANCEL_OPTION:
+                        return;
+                    default:
+                        return;
+                }
+            } else {
+                NewCityDialog dialog = new NewCityDialog(this);
+                dialog.setVisible(true);
+                this.setEnabled(false);
+            }
+        } else {
+            NewCityDialog dialog = new NewCityDialog(this);
+            dialog.setVisible(true);
+            this.setEnabled(false);
+        }
+        this.setCitySavedButtonDisable();
+    }//GEN-LAST:event_newCityMenuItemActionPerformed
+
+    private void saveCityMenuItmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveCityMenuItmActionPerformed
+        this.currentCity.save();
+        this.setCitySavedButtonDisable();
+    }//GEN-LAST:event_saveCityMenuItmActionPerformed
 
     public Maps getCurrentMap() {
         return currentMap;
@@ -1184,6 +1359,7 @@ public class MainFrame extends JFrame {
     private javax.swing.JMenuItem saveCityMenuItm;
     private javax.swing.JButton saveModelButton;
     private javax.swing.JMenuItem saveModelMenuItem;
+    public javax.swing.JButton saveToFileButton;
     private javax.swing.JCheckBoxMenuItem sexeDistributionMenu;
     private javax.swing.JPanel statistiquePanel;
     private javax.swing.JButton stopButton;
@@ -1191,4 +1367,5 @@ public class MainFrame extends JFrame {
     private javax.swing.JMenuItem symptomStageMenu;
     private javax.swing.JMenu toolsMenu;
     // End of variables declaration//GEN-END:variables
+
 }

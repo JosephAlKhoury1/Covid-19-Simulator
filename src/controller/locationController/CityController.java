@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import models.client1.City;
-import models.client1.HousePopulation;
-import models.client1.HumanCityAgeType;
-import models.client1.ReligionType;
-import models.client1.SexeType;
-import models.location1.LocationCategory;
+import models.client.City;
+import models.client.HousePopulation;
+import models.client.HumanCityAgeType;
+import models.client.ReligionType;
+import models.client.SexeType;
+import models.location.LocationCategory;
 
 public class CityController {
 

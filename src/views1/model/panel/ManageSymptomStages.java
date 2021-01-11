@@ -4,7 +4,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JOptionPane;
 import models.model.Model;
 import models.model.SymptomStage;
-import resources.icon.Messages;
+import resources.Messages.Messages;
 import views1.MainFrame;
 import views1.model.dialog.ManageSymptomStagesDialog;
 
@@ -274,6 +274,7 @@ public class ManageSymptomStages extends javax.swing.JPanel {
                 SymptomStage stage = new SymptomStage(name, 0.0, 0.0, index, inHospital, frame.getCurrentModel());
 
                 this.frame.getCurrentModel().addNewSymptomStage(stage);
+                this.model.getModelPanel().getStatistiquePane().reinitStagePanel();
                 frame.setModelSavedButtonEnable();
                 this.frame.setEnabled(true);
                 this.dialog.dispose();

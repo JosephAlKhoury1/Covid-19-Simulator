@@ -24,11 +24,10 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import models.client1.MonteCarlo;
-import resources.icon.Colors;
+import Properties.MonteCarlo;
+import resources.Colors.Colors;
 import resources.icon.Icons;
-import resources.icon.Messages;
-import views1.MainFrame;
+import resources.Messages.Messages;
 
 public class HumanAge {
 
@@ -55,11 +54,27 @@ public class HumanAge {
     private List<SymptomAge> listSymptomAges;
     private List<SymptomAge> listSymptomAgesDeleted;
 
+    private boolean minAgeValid = false, maxAgeValid = false;
+
     public HumanAge(int id, String name, int minAge, int maxAge) {
         this.id = id;
         this.name = name;
         this.minAge = minAge;
         this.maxAge = maxAge;
+
+        if (minAge != -1) {
+            this.minAgeValid = true;
+        } else {
+            this.minAgeValid = false;
+            this.name = "Invalid";
+        }
+
+        if (maxAge != -1) {
+            this.maxAgeValid = true;
+        } else {
+            this.maxAgeValid = false;
+            this.name = "Invalid";
+        }
 
         this.isNew = false;
         this.saved = true;
@@ -123,10 +138,24 @@ public class HumanAge {
     }
 
     public HumanAge(String name, int minAge, int maxAge, List<SymptomType> listSymptom, Model model) {
-        this.name = "between " + minAge + " and " + maxAge;
+        this.name = "Between " + minAge + " and " + maxAge;
         this.minAge = minAge;
         this.maxAge = maxAge;
         this.model = model;
+        if (minAge != -1) {
+            this.minAgeValid = true;
+        } else {
+            this.minAgeValid = false;
+            this.name = "Invalid";
+        }
+
+        if (maxAge != -1) {
+            this.maxAgeValid = true;
+        } else {
+            this.maxAgeValid = false;
+            this.name = "Invalid";
+        }
+
         this.isNew = true;
         this.saved = false;
         this.deleted = false;
@@ -175,9 +204,9 @@ public class HumanAge {
         this.maxAgeTxt.getDocument().addDocumentListener(this.maxListener);
 
         this.panel = new JPanel();
-        this.panel.setPreferredSize(new Dimension(listSymptom.size() * 120, 35));
-//        this.panel.setMinimumSize(new Dimension(listSymptom.size() * 120, 35));
-//        this.panel.setMaximumSize(new Dimension(listSymptom.size() * 1200, 35));
+        this.panel.setPreferredSize(new Dimension(listSymptom.size() * 120 + 460, 35));
+        this.panel.setMinimumSize(new Dimension(listSymptom.size() * 120 + 460, 35));
+        this.panel.setMaximumSize(new Dimension(listSymptom.size() * 1200, 35));
         this.panel.setBorder(BorderFactory.createEtchedBorder());
         this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
 
@@ -223,6 +252,131 @@ public class HumanAge {
         });
         this.panel.add(removeButton);
         removeButton.setIcon(Icons.DELETEICON);
+        checkValid();
+    }
+
+    public HumanAge(HumanAge old, Model model) {
+        this.name = "Between " + old.minAge + " and " + old.maxAge;
+        this.minAge = old.minAge;
+        this.maxAge = old.maxAge;
+        this.model = model;
+        if (minAge != -1) {
+            this.minAgeValid = true;
+        } else {
+            this.minAgeValid = false;
+            this.name = "Invalid";
+        }
+
+        if (maxAge != -1) {
+            this.maxAgeValid = true;
+        } else {
+            this.maxAgeValid = false;
+            this.name = "Invalid";
+        }
+
+        this.isNew = true;
+        this.saved = false;
+        this.deleted = false;
+
+        this.listSymptomAgesDeleted = new ArrayList();
+
+        this.nameLabel = new JLabel(name);
+        this.nameLabel.setPreferredSize(new Dimension(130, 31));
+        this.nameLabel.setMaximumSize(new Dimension(130, 31));
+        this.nameLabel.setMinimumSize(new Dimension(130, 31));
+        this.nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        this.nameLabel.setToolTipText("");
+        this.nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.nameLabel.setBorder(BorderFactory.createEtchedBorder());
+
+        this.cName = Box.createVerticalStrut(3);
+
+        this.minAgeTxt = new JTextField(this.minAge + "");
+        this.minAgeTxt.setPreferredSize(new Dimension(130, 31));
+        this.minAgeTxt.setMaximumSize(new Dimension(130, 31));
+        this.minAgeTxt.setMinimumSize(new Dimension(130, 31));
+        this.minAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
+        this.minAgeTxt.setToolTipText("");
+        this.minAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.minAgeTxt.setBackground(new Color(255, 204, 51));
+
+        this.cMinAge = Box.createHorizontalStrut(3);
+
+        this.maxAgeTxt = new JTextField(this.maxAge + "");
+        this.maxAgeTxt.setPreferredSize(new Dimension(130, 31));
+        this.maxAgeTxt.setMaximumSize(new Dimension(130, 31));
+        this.maxAgeTxt.setMinimumSize(new Dimension(130, 31));
+        this.maxAgeTxt.setHorizontalAlignment(SwingConstants.CENTER);
+        this.maxAgeTxt.setToolTipText("");
+        this.maxAgeTxt.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.maxAgeTxt.setBackground(new Color(255, 204, 51));
+
+        this.cMaxAge = Box.createHorizontalStrut(3);
+
+        this.minListener = new JTextFieldMinIntegerListener(this.minAgeTxt, this);
+        this.minAgeTxt.addFocusListener(this.minListener);
+        this.minAgeTxt.getDocument().addDocumentListener(this.minListener);
+
+        this.maxListener = new JTextFieldMaxIntegerListener(this.maxAgeTxt, this);
+        this.maxAgeTxt.addFocusListener(this.maxListener);
+        this.maxAgeTxt.getDocument().addDocumentListener(this.maxListener);
+
+        this.panel = new JPanel();
+        this.panel.setPreferredSize(new Dimension(model.getListSymptomType().size() * 120 + 460, 35));
+        this.panel.setMinimumSize(new Dimension(model.getListSymptomType().size() * 120 + 460, 35));
+        this.panel.setBorder(BorderFactory.createEtchedBorder());
+        this.panel.setLayout(new BoxLayout(this.panel, BoxLayout.X_AXIS));
+
+        this.cPanel = Box.createVerticalStrut(3);
+
+        this.panel.add(this.nameLabel);
+        this.panel.add(this.minAgeTxt);
+        this.panel.add(this.maxAgeTxt);
+
+        this.listSymptomAges = new ArrayList();
+        double sum = 0;
+        for (SymptomType stn : model.getListSymptomType()) {
+            double percentage = 0.0;
+            for (SymptomAge sa : old.getListSymptomAges()) {
+                if (sa.getHumanAge().getMinAge() == this.minAge && sa.getHumanAge().getMaxAge() == this.maxAge && sa.getSymptomType().getName().equals(stn.getName())) {
+                    percentage = sa.getPercentage();
+                    break;
+                }
+            }
+            SymptomAge sa = new SymptomAge(this, stn, percentage, model);
+            this.listSymptomAges.add(sa);
+            this.panel.add(sa.getPercentageTxt());
+            sum += sa.getPercentage();
+        }
+
+        if (sum != 100) {
+            this.nameLabel.setBackground(Colors.WARNINGCOLOR);
+            this.nameLabel.setIcon(Icons.WARNINGICON);
+            this.nameLabel.setToolTipText(Messages.AGEPERCENTAGEWARNING);
+            for (SymptomAge sa : this.listSymptomAges) {
+                sa.getPercentageTxt().setBackground(Colors.WARNINGCOLOR);
+            }
+        } else {
+            this.nameLabel.setBackground(Colors.WHITE);
+            this.nameLabel.setIcon(null);
+            this.nameLabel.setToolTipText(null);
+            for (SymptomAge sa : this.listSymptomAges) {
+                sa.getPercentageTxt().setBackground(Colors.WHITE);
+            }
+        }
+        removeButton = new JButton();
+        removeButton.setPreferredSize(new Dimension(40, 35));
+        removeButton.setMinimumSize(new Dimension(40, 35));
+        removeButton.setMaximumSize(new Dimension(40, 35));
+        removeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeActionPerformed();
+            }
+        });
+        this.panel.add(removeButton);
+        removeButton.setIcon(Icons.DELETEICON);
+        checkValid();
     }
 
     public Component getcPanel() {
@@ -285,6 +439,7 @@ public class HumanAge {
             }
         }
         this.panel.add(removeButton);
+        checkValid();
     }
 
     public void setcPanel(Component cPanel) {
@@ -293,9 +448,9 @@ public class HumanAge {
 
     public void removeActionPerformed() {
 
-        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETEHUMANAGE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+        int index = JOptionPane.showOptionDialog(this.model.getMainFrame(), Messages.DELETEHUMANAGE, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, Icons.WARNINGICON, null, null);
 
-        if (index == JOptionPane.NO_OPTION) {
+        if (index == JOptionPane.NO_OPTION || index == JOptionPane.CLOSED_OPTION) {
             return;
         }
         this.setDeleted(true);
@@ -429,6 +584,22 @@ public class HumanAge {
         return cMaxAge;
     }
 
+    public boolean isMinAgeValid() {
+        return minAgeValid;
+    }
+
+    public void setMinAgeValid(boolean minAgeValid) {
+        this.minAgeValid = minAgeValid;
+    }
+
+    public boolean isMaxAgeValid() {
+        return maxAgeValid;
+    }
+
+    public void setMaxAgeValid(boolean maxAgeValid) {
+        this.maxAgeValid = maxAgeValid;
+    }
+
     public void setcMaxAge(Component cMaxAge) {
         this.cMaxAge = cMaxAge;
     }
@@ -517,6 +688,25 @@ public class HumanAge {
         this.panel.repaint();
     }
 
+    private void checkValid() {
+        if (!this.minAgeValid || !this.maxAgeValid) {
+            this.nameLabel.setIcon(Icons.WARNINGICON);
+            this.nameLabel.setToolTipText(Messages.ThisAgeIsInvalid());
+            nameLabel.setText("Invalid");
+
+            for (SymptomAge lg : this.listSymptomAges) {
+                lg.getPercentageTxt().setEnabled(false);
+            }
+        } else {
+            this.nameLabel.setIcon(null);
+            this.nameLabel.setToolTipText(null);
+            nameLabel.setText("Between " + this.minAge + " and " + this.maxAge);
+            for (SymptomAge lg : this.listSymptomAges) {
+                lg.getPercentageTxt().setEnabled(true);
+            }
+        }
+    }
+
     public void removeSymptomType(SymptomType st) {
         SymptomAge tmp = null;
         double newPer = 0;
@@ -554,10 +744,7 @@ public class HumanAge {
 
         private JTextField jtextField;
 
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
         private boolean insert = true;
-        private final String numberHigher = "Min age can't be higher or equal to max age!";
         private HumanAge humanAge;
 
         public JTextFieldMinIntegerListener(JTextField textField, HumanAge humanAge) {
@@ -578,25 +765,26 @@ public class HumanAge {
         @Override
         public void insertUpdate(DocumentEvent e) {
             String numTxt = this.jtextField.getText();
+            if ("-1".equals(numTxt) || "-".equals(numTxt)) {
+                if (!this.humanAge.isMinAgeValid()) {
+                    return;
+                }
+            }
             if (numTxt.contains("f") || numTxt.contains("d")) {
                 this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(minAge + "");
                 return;
             }
             try {
-                int d = Integer.parseInt(numTxt);
-                if (!insert) {
-                    model.getMainFrame().setModelSavedButtonEnable();
-                }
-
+                Integer.parseInt(numTxt);
             } catch (NumberFormatException ex) {
                 insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(minAge + "");
@@ -606,13 +794,17 @@ public class HumanAge {
         @Override
         public void removeUpdate(DocumentEvent e) {
             String numTxt = this.jtextField.getText();
+            if ("-1".equals(numTxt) || "-".equals(numTxt)) {
+                if (!this.humanAge.isMinAgeValid()) {
+                    return;
+                }
+            }
             if (insert) {
                 return;
             }
             if (numTxt.length() <= 0 || numTxt.equals("")) {
                 return;
             }
-            model.getMainFrame().setModelSavedButtonEnable();
         }
 
         @Override
@@ -631,32 +823,41 @@ public class HumanAge {
                 insert = true;
                 insertZero(minAge + "");
                 return;
+            } else if ("-1".equals(numtxt) || "-".equals(numtxt)) {
+                insert = true;
+                if (!this.humanAge.isMinAgeValid()) {
+                    insertZero(minAge + "");
+                    return;
+                }
             } else {
                 insert = true;
             }
             int d = Integer.parseInt(numtxt);
-            if (d >= maxAge) {
+            if (d >= maxAge && this.humanAge.isMaxAgeValid()) {
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberHigher, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.minAgeCantBeHigherThanMaxAge(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(minAge + "");
             } else {
                 boolean isOk = true;
                 for (HumanAge ha : model.getListHumanAge()) {
-                    if (ha.getMinAge() <= d && ha.getMaxAge() >= d && this.humanAge != ha) {
-                        isOk = false;
-                        break;
+                    if (ha.isMinAgeValid() && ha.isMaxAgeValid()) {
+                        if (this.humanAge != ha && ha.getMinAge() <= d && ha.getMaxAge() >= d) {
+                            isOk = false;
+                            break;
+                        }
                     }
                 }
                 if (isOk) {
                     minAge = d;
-                    name = "between " + minAge + " and " + maxAge;
-                    nameLabel.setText(name);
+                    this.humanAge.checkValid();
+                    this.humanAge.setMinAgeValid(true);
+                    model.getMainFrame().setModelSavedButtonEnable();
                     this.humanAge.setSaved(false);
                 } else {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberHigher, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(model.getMainFrame(), Messages.ThisAgeIsContainsInOtherAge(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(minAge + "");
@@ -669,10 +870,6 @@ public class HumanAge {
     private class JTextFieldMaxIntegerListener implements DocumentListener, FocusListener {
 
         private JTextField jtextField;
-        private final String numberFormat = "Parameter have to be a number!";
-        private final String badNumberValueTitle = "Bad Parameter";
-        private boolean insert = true;
-        private final String numberLower = "Max age can't be lower or equal to min age!";
         private HumanAge humanAge;
 
         public JTextFieldMaxIntegerListener(JTextField textField, HumanAge humanAge) {
@@ -693,25 +890,24 @@ public class HumanAge {
         @Override
         public void insertUpdate(DocumentEvent e) {
             String numTxt = this.jtextField.getText();
+            if (numTxt.equals("-1") || numTxt.equals("-")) {
+                if (!this.humanAge.isMaxAgeValid()) {
+                    return;
+                }
+            }
             if (numTxt.contains("f") || numTxt.contains("d")) {
-                this.insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(maxAge + "");
                 return;
             }
             try {
-                int d = Integer.parseInt(numTxt);
-                if (!insert) {
-                    model.getMainFrame().setModelSavedButtonEnable();
-                }
-
+                Integer.parseInt(numTxt);
             } catch (NumberFormatException ex) {
-                insert = true;
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberFormat, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.badNumberFormat(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(maxAge + "");
@@ -721,10 +917,11 @@ public class HumanAge {
         @Override
         public void removeUpdate(DocumentEvent e) {
             String numTxt = this.jtextField.getText();
-            if (numTxt.length() <= 0 || numTxt.equals("")) {
-                return;
+            if (numTxt.equals("-1") || numTxt.equals("-")) {
+                if (!this.humanAge.isMaxAgeValid()) {
+                    return;
+                }
             }
-            model.getMainFrame().setModelSavedButtonEnable();
         }
 
         @Override
@@ -733,42 +930,47 @@ public class HumanAge {
 
         @Override
         public void focusGained(FocusEvent e) {
-            insert = false;
         }
 
         @Override
         public void focusLost(FocusEvent e) {
             String numTxt = this.jtextField.getText();
+            numTxt = numTxt.trim();
             if (numTxt.equals("")) {
-                insert = true;
                 insertZero(maxAge + "");
                 return;
-            } else {
-                insert = true;
+            } else if (numTxt.equals("-1") || numTxt.equals("-")) {
+                if (!this.humanAge.isMaxAgeValid()) {
+                    insertZero(maxAge + "");
+                    return;
+                }
             }
             int d = Integer.parseInt(numTxt);
-            if (d <= minAge) {
+            if (d <= minAge && this.humanAge.isMinAgeValid()) {
                 Runnable doHighlight = () -> {
-                    JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                    JOptionPane.showOptionDialog(model.getMainFrame(), Messages.maxAgeCantBeLowerThanMinAge(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                 };
                 SwingUtilities.invokeLater(doHighlight);
                 insertZero(maxAge + "");
             } else {
                 boolean isOk = true;
                 for (HumanAge ha : model.getListHumanAge()) {
-                    if (ha.getMinAge() <= d && ha.getMaxAge() >= d && this.humanAge != ha) {
-                        isOk = false;
-                        break;
+                    if (ha.isMinAgeValid() && ha.isMaxAgeValid()) {
+                        if (this.humanAge != ha && ha.getMinAge() <= d && ha.getMaxAge() >= d) {
+                            isOk = false;
+                            break;
+                        }
                     }
                 }
                 if (isOk) {
                     maxAge = d;
-                    name = "between " + minAge + " and " + maxAge;
-                    nameLabel.setText(name);
+                    this.humanAge.setMaxAgeValid(true);
+                    model.getMainFrame().setModelSavedButtonEnable();
                     this.humanAge.setSaved(false);
+                    this.humanAge.checkValid();
                 } else {
                     Runnable doHighlight = () -> {
-                        JOptionPane.showOptionDialog(model.getMainFrame(), this.numberLower, this.badNumberValueTitle, JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
+                        JOptionPane.showOptionDialog(model.getMainFrame(), Messages.ThisAgeIsContainsInOtherAge(), Messages.error(), JOptionPane.CLOSED_OPTION, JOptionPane.ERROR_MESSAGE, null, null, null);
                     };
                     SwingUtilities.invokeLater(doHighlight);
                     insertZero(maxAge + "");
